@@ -1,0 +1,394 @@
+import { useControlledState } from '@rc-component/util';
+import type { GetRef, SelectProps } from 'antd';
+import { ConfigProvider, Select } from 'antd';
+import React, { useImperativeHandle, useMemo, useRef, useState } from 'react';
+import useSWR from 'swr';
+import {
+  nanoid,
+  objectToMap,
+  ProFieldValueEnumType,
+  RequestOptionsType,
+  useDebounceValue,
+  useDeepCompareEffect,
+  useDeepCompareMemo,
+  useRefFunction,
+} from '../../../utils';
+import {
+  isProFieldEditOrUpdateMode,
+  isProFieldReadMode,
+} from '../../internal/fieldMode';
+import type { ProFieldFC } from '../../types';
+import { FieldSelectLightEdit } from './FieldSelectLightEdit';
+import { FieldSelectRead } from './FieldSelectRead';
+import { FieldSelectSearchEdit } from './FieldSelectSearchEdit';
+import type { FieldSelectProps } from './types';
+
+export type { FieldSelectProps };
+
+type SelectOptionType = Partial<RequestOptionsType>[];
+
+/**
+ * 递归筛选 item
+ *
+ * @param item
+ * @param keyWords
+ * @returns
+ */
+function filerByItem(
+  item: {
+    label: string;
+    value: string;
+    optionType: string;
+    children: any[];
+    options: any[];
+  },
+  keyWords?: string,
+) {
+  if (!keyWords) return true;
+  if (
+    item?.label?.toString().toLowerCase().includes(keyWords.toLowerCase()) ||
+    item?.value?.toString().toLowerCase().includes(keyWords.toLowerCase())
+  ) {
+    return true;
+  }
+  if (item.children || item.options) {
+    const findItem = [...(item.children || []), item.options || []].find(
+      (mapItem) => {
+        return filerByItem(mapItem, keyWords);
+      },
+    );
+    if (findItem) return true;
+  }
+  return false;
+}
+
+/**
+ * 把 value 的枚举转化为数组
+ *
+ * @param valueEnumParams
+ */
+export const proFieldParsingValueEnumToArray = (
+  valueEnumParams: ProFieldValueEnumType,
+): SelectOptionType => {
+  const enumArray: Partial<
+    RequestOptionsType & {
+      text: string;
+      /** 是否禁用 */
+      disabled?: boolean;
+    }
+  >[] = [];
+  const valueEnum = objectToMap(valueEnumParams);
+
+  valueEnum.forEach((_, key) => {
+    const value = (valueEnum.get(key) || valueEnum.get(`${key}`)) as {
+      text: string;
+      disabled?: boolean;
+    };
+
+    if (!value) {
+      return;
+    }
+
+    if (typeof value === 'object' && value?.text) {
+      enumArray.push({
+        text: value?.text as unknown as string,
+        value: key,
+        label: value?.text as unknown as string,
+        disabled: value.disabled,
+      });
+      return;
+    }
+    enumArray.push({
+      text: value as unknown as string,
+      value: key,
+    });
+  });
+  return enumArray;
+};
+
+export const useFieldFetchData = (
+  props: FieldSelectProps & {
+    proFieldKey?: React.Key;
+    defaultKeyWords?: string;
+    cacheForSwr?: boolean;
+  },
+): [boolean, SelectOptionType, (keyWord?: string) => void, () => void] => {
+  const { cacheForSwr, fieldProps } = props;
+
+  const [keyWords, setKeyWords] = useState<string | undefined>(
+    props.defaultKeyWords,
+  );
+  /** Key 是用来缓存请求的，如果不在是有问题 */
+  const [cacheKey] = useState(() => {
+    if (props.proFieldKey) {
+      return props.proFieldKey.toString();
+    }
+    if (props.request) {
+      return nanoid();
+    }
+    return 'no-fetch';
+  });
+
+  const proFieldKeyRef = useRef(cacheKey);
+
+  const getOptionsFormValueEnum = useRefFunction(
+    (coverValueEnum: ProFieldValueEnumType) => {
+      return proFieldParsingValueEnumToArray(objectToMap(coverValueEnum)).map(
+        ({ value, text, ...rest }) => ({
+          label: text,
+          value,
+          key: value,
+          ...rest,
+        }),
+      );
+    },
+  );
+
+  const defaultOptions = useDeepCompareMemo(() => {
+    if (!fieldProps) return undefined;
+    const data = fieldProps?.options || fieldProps?.treeData;
+    if (!data) return undefined;
+    const { children, label, value } = fieldProps.fieldNames || {};
+    const traverseFieldKey = (
+      _options: typeof options,
+      type: 'children' | 'label' | 'value',
+    ) => {
+      if (!_options?.length) return;
+      const length = _options.length;
+      let i = 0;
+      while (i < length) {
+        const cur = _options[i++];
+        if (cur[children] || cur[label] || cur[value]) {
+          cur[type] =
+            cur[
+              type === 'children' ? children : type === 'label' ? label : value
+            ];
+          traverseFieldKey(cur[children], type);
+        }
+      }
+    };
+
+    if (children) traverseFieldKey(data, 'children');
+    if (label) traverseFieldKey(data, 'label');
+    if (value) traverseFieldKey(data, 'value');
+    return data;
+  }, [fieldProps]);
+
+  const [options, setOptions] = useControlledState<SelectOptionType>(
+    () => (props.valueEnum ? getOptionsFormValueEnum(props.valueEnum) : []),
+    defaultOptions,
+  );
+
+  useDeepCompareEffect(() => {
+    // 优先使用 fieldProps?.options
+    if (
+      !props.valueEnum ||
+      props.fieldProps?.options ||
+      props.fieldProps?.treeData
+    )
+      return;
+    setOptions(getOptionsFormValueEnum(props.valueEnum));
+  }, [props.valueEnum]);
+
+  const swrKey = useDebounceValue(
+    [proFieldKeyRef.current, props.params, keyWords] as const,
+    props.debounceTime ?? props?.fieldProps?.debounceTime ?? 0,
+    [props.params, keyWords],
+  );
+
+  const {
+    data,
+    mutate: setLocaleData,
+    isValidating,
+  } = useSWR(
+    () => {
+      if (!props.request) {
+        return null;
+      }
+
+      return swrKey;
+    },
+    ([, params, kw]) =>
+      props.request!(
+        {
+          ...params,
+          keyWords: kw,
+        },
+        props,
+      ),
+    {
+      revalidateIfStale: !cacheForSwr,
+      revalidateOnReconnect: cacheForSwr,
+      shouldRetryOnError: false,
+      revalidateOnFocus: false,
+    },
+  );
+
+  const resOptions = useMemo(() => {
+    const opt = options?.map((item) => {
+      if (typeof item === 'string') {
+        return {
+          label: item,
+          value: item,
+        };
+      }
+      if (item.children || item.options) {
+        const childrenOptions = [
+          ...(item.children || []),
+          ...(item.options || []),
+        ].filter((mapItem) => {
+          return filerByItem(mapItem, keyWords);
+        });
+        return {
+          ...item,
+          children: childrenOptions,
+          options: childrenOptions,
+        };
+      }
+      return item;
+    });
+
+    // filterOption 为 true 时 filter数据, filterOption 默认为true
+    if (
+      props.fieldProps?.filterOption === true ||
+      props.fieldProps?.filterOption === undefined
+    ) {
+      return opt?.filter((item) => {
+        if (!item) return false;
+        if (!keyWords) return true;
+        return filerByItem(item as any, keyWords);
+      });
+    }
+
+    return opt;
+  }, [options, keyWords, props.fieldProps?.filterOption]);
+
+  return [
+    isValidating,
+    props.request ? (data as SelectOptionType) : resOptions,
+    (fetchKeyWords?: string) => {
+      setKeyWords(fetchKeyWords);
+    },
+    () => {
+      setKeyWords(undefined);
+      setLocaleData([], false);
+    },
+  ];
+};
+
+/**
+ * 可以根据 valueEnum 来进行类型的设置
+ *
+ * @param
+ */
+const FieldSelect: ProFieldFC<
+  FieldSelectProps & Pick<SelectProps, 'fieldNames' | 'style' | 'className'>
+> = (props, ref) => {
+  const {
+    mode,
+    valueEnum,
+    render,
+    formItemRender,
+    request: _request,
+    fieldProps,
+    light,
+    proFieldKey: _proFieldKey,
+    params: _params,
+    label,
+    variant,
+    id,
+    lightLabel,
+    labelTrigger,
+  } = props;
+
+  const inputRef = useRef<GetRef<typeof Select>>(null);
+  
+  const { fieldNames } = fieldProps;
+
+  const [loading, options, fetchData, resetData] = useFieldFetchData(props);
+  const { componentSize: componentSizeFromConfig } =
+    ConfigProvider?.useConfig?.() || {
+      componentSize: undefined,
+    };
+  const componentSize = componentSizeFromConfig ?? 'middle';
+  useImperativeHandle(
+    ref,
+    () => ({
+      ...(inputRef.current || {}),
+      fetchData: (keyWord: string) => fetchData(keyWord),
+    }),
+    [fetchData],
+  );
+
+  const optionsValueEnum = useMemo(() => {
+    if (!isProFieldReadMode(mode)) return;
+
+    const {
+      label: labelPropsName = 'label',
+      value: valuePropsName = 'value',
+      options: optionsPropsName = 'options',
+    } = fieldNames || {};
+
+    const valuesMap = new Map();
+
+    const traverseOptions = (_options: typeof options) => {
+      if (!_options?.length) {
+        return valuesMap;
+      }
+      const length = _options.length;
+      let i = 0;
+      while (i < length) {
+        const cur = _options[i++];
+        valuesMap.set(cur[valuePropsName], cur[labelPropsName]);
+        traverseOptions(cur[optionsPropsName]);
+      }
+      return valuesMap;
+    };
+
+    return traverseOptions(options);
+  }, [fieldNames, mode, options]);
+
+  if (isProFieldReadMode(mode)) {
+    return (
+      <FieldSelectRead
+        mode={mode}
+        valueEnum={valueEnum}
+        render={render}
+        fieldProps={fieldProps}
+        optionsValueEnum={optionsValueEnum}
+        {...props}
+      />
+    );
+  }
+
+  if (isProFieldEditOrUpdateMode(mode)) {
+    const sharedEditProps = {
+      mode,
+      formItemRender,
+      fieldProps,
+      id,
+      label,
+      variant,
+      loading,
+      options,
+      fetchData,
+      resetData,
+      inputRef,
+      ...props,
+    };
+    if (light) {
+      return (
+        <FieldSelectLightEdit
+          lightLabel={lightLabel}
+          labelTrigger={labelTrigger}
+          {...sharedEditProps}
+          componentSize={componentSize}
+        />
+      );
+    }
+    return <FieldSelectSearchEdit {...sharedEditProps} />;
+  }
+  return null;
+};
+
+export default React.forwardRef(FieldSelect);

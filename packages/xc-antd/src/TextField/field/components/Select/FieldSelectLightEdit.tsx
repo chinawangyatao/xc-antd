@@ -1,0 +1,68 @@
+import type { GetRef } from 'antd';
+import { Select } from 'antd';
+import React from 'react';
+import type { RequestOptionsType } from '../../../utils';
+import type { ProFieldFC } from '../../types';
+import type { FieldSelectFullProps } from './FieldSelectSearchEdit';
+import LightSelect from './LightSelect';
+
+export type FieldSelectLightEditProps = Parameters<
+  ProFieldFC<FieldSelectFullProps>
+>[0] & {
+  intl?: any;
+  loading: boolean;
+  options: RequestOptionsType[];
+  fetchData: (keyWord?: string) => void;
+  resetData: () => void;
+  inputRef: React.RefObject<GetRef<typeof Select>>;
+  componentSize: string;
+};
+
+export function FieldSelectLightEdit(props: FieldSelectLightEditProps) {
+  const {
+    mode,
+    formItemRender,
+    fieldProps,
+    id,
+    label,
+    variant,
+    lightLabel,
+    labelTrigger,
+    intl,
+    loading,
+    options,
+    fetchData,
+    inputRef,
+    componentSize,
+    ...rest
+  } = props;
+
+  const dom = (
+    <LightSelect
+      id={id}
+      loading={loading}
+      ref={inputRef}
+      allowClear
+      size={componentSize as any}
+      options={options}
+      label={label}
+      labelVariant={variant}
+      placeholder={'请选择'}
+      lightLabel={lightLabel}
+      labelTrigger={labelTrigger}
+      fetchData={fetchData}
+      {...fieldProps}
+    />
+  );
+
+  if (formItemRender) {
+    return (
+      formItemRender(
+        rest.text,
+        { mode, ...fieldProps, options, loading },
+        dom,
+      ) ?? null
+    );
+  }
+  return dom;
+}

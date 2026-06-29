@@ -1,0 +1,25 @@
+import type { DependencyList } from 'react';
+import { useEffect, useState } from 'react';
+import { useLatest } from './useLatest';
+
+export function useDebounceValue<T>(
+  value: T,
+  delay: number = 100,
+  deps?: DependencyList,
+): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  const valueRef = useLatest(value);
+
+  useEffect(
+    () => {
+      const handler = setTimeout(() => {
+        setDebouncedValue(valueRef.current);
+      }, delay);
+
+      return () => clearTimeout(handler);
+    },
+    deps ? [delay, ...deps] : undefined,
+  );
+
+  return debouncedValue;
+}

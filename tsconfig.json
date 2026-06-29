@@ -1,0 +1,7 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/xc-antd/tsconfig.json"},
+    { "path": "./apps/docs/tsconfig.json" }
+  ]
+}

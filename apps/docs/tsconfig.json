@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
+    "jsx": "react-jsx",
+    "types": ["vite/client", "react", "react-dom"],
+    "paths": {
+      "@xc-antd/ui": ["../../packages/xc-antd/src/index.ts"]
+    },
+    // 开发模式下关闭引起大量红线的严格检查，改善 IDE 体验
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "erasableSyntaxOnly": false,
+    // 允许普通 import 导入类型，方便 antd 等组件库的使用
+    "verbatimModuleSyntax": false
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../../packages/xc-antd" }
+  ]
+}

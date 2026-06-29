@@ -1,0 +1,30 @@
+{
+  "name": "xc-antd",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "bun run --filter @xc-antd/docs dev",
+    "build": "bun run --filter @xc-antd/ui build",
+    "build:docs": "bun run --filter @xc-antd/docs build",
+    "lint": "eslint .",
+    "preview": "bun run --filter @xc-antd/docs preview"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.12.3",
+    "eslint": "^10.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.6.0",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.59.2"
+  },
+  "dependencies": {
+    "@ant-design/icons": "6.x"
+  }
+}
