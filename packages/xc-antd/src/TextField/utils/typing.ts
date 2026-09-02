@@ -98,6 +98,7 @@ export type ProFieldValueType =
   | 'cascader'
   | 'treeSelect'
   | 'color'
+  | 'tag'
   | 'segmented';
 
 export type ProFieldValueTypeInput =

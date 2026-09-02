@@ -12,6 +12,17 @@ export interface ColumnSettingItem {
   disabled: boolean;
 }
 
+export function getSearchActionOffset(
+  itemCount: number,
+  columnsPerRow: number,
+  columnSpan: number,
+): number {
+  const remainder = itemCount % columnsPerRow;
+  const emptyColumns =
+    (columnsPerRow - 1 - remainder + columnsPerRow) % columnsPerRow;
+  return emptyColumns * columnSpan;
+}
+
 export function getCrudColumnKey<
   RecordType extends object,
   Query extends CrudTableQuery,

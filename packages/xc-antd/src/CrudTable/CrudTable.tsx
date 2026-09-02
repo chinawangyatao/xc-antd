@@ -162,7 +162,6 @@ export function CrudTable<
     rowKey = 'id' as keyof RecordType & string,
     actionRef,
     search = {},
-    headerTitle,
     toolBarRender,
     rowActions,
     tableAlertRender,
@@ -605,9 +604,8 @@ export function CrudTable<
       )}
 
       <div className="xc-crud-table__toolbar">
-        <div className="xc-crud-table__title">{headerTitle}</div>
-        <div className="xc-crud-table__toolbar-actions">
-          {toolbar}
+        <div className="xc-crud-table__toolbar-primary">{toolbar}</div>
+        <div className="xc-crud-table__toolbar-options">
           <Space size={4}>
             {resolvedOptions.reload && (
               <Tooltip title="刷新">

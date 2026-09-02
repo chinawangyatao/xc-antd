@@ -5,6 +5,7 @@ import {
   columnSettingsToState,
   createColumnSettings,
   filterLocalData,
+  getSearchActionOffset,
   moveColumnSetting,
 } from '../src/CrudTable/utils';
 
@@ -89,5 +90,19 @@ describe('CrudTable query processing', () => {
 
     expect(filterLocalData(rows, { name: '张' }, columns)).toEqual([rows[0]]);
     expect(filterLocalData(rows, { status: 'disabled' }, columns)).toEqual([rows[1]]);
+  });
+});
+
+describe('CrudTable search grid', () => {
+  test('keeps actions in the fourth desktop grid cell', () => {
+    expect([1, 2, 3, 4, 5].map((count) =>
+      getSearchActionOffset(count, 4, 6),
+    )).toEqual([12, 6, 0, 18, 12]);
+  });
+
+  test('keeps actions in the second tablet grid cell', () => {
+    expect([1, 2, 3].map((count) =>
+      getSearchActionOffset(count, 2, 12),
+    )).toEqual([0, 12, 0]);
   });
 });

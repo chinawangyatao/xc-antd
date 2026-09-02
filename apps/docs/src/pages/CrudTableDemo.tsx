@@ -1,22 +1,27 @@
 import React from 'react';
 import {
   Button,
+  Col,
   Form,
   Input,
   message,
-  Modal,
   Popconfirm,
   Select,
   Tooltip,
   Typography,
+  Upload,
 } from 'antd';
 import {
   DeleteOutlined,
+  DownloadOutlined,
   EditOutlined,
   PlusOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import {
+  ActionDrawer,
   CrudTable,
+  FormGroup,
   type CrudTableAction,
   type CrudTableColumn,
   type CrudTableRequest,
@@ -29,6 +34,7 @@ interface UserRecord {
   department: 'product' | 'technology' | 'operation';
   role: string;
   status: 'enabled' | 'disabled';
+  tags: string[];
   phone: string;
   city: string;
   createdAt: string;
@@ -55,12 +61,24 @@ const statuses = {
   disabled: { text: '停用', status: 'Default' },
 };
 
+const userTags = {
+  vip: { text: 'VIP', color: 'gold' },
+  focus: { text: '重点关注', color: 'blue' },
+  new: { text: '新用户', color: 'green' },
+  risk: { text: '风险', status: 'Error' },
+};
+
 const initialMockUsers: UserRecord[] = Array.from({ length: 57 }, (_, index) => ({
   id: index + 1,
   name: ['张伟', '李娜', '王强', '赵敏', '陈晨'][index % 5] + (index + 1),
   department: (['product', 'technology', 'operation'] as const)[index % 3],
   role: ['产品经理', '前端工程师', '运营专员', '后端工程师'][index % 4],
   status: index % 4 === 0 ? 'disabled' : 'enabled',
+  tags: index % 4 === 0
+    ? ['risk']
+    : index % 3 === 0
+      ? ['vip', 'focus']
+      : ['new'],
   phone: `1380000${String(1000 + index).slice(-4)}`,
   city: ['北京', '上海', '青岛', '杭州'][index % 4],
   createdAt: `2026-${String((index % 8) + 1).padStart(2, '0')}-${String(
@@ -117,6 +135,7 @@ const CrudTableDemo = () => {
       record ?? {
         status: 'enabled',
         department: 'technology',
+        tags: ['new'],
       },
     );
     setEditorOpen(true);
@@ -139,10 +158,9 @@ const CrudTableDemo = () => {
         ...usersRef.current,
       ];
     }
-    setEditorOpen(false);
-    editorForm.resetFields();
     await message.success(editingUser ? '保存成功' : '新增成功');
     actionRef.current?.reload(true);
+    return true;
   };
 
   const deleteUsers = async (ids: number[]) => {
@@ -169,7 +187,7 @@ const CrudTableDemo = () => {
         dataIndex: 'name',
         valueType: 'text',
         copyable: true,
-        fixed: 'left',
+        // fixed: 'left',
         sorter: true,
         formItemProps: { rules: [{ max: 20, message: '最多输入 20 个字符' }] },
       },
@@ -190,6 +208,14 @@ const CrudTableDemo = () => {
         dataIndex: 'status',
         valueType: 'select',
         valueEnum: statuses,
+      },
+      {
+        title: '标签',
+        dataIndex: 'tags',
+        valueType: 'tag',
+        valueEnum: userTags,
+        hideInSearch: true,
+        width: 180,
       },
       {
         title: '手机号',
@@ -236,8 +262,35 @@ const CrudTableDemo = () => {
         rowKey="id"
         columns={columns}
         request={queryUsers}
-        headerTitle="用户管理"
-        search={{ defaultCollapsed: true, defaultColsNumber: 3 }}
+        search={{
+          defaultCollapsed: true,
+          defaultColsNumber: 3,
+          extraActions: ({ form }) => (
+            <>
+              <Upload
+                showUploadList={false}
+                beforeUpload={(file) => {
+                  void message.success(`已选择文件：${file.name}`);
+                  return Upload.LIST_IGNORE;
+                }}
+              >
+                <Tooltip title="上传">
+                  <Button aria-label="上传" icon={<UploadOutlined />} />
+                </Tooltip>
+              </Upload>
+              <Tooltip title="导出">
+                <Button
+                  aria-label="导出"
+                  icon={<DownloadOutlined />}
+                  onClick={() => {
+                    const values = form.getFieldsValue(true);
+                    void message.info(`按当前条件导出：${JSON.stringify(values)}`);
+                  }}
+                />
+              </Tooltip>
+            </>
+          ),
+        }}
         rowSelection
         onSelectionChange={setSelectedRows}
         rowActions={(record) => (
@@ -293,47 +346,79 @@ const CrudTableDemo = () => {
         adaptiveHeight={{ minHeight: 360, offsetBottom: 24 }}
       />
 
-      <Modal
+      <ActionDrawer
         title={editingUser ? '编辑用户' : '新增用户'}
         open={editorOpen}
-        onCancel={() => {
-          setEditorOpen(false);
-          editorForm.resetFields();
+        size={640}
+        onOpenChange={(open) => {
+          setEditorOpen(open);
+          if (!open) {
+            editorForm.resetFields();
+            setEditingUser(undefined);
+          }
         }}
-        onOk={() => void saveUser()}
-        destroyOnHidden
+        onConfirm={saveUser}
       >
         <Form form={editorForm} layout="vertical" preserve={false}>
-          <Form.Item name="name" label="姓名" rules={[{ required: true }]}>
-            <Input placeholder="请输入姓名" />
-          </Form.Item>
-          <Form.Item name="department" label="部门" rules={[{ required: true }]}>
-            <Select
-              options={Object.entries(departments).map(([value, item]) => ({
-                value,
-                label: item.text,
-              }))}
-            />
-          </Form.Item>
-          <Form.Item name="role" label="岗位" rules={[{ required: true }]}>
-            <Input placeholder="请输入岗位" />
-          </Form.Item>
-          <Form.Item name="status" label="状态" rules={[{ required: true }]}>
-            <Select
-              options={Object.entries(statuses).map(([value, item]) => ({
-                value,
-                label: item.text,
-              }))}
-            />
-          </Form.Item>
-          <Form.Item name="phone" label="手机号" rules={[{ required: true }]}>
-            <Input placeholder="请输入手机号" />
-          </Form.Item>
-          <Form.Item name="city" label="城市" rules={[{ required: true }]}>
-            <Input placeholder="请输入城市" />
-          </Form.Item>
+          <FormGroup title="基础信息">
+            <Col xs={24} md={12}>
+              <Form.Item name="name" label="姓名" rules={[{ required: true }]}>
+                <Input placeholder="请输入姓名" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item name="department" label="部门" rules={[{ required: true }]}>
+                <Select
+                  options={Object.entries(departments).map(([value, item]) => ({
+                    value,
+                    label: item.text,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item name="role" label="岗位" rules={[{ required: true }]}>
+                <Input placeholder="请输入岗位" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item name="status" label="状态" rules={[{ required: true }]}>
+                <Select
+                  options={Object.entries(statuses).map(([value, item]) => ({
+                    value,
+                    label: item.text,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item name="tags" label="标签" rules={[{ required: true }]}>
+                <Select
+                  mode="multiple"
+                  placeholder="请选择标签"
+                  options={Object.entries(userTags).map(([value, item]) => ({
+                    value,
+                    label: item.text,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+          </FormGroup>
+
+          <FormGroup title="联系信息">
+            <Col xs={24} md={12}>
+              <Form.Item name="phone" label="手机号" rules={[{ required: true }]}>
+                <Input placeholder="请输入手机号" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item name="city" label="城市" rules={[{ required: true }]}>
+                <Input placeholder="请输入城市" />
+              </Form.Item>
+            </Col>
+          </FormGroup>
         </Form>
-      </Modal>
+      </ActionDrawer>
     </div>
   );
 };

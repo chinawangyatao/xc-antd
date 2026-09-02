@@ -45,6 +45,46 @@ function Home() {
         </Space>
       </Card>
 
+      <Card hoverable onClick={() => navigate('/action-overlay')} style={{ cursor: 'pointer' }}>
+        <Title level={5} style={{ margin: 0 }}>
+          ActionDrawer / ActionModal
+        </Title>
+        <Paragraph style={{ color: '#666', marginTop: 8, marginBottom: 8 }}>
+          统一确认与取消顺序、底部左对齐和异步提交状态的操作容器。
+        </Paragraph>
+        <Space>
+          <Tag color="blue">抽屉优先</Tag>
+          <Tag>统一 Footer</Tag>
+        </Space>
+      </Card>
+
+      <Card hoverable onClick={() => navigate('/form-group')} style={{ cursor: 'pointer' }}>
+        <Title level={5} style={{ margin: 0 }}>
+          FormGroup
+        </Title>
+        <Paragraph style={{ color: '#666', marginTop: 8, marginBottom: 8 }}>
+          使用标识标题和栅格内容区组织较长表单。
+        </Paragraph>
+        <Space>
+          <Tag color="cyan">表单分组</Tag>
+          <Tag>React Children</Tag>
+        </Space>
+      </Card>
+
+      <Card hoverable onClick={() => navigate('/schema-form')} style={{ cursor: 'pointer' }}>
+        <Title level={5} style={{ margin: 0 }}>
+          SchemaForm
+        </Title>
+        <Paragraph style={{ color: '#666', marginTop: 8, marginBottom: 8 }}>
+          由配置驱动分组、字段、校验、联动和提交转换的重型表单。
+        </Paragraph>
+        <Space>
+          <Tag color="purple">配置表单</Tag>
+          <Tag>类型安全</Tag>
+          <Tag>字段联动</Tag>
+        </Space>
+      </Card>
+
       <Card>
         <Title level={4}>快速开始</Title>
         <pre

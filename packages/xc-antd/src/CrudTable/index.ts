@@ -14,6 +14,7 @@ export type {
   CrudTableRequest,
   CrudTableRequestParams,
   CrudTableRequestResult,
+  CrudTableSearchActionsContext,
   CrudTableSearchConfig,
   CrudValueEnum,
   CrudValueEnumItem,

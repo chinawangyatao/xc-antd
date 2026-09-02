@@ -25,6 +25,7 @@ import FieldSelect, {
 import FieldSlider from './components/Slider';
 import FieldStatus, { ProFieldBadgeColor } from './components/Status';
 import FieldSwitch from './components/Switch';
+import FieldTag from './components/Tag';
 import FieldText from './components/Text';
 import FieldTextArea from './components/TextArea';
 import FieldTimePicker, { FieldTimeRangePicker } from './components/TimePicker';
@@ -68,6 +69,7 @@ export {
   FieldSlider,
   FieldStatus,
   FieldSwitch,
+  FieldTag,
   FieldText,
   FieldTextArea,
   FieldTimePicker,

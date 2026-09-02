@@ -1,0 +1,22 @@
+.xc-schema-form {
+  width: 100%;
+}
+
+.xc-schema-form__submitter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-block-start: 8px;
+}
+
+.xc-schema-form__submitter--left {
+  justify-content: flex-start;
+}
+
+.xc-schema-form__submitter--center {
+  justify-content: center;
+}
+
+.xc-schema-form__submitter--right {
+  justify-content: flex-end;
+}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Form } from 'antd';
+import { Button, Col, Form, Row } from 'antd';
 import { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined } from '@ant-design/icons';
 import { TextField } from '../TextField';
 import type {
@@ -7,6 +7,7 @@ import type {
   CrudTableQuery,
   CrudTableSearchConfig,
 } from './types';
+import { getSearchActionOffset } from './utils';
 
 interface SearchFieldProps<
   RecordType extends object,
@@ -95,10 +96,13 @@ export function CrudTableSearchForm<
     [columns],
   );
 
-  const defaultColsNumber = Math.max(1, config.defaultColsNumber ?? 3);
-  const visibleColumns = collapsed
-    ? searchableColumns.slice(0, defaultColsNumber)
-    : searchableColumns;
+  const defaultColsNumber = Math.min(
+    3,
+    Math.max(1, config.defaultColsNumber ?? 3),
+  );
+  const visibleColumnCount = collapsed
+    ? Math.min(searchableColumns.length, defaultColsNumber)
+    : searchableColumns.length;
   const canCollapse = searchableColumns.length > defaultColsNumber;
 
   const setCollapsed = (next: boolean) => {
@@ -110,6 +114,14 @@ export function CrudTableSearchForm<
     form.resetFields();
     onReset(form.getFieldsValue(true));
   };
+  const extraActions = typeof config.extraActions === 'function'
+    ? config.extraActions({
+        form,
+        loading,
+        submit: () => form.submit(),
+        reset: handleReset,
+      })
+    : config.extraActions;
 
   if (searchableColumns.length === 0) return null;
 
@@ -122,47 +134,74 @@ export function CrudTableSearchForm<
         layout="vertical"
         className="xc-crud-table__search-form"
       >
-        <div className="xc-crud-table__search-grid">
-          {visibleColumns.map((column) => (
-            <Form.Item
+        <Row gutter={20} align="bottom" className="xc-crud-table__search-row">
+          {searchableColumns.map((column, index) => (
+            <Col
               key={String(column.key ?? column.dataIndex)}
-              name={column.dataIndex as never}
-              label={column.title}
-              {...column.formItemProps}
-              {...(typeof column.search === 'object'
-                ? column.search.formItemProps
-                : undefined)}
+              xs={24}
+              sm={12}
+              lg={6}
+              style={{ display: index < visibleColumnCount ? undefined : 'none' }}
             >
-              <SearchField column={column} />
-            </Form.Item>
-          ))}
-          <div className="xc-crud-table__search-actions">
-            {canCollapse && (
-              <Button
-                type="link"
-                icon={collapsed ? <DownOutlined /> : <UpOutlined />}
-                onClick={() => setCollapsed(!collapsed)}
+              <Form.Item
+                name={column.dataIndex as never}
+                label={column.title}
+                preserve
+                {...column.formItemProps}
+                {...(typeof column.search === 'object'
+                  ? column.search.formItemProps
+                  : undefined)}
               >
-                {collapsed ? '展开' : '收起'}
-              </Button>
-            )}
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={handleReset}
-              disabled={loading}
+                <SearchField column={column} />
+              </Form.Item>
+            </Col>
+          ))}
+          <Col
+            xs={24}
+            sm={{
+              span: 12,
+              offset: getSearchActionOffset(visibleColumnCount, 2, 12),
+            }}
+            lg={{
+              span: 6,
+              offset: getSearchActionOffset(visibleColumnCount, 4, 6),
+            }}
+          >
+            <Form.Item
+              label={<span aria-hidden="true">&nbsp;</span>}
+              colon={false}
+              className="xc-crud-table__search-actions-item"
             >
-              {config.resetText ?? '重置'}
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              icon={<SearchOutlined />}
-              loading={loading}
-            >
-              {config.submitText ?? '查询'}
-            </Button>
-          </div>
-        </div>
+              <div className="xc-crud-table__search-actions">
+                {canCollapse && (
+                  <Button
+                    type="link"
+                    icon={collapsed ? <DownOutlined /> : <UpOutlined />}
+                    onClick={() => setCollapsed(!collapsed)}
+                  >
+                    {collapsed ? '展开' : '收起'}
+                  </Button>
+                )}
+                <Button
+                  icon={<ReloadOutlined />}
+                  onClick={handleReset}
+                  disabled={loading}
+                >
+                  {config.resetText ?? '重置'}
+                </Button>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  icon={<SearchOutlined />}
+                  loading={loading}
+                >
+                  {config.submitText ?? '查询'}
+                </Button>
+                {extraActions}
+              </div>
+            </Form.Item>
+          </Col>
+        </Row>
       </Form>
     </div>
   );

@@ -103,6 +103,13 @@ export interface CrudTableColumnsStateConfig {
   persistenceType?: 'localStorage' | 'sessionStorage';
 }
 
+export interface CrudTableSearchActionsContext<Query extends CrudTableQuery> {
+  form: FormInstance<Query>;
+  loading: boolean;
+  submit: () => void;
+  reset: () => void;
+}
+
 export interface CrudTableSearchConfig<Query extends CrudTableQuery> {
   initialValues?: Partial<Query>;
   defaultCollapsed?: boolean;
@@ -111,6 +118,9 @@ export interface CrudTableSearchConfig<Query extends CrudTableQuery> {
   defaultColsNumber?: number;
   submitText?: React.ReactNode;
   resetText?: React.ReactNode;
+  extraActions?:
+    | React.ReactNode
+    | ((context: CrudTableSearchActionsContext<Query>) => React.ReactNode);
 }
 
 export interface CrudTableOptions {
@@ -148,7 +158,6 @@ export interface CrudTableProps<
   rowKey?: keyof RecordType & string | ((record: RecordType) => React.Key);
   actionRef?: React.Ref<CrudTableAction<RecordType, Query>>;
   search?: false | CrudTableSearchConfig<Query>;
-  headerTitle?: React.ReactNode;
   toolBarRender?: (
     action: CrudTableAction<RecordType, Query>,
     selectedRows: RecordType[],
