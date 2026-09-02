@@ -14,7 +14,7 @@
     "@rc-component/util": "^1.2.0",
     "@tailwindcss/vite": "^4.3.0",
     "@tanstack/react-table": "^8.21.3",
-    "@xc-antd/ui": "workspace:*",
+    "@zhilv/xc-antd": "workspace:*",
     "antd": "^6.4.3",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",

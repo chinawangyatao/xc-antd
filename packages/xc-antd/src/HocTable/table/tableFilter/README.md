@@ -13,10 +13,10 @@
 
 ```ts
 // 直接引入主组件 + 子组件（推荐）
-import { TableFilter } from '@xc-antd/ui';
+import { TableFilter } from '@zhilv/xc-antd';
 
 // 仅引入子组件
-import { TableFilterInput, TableFilterSelect } from '@xc-antd/ui';
+import { TableFilterInput, TableFilterSelect } from '@zhilv/xc-antd';
 
 // 类型
 import type {
@@ -25,7 +25,7 @@ import type {
   TableFilterProps,
   TableFilterInputProps,
   TableFilterSelectProps,
-} from '@xc-antd/ui';
+} from '@zhilv/xc-antd';
 ```
 
 ---
@@ -82,8 +82,8 @@ import type {
 `SimpleTable` 通过 `useXcTable` hook 自动接入 `TableFilter`，业务侧只需在列定义中声明 `filterable / filterMode / filterOptions` 即可：
 
 ```tsx
-import { SimpleTable } from '@xc-antd/ui';
-import type { XcColumnDef } from '@xc-antd/ui';
+import { SimpleTable } from '@zhilv/xc-antd';
+import type { XcColumnDef } from '@zhilv/xc-antd';
 
 const columns: XcColumnDef<DataType>[] = [
   // input 模糊搜索（默认）

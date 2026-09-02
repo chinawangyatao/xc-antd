@@ -6,7 +6,7 @@ import {
     type XcColumnDef,
     type NewRowFieldConfig,
     type SimpleTableValidationRule,
-} from '@xc-antd/ui';
+} from '@zhilv/xc-antd';
 
 /** 业务行数据类型 */
 interface DataType {

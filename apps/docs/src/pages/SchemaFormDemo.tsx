@@ -5,7 +5,7 @@ import {
   SchemaForm,
   type SchemaFormAction,
   type SchemaFormGroup,
-} from '@xc-antd/ui';
+} from '@zhilv/xc-antd';
 import type { Dayjs } from 'dayjs';
 
 type DateValue = string | Dayjs;

@@ -9,10 +9,12 @@
   ],
   "scripts": {
     "dev": "bun run --filter @xc-antd/docs dev",
-    "build": "bun run --filter @xc-antd/ui build",
+    "build": "bun run --filter @zhilv/xc-antd build",
     "build:docs": "bun run --filter @xc-antd/docs build",
     "lint": "eslint .",
     "test": "bun test packages/xc-antd/tests",
+    "pack:private": "bun run build && npm pack --dry-run --workspace @zhilv/xc-antd",
+    "publish:private": "bun run test && bun run build && npm publish --workspace @zhilv/xc-antd",
     "preview": "bun run --filter @xc-antd/docs preview"
   },
   "devDependencies": {

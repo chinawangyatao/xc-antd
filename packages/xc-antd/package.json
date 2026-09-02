@@ -1,6 +1,30 @@
 {
-  "name": "@xc-antd/ui",
+  "name": "@zhilv/xc-antd",
   "version": "0.0.1",
+  "description": "React and Ant Design enterprise components for forms, tables and business workflows",
+  "keywords": [
+    "react",
+    "antd",
+    "ant-design",
+    "typescript",
+    "component-library"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chinawangyatao/xc-view.git",
+    "directory": "packages/xc-antd"
+  },
+  "homepage": "https://github.com/chinawangyatao/xc-view#readme",
+  "bugs": {
+    "url": "https://github.com/chinawangyatao/xc-view/issues"
+  },
+  "publishConfig": {
+    "registry": "http://repo.zhihuiwenlvyun.com/repository/npm-hosted/"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "type": "module",
   "main": "./dist/xc-antd.cjs",
   "module": "./dist/xc-antd.js",
