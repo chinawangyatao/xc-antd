@@ -3,6 +3,7 @@ import type { DrawerProps } from 'antd';
 import {
   ActionOverlayFooter,
   type ActionOverlayCommonProps,
+  UnsavedChangesPrompt,
   useActionOverlay,
 } from './shared';
 
@@ -22,6 +23,9 @@ export function ActionDrawer({
   onConfirm,
   onCancel,
   onOpenChange,
+  form,
+  hasUnsavedChanges,
+  unsavedChangesPrompt,
   destroyOnHidden = true,
   mask,
   size = 720,
@@ -32,6 +36,9 @@ export function ActionDrawer({
     onConfirm,
     onCancel,
     onOpenChange,
+    form,
+    hasUnsavedChanges,
+    unsavedChangesPrompt,
   });
   const footerNode = footer === false ? null : footer ?? (
     <ActionOverlayFooter
@@ -43,19 +50,28 @@ export function ActionDrawer({
       confirmButtonProps={confirmButtonProps}
       cancelButtonProps={cancelButtonProps}
       onConfirm={action.confirm}
-      onCancel={action.cancel}
+      onCancel={action.requestClose}
     />
   );
 
   return (
-    <Drawer
-      {...drawerProps}
-      size={size}
-      mask={mask ?? { closable: false }}
-      destroyOnHidden={destroyOnHidden}
-      footer={footerNode}
-      onClose={action.cancel}
-    />
+    <>
+      <Drawer
+        {...drawerProps}
+        size={size}
+        mask={mask ?? { closable: true }}
+        destroyOnHidden={destroyOnHidden}
+        footer={footerNode}
+        onClose={action.requestClose}
+      />
+      <UnsavedChangesPrompt
+        open={action.unsavedPromptOpen}
+        config={unsavedChangesPrompt || undefined}
+        zIndex={(drawerProps.zIndex ?? 1000) + 10}
+        onDiscard={action.discardChanges}
+        onContinue={action.continueEditing}
+      />
+    </>
   );
 }
 

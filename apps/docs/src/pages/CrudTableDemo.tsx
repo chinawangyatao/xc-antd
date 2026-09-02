@@ -350,6 +350,7 @@ const CrudTableDemo = () => {
         title={editingUser ? '编辑用户' : '新增用户'}
         open={editorOpen}
         size={640}
+        form={editorForm}
         onOpenChange={(open) => {
           setEditorOpen(open);
           if (!open) {

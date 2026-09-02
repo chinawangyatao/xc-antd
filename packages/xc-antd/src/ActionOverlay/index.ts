@@ -7,4 +7,5 @@ export type { ActionModalProps } from './ActionModal';
 export type {
   ActionConfirmResult,
   ActionOverlayCommonProps,
+  UnsavedChangesPromptConfig,
 } from './shared';

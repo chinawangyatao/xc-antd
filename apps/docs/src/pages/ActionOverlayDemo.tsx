@@ -9,6 +9,8 @@ const wait = (duration: number) =>
 const ActionOverlayDemo = () => {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [modalOpen, setModalOpen] = React.useState(false);
+  const [drawerValue, setDrawerValue] = React.useState('');
+  const [modalValue, setModalValue] = React.useState('');
 
   const handleConfirm = async (messageText: string) => {
     await wait(600);
@@ -23,7 +25,7 @@ const ActionOverlayDemo = () => {
           抽屉与弹窗
         </Typography.Title>
         <Typography.Paragraph type="secondary">
-          统一采用左对齐 footer，确认按钮在前、取消按钮在后，并内置异步确认状态。
+          统一采用左对齐 footer，并在存在未保存内容时拦截蒙版、关闭和取消操作。
         </Typography.Paragraph>
       </div>
 
@@ -43,20 +45,36 @@ const ActionOverlayDemo = () => {
       <ActionDrawer
         title="新增数据"
         open={drawerOpen}
-        onOpenChange={setDrawerOpen}
+        onOpenChange={(open) => {
+          setDrawerOpen(open);
+          if (!open) setDrawerValue('');
+        }}
+        hasUnsavedChanges={drawerValue.trim().length > 0}
         onConfirm={() => handleConfirm('抽屉提交成功')}
       >
         <Typography.Paragraph>业务表单内容放在这里。</Typography.Paragraph>
-        <Input placeholder="请输入示例内容" />
+        <Input
+          value={drawerValue}
+          placeholder="输入内容后点击蒙版"
+          onChange={(event) => setDrawerValue(event.target.value)}
+        />
       </ActionDrawer>
 
       <ActionModal
         title="操作确认"
         open={modalOpen}
-        onOpenChange={setModalOpen}
+        onOpenChange={(open) => {
+          setModalOpen(open);
+          if (!open) setModalValue('');
+        }}
+        hasUnsavedChanges={modalValue.trim().length > 0}
         onConfirm={() => handleConfirm('弹窗操作成功')}
       >
-        确定要执行当前操作吗？
+        <Input
+          value={modalValue}
+          placeholder="输入内容后点击蒙版"
+          onChange={(event) => setModalValue(event.target.value)}
+        />
       </ActionModal>
     </Space>
   );
