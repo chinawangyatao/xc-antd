@@ -26,7 +26,6 @@ export function FieldRangePickerEdit(props: Props, ref: React.Ref<unknown>) {
     formItemRender,
     showTime,
     fieldProps,
-    intl,
     variant: propsVariant,
   } = props;
 

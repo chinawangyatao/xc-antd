@@ -36,7 +36,6 @@ export function FieldTimeRangePickerLightEdit(
     finalFormat,
     open,
     setOpen,
-    intl,
   } = props;
 
   const dayValue = parseValueToDay(

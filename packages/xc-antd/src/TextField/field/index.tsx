@@ -29,11 +29,11 @@ import FieldText from './components/Text';
 import FieldTextArea from './components/TextArea';
 import FieldTimePicker, { FieldTimeRangePicker } from './components/TimePicker';
 import FieldTreeSelect from './components/TreeSelect';
-import {
+import { PureProField } from './PureProField';
+import type {
   ProFieldEmptyText,
   ProFieldMoneyProps,
   ProFieldPropsType,
-  PureProField,
 } from './PureProField';
 
 export type {

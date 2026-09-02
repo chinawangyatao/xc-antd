@@ -1,4 +1,4 @@
-import type { DependencyList } from 'react';
+import type { DependencyList, EffectCallback } from 'react';
 import { useEffect, useRef } from 'react';
 import { isDeepEqualReact } from '../isDeepEqualReact';
 import { useDebounceFn } from './useDebounceFn';
@@ -6,16 +6,16 @@ import { useDebounceFn } from './useDebounceFn';
 export const isDeepEqual = (a: any, b: any, ignoreKeys?: string[]) =>
   isDeepEqualReact(a, b, ignoreKeys);
 
-export function useDeepCompareMemoize(value: any, ignoreKeys?: any) {
-  const ref = useRef();
+export function useDeepCompareMemoize<T>(value: T, ignoreKeys?: any): T {
+  const ref = useRef<T | undefined>(undefined);
   if (!isDeepEqual(value, ref.current, ignoreKeys)) {
     ref.current = value;
   }
-  return ref.current;
+  return ref.current as T;
 }
 
 export function useDeepCompareEffect(
-  effect: React.EffectCallback,
+  effect: EffectCallback,
   dependencies: DependencyList,
   ignoreKeys?: string[],
 ) {
@@ -23,7 +23,7 @@ export function useDeepCompareEffect(
 }
 
 export function useDeepCompareEffectDebounce(
-  effect: React.EffectCallback,
+  effect: EffectCallback,
   dependencies: DependencyList,
   ignoreKeys?: string[],
   waitTime?: number,

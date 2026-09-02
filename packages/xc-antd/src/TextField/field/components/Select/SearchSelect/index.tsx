@@ -134,7 +134,7 @@ const SearchSelect = <T,>(props: SearchSelectProps<T[]>, ref: any) => {
     propsSearchValue,
   );
 
-  const selectRef = useRef<any>();
+  const selectRef = useRef<any>(null);
 
   useImperativeHandle(ref, () => selectRef.current);
 

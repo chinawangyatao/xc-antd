@@ -38,7 +38,6 @@ export function FieldRangePickerLightEdit(
     fieldProps,
     open,
     setOpen,
-    intl,
   } = props;
 
   const dayValue = parseValueToDay(fieldProps.value) as dayjs.Dayjs[];

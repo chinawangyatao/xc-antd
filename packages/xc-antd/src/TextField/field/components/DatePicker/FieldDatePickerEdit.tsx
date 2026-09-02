@@ -27,11 +27,9 @@ export function FieldDatePickerEdit(props: Props, ref: React.Ref<unknown>) {
     fieldProps,
     picker,
     variant,
-    intl,
   } = props;
 
   const {
-    disabled: _disabled,
     value,
     placeholder = '请选择',
   } = fieldProps;

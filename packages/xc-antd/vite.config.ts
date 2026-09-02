@@ -19,6 +19,7 @@ export default defineConfig({
       name: 'XcAntd',
       formats: ['es', 'cjs'],
       fileName: 'xc-antd',
+      cssFileName: 'style',
     },
     rollupOptions: {
       external: ['react', 'react-dom', 'antd', '@ant-design/icons'],

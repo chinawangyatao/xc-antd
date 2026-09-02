@@ -8,11 +8,11 @@ const addArrayKeys = (doms: React.ReactNode[]) =>
     if (!React.isValidElement(dom)) {
       return <React.Fragment key={index}>{dom}</React.Fragment>;
     }
-    return React.cloneElement(dom, {
+    const element = dom as React.ReactElement<{ style?: React.CSSProperties }>;
+    return React.cloneElement(element, {
       key: index,
-      ...dom?.props,
       style: {
-        ...dom?.props?.style,
+        ...element.props.style,
       },
     });
   });

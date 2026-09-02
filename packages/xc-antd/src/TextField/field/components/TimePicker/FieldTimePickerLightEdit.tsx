@@ -36,7 +36,6 @@ export function FieldTimePickerLightEdit(
     finalFormat,
     open,
     setOpen,
-    intl,
   } = props;
   const { disabled, value } = fieldProps;
   const dayValue = parseValueToDay(value, finalFormat) as dayjs.Dayjs;

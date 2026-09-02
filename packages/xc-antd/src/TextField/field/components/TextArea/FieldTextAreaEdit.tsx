@@ -7,7 +7,7 @@ type Props = Parameters<ProFieldFC<{ text: string }>>[0] & {
 };
 
 export function FieldTextAreaEdit(props: Props, ref: React.Ref<unknown>) {
-  const { text, mode, formItemRender, fieldProps, intl } = props;
+  const { text, mode, formItemRender, fieldProps } = props;
   const dom = (
     <Input.TextArea
       ref={ref as React.Ref<any>}

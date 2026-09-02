@@ -6,3 +6,4 @@ import './index.css'
 // TextField
 export * from './TextField/field';
 export * from './HocTable';
+export * from './CrudTable';

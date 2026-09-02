@@ -3,6 +3,7 @@ import { Spin, TreeSelect } from 'antd';
 import { clsx } from 'clsx';
 import React from 'react';
 import { FieldLabel } from '../../../utils';
+import type { ProFieldFCRenderProps } from '../../../provider';
 import type { TreeSelectFieldProps } from './types';
 
 type TreeSelectShowSearchObject = Exclude<
@@ -23,7 +24,7 @@ export interface FieldTreeSelectLightEditProps {
   fieldProps: TreeSelectFieldProps;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  treeSelectRef: React.RefObject<GetRef<typeof TreeSelect>>;
+  treeSelectRef: React.RefObject<GetRef<typeof TreeSelect> | null>;
   intl?: any;
   loading: boolean;
   options: NonNullable<TreeSelectProps['treeData']>;
@@ -56,7 +57,6 @@ export function FieldTreeSelectLightEdit({
   open,
   setOpen,
   treeSelectRef,
-  intl,
   loading,
   options,
   fetchData,
