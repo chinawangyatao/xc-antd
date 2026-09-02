@@ -17,7 +17,7 @@ export type FieldSelectSearchEditProps = Parameters<
   options: RequestOptionsType[];
   fetchData: (keyWord?: string) => void;
   resetData: () => void;
-  inputRef: React.RefObject<GetRef<typeof Select>>;
+  inputRef: React.RefObject<GetRef<typeof Select> | null>;
 };
 
 export function FieldSelectSearchEdit(props: FieldSelectSearchEditProps) {
@@ -27,7 +27,6 @@ export function FieldSelectSearchEdit(props: FieldSelectSearchEditProps) {
     fieldProps,
     id,
     label,
-    intl,
     loading,
     options,
     fetchData,

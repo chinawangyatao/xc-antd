@@ -193,6 +193,10 @@ export type TextFieldValueTypePropsMap = {
     debounceTime?: number;
   };
   color: {};
+  tag: {
+    separator?: string;
+    maxTagCount?: number;
+  };
   segmented: {};
 };
 

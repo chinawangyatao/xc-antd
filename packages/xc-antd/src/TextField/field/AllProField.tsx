@@ -29,6 +29,7 @@ import FieldSegmented from './components/Segmented';
 import FieldSelect from './components/Select';
 import FieldSlider from './components/Slider';
 import FieldSwitch from './components/Switch';
+import FieldTag from './components/Tag';
 import FieldText from './components/Text';
 import FieldTextArea from './components/TextArea';
 import FieldTimePicker, { FieldTimeRangePicker } from './components/TimePicker';
@@ -405,6 +406,10 @@ function renderDefaultValueTypeLeaf(
 
   if (valueType === 'color') {
     return <FieldColorPicker text={dataValue as string} {...props} />;
+  }
+
+  if (valueType === 'tag') {
+    return <FieldTag text={dataValue as never} {...props} />;
   }
 
   if (valueType === 'segmented') {

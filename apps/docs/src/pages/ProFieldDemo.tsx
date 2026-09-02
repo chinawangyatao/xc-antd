@@ -59,6 +59,11 @@ const specificPropsData: Record<string, { prop: string; desc: string; type: stri
     { prop: 'defaultKeyWords', desc: '默认搜索关键词', type: 'string', default: '-' },
     { prop: 'variant', desc: '变体样式', type: "'outlined' | 'filled' | 'borderless'", default: '-' },
   ],
+  tag: [
+    { prop: 'separator', desc: '字符串拆分为多个标签时使用的分隔符', type: 'string', default: '-' },
+    { prop: 'maxTagCount', desc: '最多展示的标签数量', type: 'number', default: '-' },
+    { prop: 'tagProps', desc: 'Tag 属性或按标签返回属性的函数', type: 'TagProps | Function', default: '-' },
+  ],
   second: [
     { prop: 'placeholder', desc: '占位文本', type: 'string', default: "'请输入'" },
   ],
@@ -105,7 +110,7 @@ const allValueTypes = [
   'progress', 'rate', 'slider', 'switch', 'color', 'second',
   'date', 'dateTime', 'time', 'dateRange', 'fromNow',
   'select', 'radio', 'radioButton', 'checkbox', 'segmented',
-  'cascader', 'treeSelect', 'image', 'code', 'jsonCode',
+  'cascader', 'treeSelect', 'tag', 'image', 'code', 'jsonCode',
 ]
 
 /* ==================== 状态枚举 ==================== */
@@ -114,6 +119,12 @@ const statusEnum = {
   offline: { text: '离线', status: 'Default' },
   busy: { text: '忙碌', status: 'Warning' },
   error: { text: '异常', status: 'Error' },
+}
+
+const tagEnum = {
+  design: { text: '设计', color: 'blue' },
+  frontend: { text: '前端', color: 'cyan' },
+  urgent: { text: '紧急', status: 'Error' },
 }
 
 /* ==================== Demo 数据 ==================== */
@@ -148,6 +159,7 @@ const demos: DemoItem[] = [
   { label: '单选', valueType: 'radio', defaultText: 'online', valueEnum: statusEnum },
   { label: '单选按钮', valueType: 'radioButton', defaultText: 'busy', valueEnum: statusEnum },
   { label: '多选', valueType: 'checkbox', defaultText: ['online', 'busy'], valueEnum: statusEnum },
+  { label: '标签', valueType: 'tag', defaultText: ['design', 'frontend', 'urgent'], valueEnum: tagEnum },
   { label: '分段控制器', valueType: 'segmented', defaultText: 'offline', valueEnum: statusEnum },
   { label: '图片', valueType: 'image', defaultText: 'https://gw.alipayobjects.com/zos/antfincdn/aPkFc8Sj7n/method-draw-image.svg' },
 ]

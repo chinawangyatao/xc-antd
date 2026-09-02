@@ -14,7 +14,7 @@ export type FieldSelectLightEditProps = Parameters<
   options: RequestOptionsType[];
   fetchData: (keyWord?: string) => void;
   resetData: () => void;
-  inputRef: React.RefObject<GetRef<typeof Select>>;
+  inputRef: React.RefObject<GetRef<typeof Select> | null>;
   componentSize: string;
 };
 
@@ -28,7 +28,6 @@ export function FieldSelectLightEdit(props: FieldSelectLightEditProps) {
     variant,
     lightLabel,
     labelTrigger,
-    intl,
     loading,
     options,
     fetchData,

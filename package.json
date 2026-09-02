@@ -12,6 +12,7 @@
     "build": "bun run --filter @xc-antd/ui build",
     "build:docs": "bun run --filter @xc-antd/docs build",
     "lint": "eslint .",
+    "test": "bun test packages/xc-antd/tests",
     "preview": "bun run --filter @xc-antd/docs preview"
   },
   "devDependencies": {

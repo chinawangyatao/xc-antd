@@ -6,13 +6,12 @@ import useSWR from 'swr';
 import {
   nanoid,
   objectToMap,
-  ProFieldValueEnumType,
-  RequestOptionsType,
   useDebounceValue,
   useDeepCompareEffect,
   useDeepCompareMemo,
   useRefFunction,
 } from '../../../utils';
+import type { ProFieldValueEnumType, RequestOptionsType } from '../../../utils';
 import {
   isProFieldEditOrUpdateMode,
   isProFieldReadMode,

@@ -2,8 +2,8 @@
 import {
   objectToMap,
   proFieldParsingText,
-  ProSchemaValueEnumObj,
 } from '../../../utils';
+import type { ProSchemaValueEnumObj } from '../../../utils';
 import type { ProFieldFC } from '../../types';
 import type { FieldSelectProps } from './types';
 

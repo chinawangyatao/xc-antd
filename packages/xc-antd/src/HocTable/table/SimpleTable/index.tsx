@@ -1,8 +1,10 @@
 import React from 'react';
 import { Button, Space, Table } from 'antd';
 import { createStyles } from 'antd-style';
-import TableHeaderTool, { ColumnSetting } from '../component/TableHeaderTool';
-import { useXcTable, XcColumnDef } from '../hooks/useXcTable';
+import TableHeaderTool from '../component/TableHeaderTool';
+import type { ColumnSetting } from '../component/TableHeaderTool';
+import { useXcTable } from '../hooks/useXcTable';
+import type { XcColumnDef } from '../hooks/useXcTable';
 import { TextField } from '../../../TextField';
 
 const useStyles = createStyles(({ css }) => ({

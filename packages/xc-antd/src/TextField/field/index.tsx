@@ -25,15 +25,16 @@ import FieldSelect, {
 import FieldSlider from './components/Slider';
 import FieldStatus, { ProFieldBadgeColor } from './components/Status';
 import FieldSwitch from './components/Switch';
+import FieldTag from './components/Tag';
 import FieldText from './components/Text';
 import FieldTextArea from './components/TextArea';
 import FieldTimePicker, { FieldTimeRangePicker } from './components/TimePicker';
 import FieldTreeSelect from './components/TreeSelect';
-import {
+import { PureProField } from './PureProField';
+import type {
   ProFieldEmptyText,
   ProFieldMoneyProps,
   ProFieldPropsType,
-  PureProField,
 } from './PureProField';
 
 export type {
@@ -68,6 +69,7 @@ export {
   FieldSlider,
   FieldStatus,
   FieldSwitch,
+  FieldTag,
   FieldText,
   FieldTextArea,
   FieldTimePicker,

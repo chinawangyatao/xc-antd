@@ -13,7 +13,7 @@ type Props = Omit<Parameters<ProFieldFC<GroupProps>>[0], 'options'> & {
   layoutClassName: string;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  cascaderRef: React.RefObject<GetRef<typeof Cascader>>;
+  cascaderRef: React.RefObject<GetRef<typeof Cascader> | null>;
   intl?: any;
 };
 
@@ -30,7 +30,6 @@ export function FieldCascaderLightEdit(props: Props) {
     open,
     setOpen,
     cascaderRef,
-    intl,
     ...rest
   } = props;
 

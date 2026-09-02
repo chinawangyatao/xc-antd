@@ -1,0 +1,43 @@
+.xc-form-group {
+  width: 100%;
+  margin-block-end: 16px;
+  background: #fff;
+}
+
+.xc-form-group__header {
+  min-height: 38px;
+  padding-block-end: 12px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e7e7e7;
+}
+
+.xc-form-group__title {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  color: #1d2129;
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.xc-form-group__title::before {
+  content: "";
+  width: 3px;
+  height: 12px;
+  margin-inline-end: 8px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  background: #0052d9;
+}
+
+.xc-form-group__extra {
+  margin-inline-start: auto;
+  flex: 0 0 auto;
+}
+
+.xc-form-group__body {
+  padding-block-start: 16px;
+}

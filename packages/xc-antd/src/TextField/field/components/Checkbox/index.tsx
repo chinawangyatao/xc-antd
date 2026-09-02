@@ -54,7 +54,7 @@ const FieldCheckbox: ProFieldFC<GroupProps> = (
     };
   });
 
-  const checkBoxRef = useRef();
+  const checkBoxRef = useRef<unknown>(null);
   useImperativeHandle(
     ref,
     () => ({

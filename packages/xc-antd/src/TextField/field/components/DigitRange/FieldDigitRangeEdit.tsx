@@ -1,5 +1,6 @@
 ﻿import { Input, InputNumber, Space } from 'antd';
-import React, { MutableRefObject } from 'react';
+import React from 'react';
+import type { MutableRefObject } from 'react';
 import type { ProFieldFC } from '../../types';
 import type { FieldDigitRangeProps, Value, ValuePair } from './types';
 
@@ -16,7 +17,7 @@ type Props = Parameters<ProFieldFC<FieldDigitRangeProps>>[0] & {
   placeholderValue: string | string[];
 };
 
-export function FieldDigitRangeEdit(props: Props, ref: React.Ref<unknown>) {
+export function FieldDigitRangeEdit(props: Props, _ref: React.Ref<unknown>) {
   const {
     text,
     mode: type,
@@ -30,7 +31,7 @@ export function FieldDigitRangeEdit(props: Props, ref: React.Ref<unknown>) {
     token,
     placeholderValue,
   } = props;
-  const { value, defaultValue, onChange, id } = fieldProps;
+  const { defaultValue, id } = fieldProps;
 
   const handleGroupBlur = () => {
     if (Array.isArray(valuePairRef.current)) {

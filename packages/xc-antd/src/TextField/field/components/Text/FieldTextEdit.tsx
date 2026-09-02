@@ -10,7 +10,7 @@ type FieldTextEditProps = Parameters<
 };
 
 export function FieldTextEdit(props: FieldTextEditProps) {
-  const { text, mode, formItemRender, fieldProps, inputRef, intl } = props;
+  const { text, mode, formItemRender, fieldProps, inputRef } = props;
   const placeholder = '请输入';
   const dom = (
     <Input

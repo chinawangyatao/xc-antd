@@ -15,8 +15,7 @@ type Props = Parameters<
 };
 
 export function FieldFromNowEdit(props: Props, ref: React.Ref<unknown>) {
-  const { text, mode, variant, formItemRender, format, fieldProps, intl } =
-    props;
+  const { text, mode, variant, formItemRender, fieldProps } = props;
   const placeholder = '请选择';
   const momentValue = parseValueToDay(fieldProps.value) as dayjs.Dayjs;
   const dom = (

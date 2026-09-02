@@ -13,7 +13,7 @@ type Props = Parameters<
 };
 
 export function FieldPasswordEdit(props: Props, ref: React.Ref<unknown>) {
-  const { text, mode, formItemRender, fieldProps, intl } = props;
+  const { text, mode, formItemRender, fieldProps } = props;
   const dom = (
     <Input.Password
       placeholder={'请输入'}

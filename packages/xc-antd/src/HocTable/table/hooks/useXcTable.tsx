@@ -3,10 +3,10 @@ import {
     useReactTable,
     getCoreRowModel,
     getFilteredRowModel,
-    ColumnDef,
-    ColumnFiltersState,
 } from '@tanstack/react-table';
-import TableFilter, { FilterMode } from '../tableFilter';
+import type { ColumnDef, ColumnFiltersState } from '@tanstack/react-table';
+import TableFilter from '../tableFilter';
+import type { FilterMode } from '../tableFilter';
 
 /** 内联高亮组件（避免外部 CJS 依赖的兼容问题） */
 const HighlightText: React.FC<{ text: string; keyword: string }> = ({ text, keyword }) => {
