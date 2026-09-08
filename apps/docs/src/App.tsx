@@ -10,6 +10,7 @@ import { useState } from 'react'
 import ActionOverlayDemo from './pages/ActionOverlayDemo'
 import FormGroupDemo from './pages/FormGroupDemo'
 import SchemaFormDemo from './pages/SchemaFormDemo'
+import TreeSelectPage from "./pages/TreeSelectPage.tsx";
 
 const { Header, Sider, Content } = Layout
 
@@ -21,6 +22,7 @@ const menuItems = [
   { key: '/action-overlay', icon: <ExportOutlined />, label: '抽屉与弹窗' },
   { key: '/form-group', icon: <FormOutlined />, label: 'FormGroup 示例' },
   { key: '/schema-form', icon: <ProfileOutlined />, label: 'SchemaForm 示例' },
+  { key: '/tree-select', icon: <AppstoreOutlined />, label: 'TreeSelect 示例' },
 ]
 
 function App() {
@@ -116,6 +118,7 @@ function App() {
             <Route path="/action-overlay" element={<ActionOverlayDemo />} />
             <Route path="/form-group" element={<FormGroupDemo />} />
             <Route path="/schema-form" element={<SchemaFormDemo />} />
+            <Route path="/tree-select" element={<TreeSelectPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Content>

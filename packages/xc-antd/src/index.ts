@@ -10,3 +10,4 @@ export * from './CrudTable';
 export * from './ActionOverlay';
 export * from './FormGroup';
 export * from './SchemaForm';
+export * from './InputTree'
