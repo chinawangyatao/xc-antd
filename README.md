@@ -45,7 +45,7 @@ xc-view/
 │       │   │   └── utils/      # 表格工具类型
 │       │   ├── index.ts
 │       │   └── index.css
-│       ├── package.json        # @xc-antd/ui
+│       ├── package.json        # @zhilv/xc-antd
 │       └── vite.config.ts
 │
 ├── package.json                # 根配置
@@ -156,14 +156,15 @@ bun run lint
 ### 安装组件库
 
 ```bash
-bun add @xc-antd/ui
+bun add @zhilv/xc-antd \
+  --registry http://repo.zhihuiwenlvyun.com/repository/npm-hosted/
 ```
 
 ### 引入组件
 
 ```tsx
-import { ProField, HocTable } from '@xc-antd/ui';
-import '@xc-antd/ui/style';
+import { ProField, HocTable } from '@zhilv/xc-antd';
+import '@zhilv/xc-antd/style';
 
 // 使用字段组件
 <ProField value="Hello" valueType="text" />
@@ -204,7 +205,7 @@ import '@xc-antd/ui/style';
 
 ### 包说明
 
-- **@xc-antd/ui** - 核心组件库，可独立发布
+- **@zhilv/xc-antd** - 核心组件库，可独立发布
 - **@xc-antd/docs** - 文档站点应用
 
 ### TypeScript Project References

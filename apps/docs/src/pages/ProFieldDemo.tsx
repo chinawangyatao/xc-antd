@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { Button, Card, Space, Switch, Typography, Row, Col, Divider, Table, Tag } from 'antd'
-import { TextField } from '@xc-antd/ui'
+import { TextField } from '@zhilv/xc-antd'
 
 const { Title, Paragraph, Text } = Typography
 

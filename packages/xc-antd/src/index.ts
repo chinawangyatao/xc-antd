@@ -1,6 +1,6 @@
 import './index.css'
 /**
- * @xc-antd/ui - TextField 组件库
+ * @zhilv/xc-antd - TextField 组件库
  */
 
 // TextField
@@ -10,3 +10,4 @@ export * from './CrudTable';
 export * from './ActionOverlay';
 export * from './FormGroup';
 export * from './SchemaForm';
+export * from './InputTree'

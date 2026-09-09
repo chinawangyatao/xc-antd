@@ -26,7 +26,7 @@ import {
   SimpleTable,
   simpleTableDemoData,
   type XcColumnDef,
-} from '@xc-antd/ui';
+} from '@zhilv/xc-antd';
 
 interface User {
   id: string;
@@ -127,7 +127,7 @@ import {
   type XcColumnDef,
   type NewRowFieldConfig,
   type SimpleTableValidationRule,
-} from '@xc-antd/ui';
+} from '@zhilv/xc-antd';
 import { Button, Space } from 'antd';
 
 interface DataType {

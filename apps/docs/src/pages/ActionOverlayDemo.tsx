@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Input, message, Space, Typography } from 'antd';
 import { ExportOutlined, PlusOutlined } from '@ant-design/icons';
-import { ActionDrawer, ActionModal } from '@xc-antd/ui';
+import { ActionDrawer, ActionModal } from '@zhilv/xc-antd';
 
 const wait = (duration: number) =>
   new Promise((resolve) => window.setTimeout(resolve, duration));
