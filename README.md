@@ -17,7 +17,7 @@ XC-AntD 是一个现代化的前端组件库，采用 monorepo 架构组织代�
 - **代码检查**: ESLint 10.3.0
 - **状态请求**: SWR 2.3.0
 - **路由**: React Router DOM 7.6.0
-- **表格**: TanStack React Table 8.21.3
+- **表格**: Ant Design Table 6.4.3
 
 ## 项目结构
 
@@ -41,8 +41,10 @@ xc-view/
 │       │   │   ├── provider/   # Context Provider
 │       │   │   └── utils/      # 工具函数和 hooks
 │       │   ├── HocTable/       # 高级表格组件
-│       │   │   ├── table/      # 表格核心实现
-│       │   │   └── utils/      # 表格工具类型
+│       │   │   ├── HocTable.tsx
+│       │   │   ├── types.ts
+│       │   │   ├── utils.ts
+│       │   │   └── style.css
 │       │   ├── index.ts
 │       │   └── index.css
 │       ├── package.json        # @zhilv/xc-antd
@@ -95,14 +97,23 @@ xc-view/
 
 ### 2. HocTable 高级表格组件
 
-基于 TanStack Table 封装的高级表格，提供：
+基于 Ant Design Table 的本地数据与行内新增表格，提供：
 
-- **CRUDTable** - 增删改查表格
-- **SimpleTable** - 简单表格
-- **TableFilter** - 表格筛选器
-- **TableHeaderTool** - 表格头部工具
-- **useTableFilter** - 表格筛选 Hook
-- **useXcTable** - 表格核心 Hook
+- 全局搜索与 input / select / date / switch 列级筛选
+- 列显隐、拖拽排序与表格密度设置
+- 行内新增、实时校验、单行或批量保存
+- `SimpleTable` 作为旧 API 的兼容别名
+
+请求分页、查询表单与完整 CRUD 工作流由 `CrudTable` 负责。
+
+### AI Agent Skills
+
+仓库在 `skills/` 维护项目级 Agent Skills，`.agents/skills` 指向该目录：
+
+- `xc-antd` - 帮助 AI 选择并正确使用组件。
+- `xc-antd-component-authoring` - 约束组件库目录、API、样式、兼容与测试方式。
+
+新的 AI Agent 会话可自动发现这两个 Skills。详细组件资料位于各 Skill 的 `references/` 中，按任务需要加载。
 
 ## 快速开始
 

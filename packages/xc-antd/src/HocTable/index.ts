@@ -1,41 +1,38 @@
-import SimpleTable from "./table/SimpleTable";
-import CRUDTable from "./table/CRUDTable";
-
-export { SimpleTable ,CRUDTable }
-
-export * from './table/index';
-
-// SimpleTable 对外类型
-export type {
-    SimpleTableProps,
-    NewRowFieldConfig,
-    SimpleTableValidationRule,
-    ActionRenderContext,
-} from './table/SimpleTable';
-
-// useXcTable 列定义类型
-export type { XcColumnDef } from './table/hooks/useXcTable';
-
-// 表头工具栏类型
-export type { ColumnSetting } from './table/component/TableHeaderTool';
-
-// 表头筛选封装组件
+export { HocTable, HocTable as SimpleTable, default } from './HocTable';
+/** @deprecated 请直接使用 CrudTable。 */
+export { CrudTable as CRUDTable } from '../CrudTable';
 export {
-    TableFilter,
-    TableFilterInput,
-    TableFilterSelect,
-    TableFilterDate,
-    TableFilterSwitch,
-} from './table/tableFilter';
+  TableFilter,
+  TableFilterDate,
+  TableFilterInput,
+  TableFilterSelect,
+  TableFilterSwitch,
+} from './TableFilter';
 export type {
-    FilterMode,
-    FilterOption,
-    TableFilterProps,
-    TableFilterInputProps,
-    TableFilterSelectProps,
-    TableFilterDateProps,
-    TableFilterSwitchProps,
-} from './table/tableFilter';
+  TableFilterDateProps,
+  TableFilterInputProps,
+  TableFilterProps,
+  TableFilterSelectProps,
+  TableFilterSwitchProps,
+} from './TableFilter';
+export type {
+  ActionRenderContext,
+  HocTableActionRenderContext,
+  HocTableColumn,
+  HocTableFilterMode,
+  HocTableFilterOption,
+  HocTableNewRowFieldConfig,
+  HocTableOptions,
+  HocTableProps,
+  HocTableValidationRule,
+  NewRowFieldConfig,
+  SimpleTableProps,
+  SimpleTableValidationRule,
+  XcColumnDef,
+} from './types';
+export type { ColumnSetting, HocTableColumnSetting } from './utils';
 
-// 演示数据（仅供 docs / 示例使用）
-export { dataSource as simpleTableDemoData } from './table/data/tableData';
+/** @deprecated 请使用 HocTableFilterMode。 */
+export type FilterMode = import('./types').HocTableFilterMode;
+/** @deprecated 请使用 HocTableFilterOption。 */
+export type FilterOption = import('./types').HocTableFilterOption;

@@ -17,12 +17,12 @@ const { Header, Sider, Content } = Layout
 const menuItems = [
   { key: '/', icon: <HomeOutlined />, label: '首页' },
   { key: '/pro-field', icon: <AppstoreOutlined />, label: 'TextField 示例' },
-  { key: '/table', icon: <AppstoreOutlined />, label: 'Table 示例' },
+  { key: '/table', icon: <AppstoreOutlined />, label: 'HocTable 示例' },
   { key: '/crud-table', icon: <TableOutlined />, label: 'CrudTable 示例' },
   { key: '/action-overlay', icon: <ExportOutlined />, label: '抽屉与弹窗' },
   { key: '/form-group', icon: <FormOutlined />, label: 'FormGroup 示例' },
   { key: '/schema-form', icon: <ProfileOutlined />, label: 'SchemaForm 示例' },
-  { key: '/tree-select', icon: <AppstoreOutlined />, label: 'TreeSelect 示例' },
+  { key: '/tree-select', icon: <AppstoreOutlined />, label: 'List / ListTree 示例' },
 ]
 
 function App() {
