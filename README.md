@@ -108,12 +108,16 @@ xc-view/
 
 ### AI Agent Skills
 
-仓库在 `skills/` 维护项目级 Agent Skills，`.agents/skills` 指向该目录：
+仓库在 `packages/xc-antd/skills/` 维护与 npm 包版本一致的 Agent Skills，`.agents/skills` 指向该目录：
 
 - `xc-antd` - 帮助 AI 选择并正确使用组件。
+- `xc-antd-image-upload` - 专门处理 ImageUpload、图片裁剪、Canvas 输出与上传问题。
 - `xc-antd-component-authoring` - 约束组件库目录、API、样式、兼容与测试方式。
 
-新的 AI Agent 会话可自动发现这两个 Skills。详细组件资料位于各 Skill 的 `references/` 中，按任务需要加载。
+新的 AI Agent 会话可自动发现这三个 Skills。详细组件资料位于各 Skill 的 `references/` 中，按任务需要加载。
+
+使用方安装 npm 包后，在其项目根目录执行 `npx xc-antd-skills install`
+即可安装使用 Skill；升级包后使用 `--force` 同步新版本。
 
 ## 快速开始
 
@@ -232,16 +236,13 @@ import '@zhilv/xc-antd/style';
 }
 ```
 
-## 构建配置
+## 发布与构建
 
-### Vite 库模式
+`@zhilv/xc-antd` 以 ESM TypeScript/TSX 源码发布，包入口为
+`src/index.ts`，使用方由 Vite 等现代构建器编译。发布前执行测试和
+TypeScript 类型检查，不发布 `dist/` 或 CommonJS 产物。
 
-组件库使用 Vite Library 模式构建：
-
-- 输出格式：ES Module + CommonJS
-- 自动生成 TypeScript 声明文件
-- 外部化 React、ReactDOM、Ant Design 依赖
-- 支持 CSS 代码分割
+Vite Library 模式仅用于仓库内部的浏览器打包验证。
 
 ### ESLint 配置
 

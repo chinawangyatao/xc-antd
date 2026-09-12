@@ -25,7 +25,20 @@ bun run build:docs
 git diff --check
 ```
 
-The package build must produce declarations without TypeScript errors. Treat a successful exit containing a TypeScript diagnostic as a failure to fix.
+The package source typecheck must pass without TypeScript errors. The optional
+Vite build verifies browser bundling and CSS, but declarations are not generated
+because the published type entry is the TypeScript source itself.
+
+When package metadata, the installer, or Skills change, also run:
+
+```bash
+bun test packages/xc-antd/tests/SkillInstaller.test.ts
+npm pack --dry-run --workspace @zhilv/xc-antd --json
+```
+
+Confirm the pack list contains `src/`, `skills/`, and `scripts/install-skills.mjs`.
+It must not contain `dist/`, tests, docs, nested component package manifests, or
+workspace-only files.
 
 ## Docs verification
 

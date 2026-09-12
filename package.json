@@ -13,8 +13,8 @@
     "build:docs": "bun run --filter @xc-antd/docs build",
     "lint": "eslint .",
     "test": "bun test packages/xc-antd/tests",
-    "pack:private": "bun run build && npm pack --dry-run --workspace @zhilv/xc-antd",
-    "publish:private": "bun run test && bun run build && npm publish --workspace @zhilv/xc-antd",
+    "pack:private": "bun run test && bun run --filter @zhilv/xc-antd typecheck && npm pack --dry-run --workspace @zhilv/xc-antd",
+    "publish:private": "bun run test && bun run --filter @zhilv/xc-antd typecheck && npm publish --workspace @zhilv/xc-antd",
     "preview": "bun run --filter @xc-antd/docs preview"
   },
   "devDependencies": {

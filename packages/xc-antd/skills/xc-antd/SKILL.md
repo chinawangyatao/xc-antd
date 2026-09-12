@@ -14,6 +14,7 @@ Read [references/component-map.md](references/component-map.md) when component s
 - Fields and schema-driven forms: read [references/text-field.md](references/text-field.md) for `TextField`; read [references/forms.md](references/forms.md) for `SchemaForm` or `FormGroup`.
 - Tables: read [references/crud-table.md](references/crud-table.md) for request/query CRUD flows; read [references/hoc-table.md](references/hoc-table.md) for local data and inline new rows.
 - Lists and trees: read [references/lists.md](references/lists.md).
+- Image upload or cropping: prefer the dedicated `xc-antd-image-upload` Skill.
 - Drawers, modals, async confirmation, or unsaved-change prompts: read [references/overlays.md](references/overlays.md).
 
 Read only the references needed for the current task.
@@ -32,11 +33,11 @@ In a consuming repository, inspect the installed version first:
 npm ls @zhilv/xc-antd --depth=0
 ```
 
-Then read `node_modules/@zhilv/xc-antd/dist/index.d.ts`. Treat those installed declarations as authoritative when they differ from this repository.
+Then read `node_modules/@zhilv/xc-antd/src/index.ts` and the relevant source `types.ts`. The package publishes ESM TypeScript/TSX source, so installed source is authoritative when it differs from this repository.
 
 ## Implementation rules
 
-- Import public components and types from `@zhilv/xc-antd`; consumers also import `@zhilv/xc-antd/style` once.
+- Import public components and types from `@zhilv/xc-antd`; import `@zhilv/xc-antd/style` once and ensure the consumer build handles ESM TS/TSX and Tailwind CSS v4.
 - Preserve generic record/value types instead of falling back to `any`.
 - Prefer canonical names. `SimpleTable`, `CRUDTable`, `XcColumnDef`, and related names are compatibility aliases; new code uses `HocTable`, `CrudTable`, and `HocTableColumn`.
 - `InputTree` no longer exists. Use `ListTree`.

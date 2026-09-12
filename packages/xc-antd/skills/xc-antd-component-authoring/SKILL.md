@@ -31,6 +31,8 @@ Read the relevant guidance:
 - New names are canonical. Keep an old name only when compatibility is required, export it as a deprecated alias, and do not maintain a second implementation.
 - Do not create inert buttons or callbacks. Every visible default action must work or be supplied by the caller.
 - Keep async loading, rejection, and controlled/uncontrolled behavior correct.
+- When a public API, canonical name, or behavior changes, update the matching Skill or reference under `packages/xc-antd/skills/`.
+- Treat `packages/xc-antd/skills/` as the only Skill source. Do not edit generated consumer copies under another project's `.agents/skills`.
 
 ## Completion
 
