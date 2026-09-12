@@ -205,12 +205,8 @@
 .xc-image-crop-drawer__footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.xc-image-crop-drawer__footer > span {
-  color: #8c8c8c;
+  justify-content: flex-start;
+  gap: 8px;
 }
 
 @media (max-width: 760px) {

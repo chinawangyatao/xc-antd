@@ -19,8 +19,11 @@ import type {
   ImageUploadRequestContext,
 } from './types';
 import {
+  closeImageCropSession,
+  createImageCropSession,
   resolveImageUploadResponse,
   runWithConcurrency,
+  settleImageCropSessionTransition,
   validateImageFile,
 } from './utils';
 import './style.css';
@@ -87,7 +90,9 @@ function ImageUploadInner<ResponseType = unknown>(
   const [innerFiles, setInnerFiles] = React.useState<ImageUploadFile<ResponseType>[]>(
     defaultValue,
   );
-  const [cropFiles, setCropFiles] = React.useState<File[]>([]);
+  const [cropSession, setCropSession] = React.useState(() =>
+    createImageCropSession([]),
+  );
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const [previewImage, setPreviewImage] = React.useState('');
   const rootRef = React.useRef<HTMLDivElement>(null);
@@ -98,6 +103,7 @@ function ImageUploadInner<ResponseType = unknown>(
   const pendingFiles = React.useRef<Map<string, PendingFile>>(new Map());
   const abortControllers = React.useRef<Map<string, AbortController>>(new Map());
   const mergedFiles = value ?? innerFiles;
+  const cropFiles = cropSession.files;
 
   React.useEffect(() => {
     latestFiles.current = mergedFiles;
@@ -313,7 +319,7 @@ function ImageUploadInner<ResponseType = unknown>(
     }
 
     if (crop) {
-      setCropFiles(validFiles);
+      setCropSession(createImageCropSession(validFiles));
       return;
     }
     const pending = validFiles.map((file) => ({ file }));
@@ -456,19 +462,24 @@ function ImageUploadInner<ResponseType = unknown>(
 
       {cropFiles.length > 0 && (
         <ImageCropDrawer
-          open
+          open={cropSession.open}
           files={cropFiles}
           options={cropOptions}
+          afterOpenChange={(open) => {
+            setCropSession((session) =>
+              settleImageCropSessionTransition(session, open),
+            );
+          }}
           onCancel={() => {
             onCropCancel?.(cropFiles);
-            setCropFiles([]);
+            setCropSession(closeImageCropSession);
           }}
           onComplete={async (results) => {
             results
               .filter((result) => result.cropped)
               .forEach((result) => onCropComplete?.(result));
             onBatchCropComplete?.(results);
-            setCropFiles([]);
+            setCropSession(closeImageCropSession);
             const pending = results.map((result) => ({
               file: result.file,
               cropResult: result,

@@ -32,6 +32,7 @@ published source style entry.
 - `canMoveBox` controls stencil movement; `fixedBox` disables stencil resizing.
 - `movable`, `scalable`, and `rotatable` control image transforms through cropper background-wrapper props.
 - The component owns only object URLs it created. Revoke them on replacement, removal, clear, or unmount.
+- Keep crop files mounted while the Drawer closes; clear the session from `afterOpenChange(false)` so the exit animation and object URLs remain available until it finishes.
 - Removing an uploading file aborts its request. An aborted request must not restore an error row.
 - Round output uses `CircleStencil` for UI and a Canvas ellipse mask for the actual file.
 - Never run several crop drawers simultaneously; upload concurrency is independent from crop sequencing.

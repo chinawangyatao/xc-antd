@@ -1,8 +1,11 @@
 import { describe, expect, test } from 'bun:test';
 import {
+  closeImageCropSession,
+  createImageCropSession,
   createCroppedImageFile,
   resolveImageUploadResponse,
   runWithConcurrency,
+  settleImageCropSessionTransition,
   validateImageFile,
 } from '../src/ImageUpload/utils';
 
@@ -39,6 +42,20 @@ describe('ImageUpload response handling', () => {
 });
 
 describe('ImageUpload crop output', () => {
+  test('retains crop files until the drawer close transition finishes', () => {
+    const files = [new File(['image'], 'photo.png', { type: 'image/png' })];
+    const opened = createImageCropSession(files);
+    const closing = closeImageCropSession(opened);
+
+    expect(closing).toEqual({ files, open: false });
+    expect(closing.files).toBe(files);
+    expect(settleImageCropSessionTransition(closing, false)).toEqual({
+      files: [],
+      open: false,
+    });
+    expect(settleImageCropSessionTransition(opened, false)).toBe(opened);
+  });
+
   test('creates a typed cropped File from canvas output', async () => {
     const canvas = {
       toBlob: (

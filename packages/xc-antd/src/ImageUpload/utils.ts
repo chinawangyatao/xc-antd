@@ -9,6 +9,29 @@ export interface ImageValidationOptions {
   maxSizeMB: number;
 }
 
+export interface ImageCropSessionState {
+  files: File[];
+  open: boolean;
+}
+
+export function createImageCropSession(files: File[]): ImageCropSessionState {
+  return { files, open: files.length > 0 };
+}
+
+export function closeImageCropSession(
+  session: ImageCropSessionState,
+): ImageCropSessionState {
+  return session.open ? { ...session, open: false } : session;
+}
+
+export function settleImageCropSessionTransition(
+  session: ImageCropSessionState,
+  open: boolean,
+): ImageCropSessionState {
+  if (open || session.open) return session;
+  return createImageCropSession([]);
+}
+
 export function validateImageFile(
   file: File,
   { accept, maxSizeMB }: ImageValidationOptions,

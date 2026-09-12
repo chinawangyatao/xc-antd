@@ -70,12 +70,50 @@ function getCanvasOptions(options: ImageCropOptions) {
   };
 }
 
+export function ImageCropDrawerFooter({
+  completeText,
+  completeDisabled,
+  processing,
+  showSkip,
+  onComplete,
+  onSkip,
+  onCancel,
+}: {
+  completeText: React.ReactNode;
+  completeDisabled: boolean;
+  processing: boolean;
+  showSkip: boolean;
+  onComplete: () => void;
+  onSkip: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="xc-image-crop-drawer__footer">
+      <Button
+        type="primary"
+        loading={processing}
+        disabled={completeDisabled}
+        onClick={onComplete}
+      >
+        {completeText}
+      </Button>
+      {showSkip && (
+        <Button disabled={processing} onClick={onSkip}>
+          跳过
+        </Button>
+      )}
+      <Button onClick={onCancel}>取消</Button>
+    </div>
+  );
+}
+
 export function ImageCropDrawer({
   open,
   files,
   options = {},
   title = '图片裁剪',
   width = 960,
+  afterOpenChange,
   onCancel,
   onComplete,
 }: ImageCropDrawerProps) {
@@ -178,29 +216,18 @@ export function ImageCropDrawer({
       destroyOnHidden
       keyboard={false}
       mask={{ closable: false }}
+      afterOpenChange={afterOpenChange}
       onClose={onCancel}
       footer={(
-        <div className="xc-image-crop-drawer__footer">
-          <span>
-            {sources.length > 0 ? `${currentIndex + 1} / ${sources.length}` : '0 / 0'}
-          </span>
-          <Space>
-            <Button onClick={onCancel}>取消</Button>
-            {sources.length > 1 && (
-              <Button disabled={processing} onClick={() => void skipCurrent()}>
-                跳过
-              </Button>
-            )}
-            <Button
-              type="primary"
-              loading={processing}
-              disabled={!ready || !currentSource}
-              onClick={() => void cropCurrent()}
-            >
-              {currentIndex < sources.length - 1 ? '应用并下一张' : '完成裁剪'}
-            </Button>
-          </Space>
-        </div>
+        <ImageCropDrawerFooter
+          completeText={currentIndex < sources.length - 1 ? '应用并下一张' : '完成裁剪'}
+          completeDisabled={!ready || !currentSource}
+          processing={processing}
+          showSkip={sources.length > 1}
+          onComplete={() => void cropCurrent()}
+          onSkip={() => void skipCurrent()}
+          onCancel={onCancel}
+        />
       )}
     >
       {messageContextHolder}

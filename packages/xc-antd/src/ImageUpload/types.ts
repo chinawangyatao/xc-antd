@@ -35,6 +35,7 @@ export interface ImageCropDrawerProps {
   options?: ImageCropOptions;
   title?: React.ReactNode;
   width?: number | string;
+  afterOpenChange?: (open: boolean) => void;
   onCancel: () => void;
   onComplete: (results: ImageCropResult[]) => void | Promise<void>;
 }

@@ -37,5 +37,7 @@ Important behavior:
 
 Use `ImageCropDrawer` directly when files are selected or uploaded by another workflow.
 Its public API exposes `File` and `ImageCropResult`, not react-advanced-cropper types.
+Use its optional `afterOpenChange` callback when external state should be cleared only
+after the Drawer close transition finishes.
 
 Source: `packages/xc-antd/src/ImageUpload/`; live example: `apps/docs/src/pages/ImageUploadDemo.tsx`.
