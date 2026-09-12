@@ -9,6 +9,10 @@ Use `ListPanel<ItemType>` for a searchable selectable flat list.
   data={departments}
   defaultSelectedKey="product"
   title="部门列表"
+  showAddButton
+  showSearchInput
+  showToolbarSelect
+  toolbarSelectProps={{ options: departmentTypes }}
   onSelect={(item, selectedKey) => setSelected(selectedKey ? item : undefined)}
   contextMenu={{
     onClick: ({ key, data }) => handleItemAction(key, data),
@@ -19,7 +23,8 @@ Use `ListPanel<ItemType>` for a searchable selectable flat list.
 - Default fields: `id`, `title`, `subTitle`, `disabled`; override with `fieldNames` or `getItemKey`.
 - Selection supports controlled `selectedKey` or uncontrolled `defaultSelectedKey`.
 - Clicking the selected item clears it by default; set `allowDeselect={false}` to retain it.
-- Use `toolbarSelectProps`, `toolbarExtra`, `showAddButton`, and `onAdd` for toolbar composition.
+- `showAddButton`, `showSearchInput`, and `showToolbarSelect` independently control toolbar visibility. A toolbar select renders only when `toolbarSelectProps` is provided; `searchable` remains supported for search visibility.
+- Use `toolbarSelectProps` and `toolbarExtra` for custom toolbar composition.
 - Default right-click keys are `edit` and `delete`.
 
 ## ListTree
@@ -30,6 +35,10 @@ Use `ListTree<NodeType>` for hierarchical navigation and search.
 <ListTree<ScenicNode>
   treeData={treeData}
   defaultExpandedKeys={['root']}
+  showAddButton={false}
+  showSearchInput
+  showToolbarSelect
+  toolbarSelectProps={{ options: nodeTypes }}
   nodeIcon={(node) => iconByType(node.type)}
   contextMenu={{
     onClick: ({ key, node }) => handleNodeAction(key, node),
@@ -40,6 +49,8 @@ Use `ListTree<NodeType>` for hierarchical navigation and search.
 - It passes through Ant Design Tree props except wrapper-specific class/style/tree data handling.
 - `nodeIcon(node)` supplies per-node icons; an explicit `treeData[].icon` wins.
 - Search preserves matching ancestor chains and auto-expands them.
+- It uses the same `showAddButton`, `showSearchInput`, `showToolbarSelect`, and `toolbarSelectProps` toolbar API as `ListPanel`.
+- Right-click dropdowns remain independently controlled by `contextMenu`; tree checkboxes use the inherited Ant Design `checkable` prop.
 - Default right-click keys are `addChild`, `edit`, and `delete`.
 - Delete confirmation is enabled for both list components. Customize `deleteConfirm` or use `false` only when the caller intentionally owns confirmation.
 - Do not pass `expandedKeys={undefined}`. Omit it for an uncontrolled tree.

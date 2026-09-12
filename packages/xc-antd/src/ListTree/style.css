@@ -11,7 +11,14 @@
 }
 
 .xc-list-tree__search {
+  flex: 1 1 0;
   min-width: 0;
+  width: 0;
+}
+
+.xc-list-tree__select {
+  flex: 0 0 104px;
+  width: 104px;
 }
 
 .xc-list-tree__tree .ant-tree-node-content-wrapper,

@@ -2,10 +2,12 @@ import {
   Button,
   Dropdown,
   Input,
+  Select,
   Tree,
   type ButtonProps,
   type InputProps,
   type MenuProps,
+  type SelectProps,
   type TreeProps,
 } from 'antd';
 import {
@@ -20,6 +22,7 @@ import {
   useListDeleteConfirm,
   type ListDeleteConfirmOptions,
 } from '../shared/listDeleteConfirm';
+import { resolveListToolbarVisibility } from '../shared/listToolbar';
 import './style.css';
 
 type MenuClickInfo = Parameters<NonNullable<MenuProps['onClick']>>[0];
@@ -50,6 +53,8 @@ export interface ListTreeProps<TreeDataType extends object = ListTreeDataNode>
   treeStyle?: CSSProperties;
 
   searchable?: boolean;
+  /** 是否显示搜索输入框，优先级高于 searchable。 */
+  showSearchInput?: boolean;
   searchValue?: string;
   defaultSearchValue?: string;
   searchPlaceholder?: string;
@@ -58,6 +63,10 @@ export interface ListTreeProps<TreeDataType extends object = ListTreeDataNode>
   getNodeSearchText?: (node: TreeDataType) => string;
   autoExpandOnSearch?: boolean;
 
+  /** 下拉筛选配置，传入后默认显示。 */
+  toolbarSelectProps?: SelectProps;
+  /** 是否显示已配置的下拉筛选。 */
+  showToolbarSelect?: boolean;
   /** 默认显示左上角的添加按钮。 */
   showAddButton?: boolean;
   addButtonProps?: Omit<ButtonProps, 'onClick'>;
@@ -212,6 +221,7 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
   treeClassName,
   treeStyle,
   searchable = true,
+  showSearchInput,
   searchValue,
   defaultSearchValue = '',
   searchPlaceholder = '请输入',
@@ -219,6 +229,8 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
   onSearchChange,
   getNodeSearchText,
   autoExpandOnSearch = true,
+  toolbarSelectProps,
+  showToolbarSelect,
   showAddButton,
   addButtonProps,
   onAdd,
@@ -274,11 +286,22 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
     ? {}
     : { expandedKeys: resolvedExpandedKeys };
   const shouldShowAddButton = showAddButton ?? true;
-  const shouldShowToolbar = searchable || shouldShowAddButton || Boolean(toolbarExtra);
+  const toolbarVisibility = resolveListToolbarVisibility({
+    searchable,
+    showSearchInput,
+    hasToolbarSelect: Boolean(toolbarSelectProps),
+    showToolbarSelect,
+    showAddButton: shouldShowAddButton,
+    hasToolbarExtra: Boolean(toolbarExtra),
+  });
   const {
     onChange: onSearchInputChange,
     ...restSearchInputProps
   } = searchInputProps ?? {};
+  const {
+    className: selectClassName,
+    ...restToolbarSelectProps
+  } = toolbarSelectProps ?? {};
 
   const renderTitle = (node: TreeDataType) => {
     const rawTitle = titleRender
@@ -320,7 +343,7 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
   return (
     <div className={joinClassNames('xc-list-tree', className)} style={style}>
       {contextHolder}
-      {shouldShowToolbar && (
+      {toolbarVisibility.toolbar && (
         <div className="xc-list-tree__toolbar">
           {shouldShowAddButton && (
             <Button
@@ -330,8 +353,15 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
               onClick={onAdd}
             />
           )}
+          {toolbarVisibility.toolbarSelect && (
+            <Select
+              placeholder="请选择"
+              {...restToolbarSelectProps}
+              className={joinClassNames('xc-list-tree__select', selectClassName)}
+            />
+          )}
           {toolbarExtra}
-          {searchable && (
+          {toolbarVisibility.searchInput && (
             <Input
               allowClear
               aria-label="搜索树节点"

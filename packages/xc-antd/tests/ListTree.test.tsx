@@ -5,6 +5,7 @@ import {
   type ListTreeProps,
 } from '../src/ListTree';
 import { filterListTreeData } from '../src/ListTree/ListTree';
+import { resolveListToolbarVisibility } from '../src/shared/listToolbar';
 
 interface TestNode {
   key: string;
@@ -98,5 +99,34 @@ describe('ListTree', () => {
     );
 
     expect(html).toContain('ant-dropdown-trigger');
+  });
+
+  test('shows and hides toolbar controls independently', () => {
+    expect(resolveListToolbarVisibility({
+      searchable: true,
+      showSearchInput: false,
+      hasToolbarSelect: true,
+      showToolbarSelect: false,
+      showAddButton: false,
+      hasToolbarExtra: false,
+    })).toEqual({
+      searchInput: false,
+      toolbarSelect: false,
+      toolbar: false,
+    });
+
+    const hiddenHtml = renderToStaticMarkup(
+      <ListTree
+        treeData={treeData}
+        showAddButton={false}
+        showSearchInput={false}
+        showToolbarSelect={false}
+        toolbarSelectProps={{
+          options: [{ value: 'all', label: '全部' }],
+        }}
+      />,
+    );
+
+    expect(hiddenHtml).not.toContain('xc-list-tree__toolbar');
   });
 });

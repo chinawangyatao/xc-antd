@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ListPanel, ListTree } from '@zhilv/xc-antd';
 import {
     Alert,
@@ -7,6 +7,8 @@ import {
     Descriptions,
     message,
     Row,
+    Space,
+    Switch,
     Typography,
     type TreeDataNode,
 } from 'antd';
@@ -116,6 +118,21 @@ const treeData: ScenicTreeNode[] = [
     },
 ];
 
+function filterTreeByNodeType(
+    nodes: ScenicTreeNode[],
+    nodeType: 'all' | ScenicNodeType,
+): ScenicTreeNode[] {
+    if (nodeType === 'all') return nodes;
+
+    return nodes.flatMap((node) => {
+        if (node.nodeType === nodeType) return [node];
+        const children = node.children
+            ? filterTreeByNodeType(node.children, nodeType)
+            : [];
+        return children.length > 0 ? [{ ...node, children }] : [];
+    });
+}
+
 const departmentData: DepartmentItem[] = [
     {
         id: 'product-toc',
@@ -155,7 +172,15 @@ const TreeSelectPage = () => {
     const [selectedNode, setSelectedNode] = useState<ScenicTreeNode>(treeData[0]);
     const [selectedDepartment, setSelectedDepartment] = useState<DepartmentItem>(departmentData[0]);
     const [departmentCategory, setDepartmentCategory] = useState<'all' | DepartmentItem['category']>('all');
+    const [treeNodeType, setTreeNodeType] = useState<'all' | ScenicNodeType>('all');
+    const [showAddButton, setShowAddButton] = useState(true);
+    const [showSearchInput, setShowSearchInput] = useState(true);
+    const [showToolbarSelect, setShowToolbarSelect] = useState(true);
     const [lastAction, setLastAction] = useState('尚未操作');
+    const filteredTreeData = useMemo(
+        () => filterTreeByNodeType(treeData, treeNodeType),
+        [treeNodeType],
+    );
 
     const showAction = (action: string, node?: ScenicTreeNode) => {
         const nodeTitle = node?.title ?? '根节点';
@@ -171,18 +196,54 @@ const TreeSelectPage = () => {
                 ListPanel / ListTree 列表组件
             </Typography.Title>
             <Typography.Paragraph type="secondary">
-                ListPanel 用于平铺列表，ListTree 用于层级树；两者均支持搜索和鼠标右键菜单。
+                ListPanel 用于平铺列表，ListTree 用于层级树；两者的添加按钮、搜索框和下拉选择都可独立显隐。
             </Typography.Paragraph>
+
+            <Card size="small" title="工具栏显隐配置" style={{ marginBottom: 16 }}>
+                <Space wrap>
+                    <Switch
+                        checked={showAddButton}
+                        checkedChildren="添加显示"
+                        unCheckedChildren="添加隐藏"
+                        onChange={setShowAddButton}
+                    />
+                    <Switch
+                        checked={showSearchInput}
+                        checkedChildren="搜索显示"
+                        unCheckedChildren="搜索隐藏"
+                        onChange={setShowSearchInput}
+                    />
+                    <Switch
+                        checked={showToolbarSelect}
+                        checkedChildren="下拉显示"
+                        unCheckedChildren="下拉隐藏"
+                        onChange={setShowToolbarSelect}
+                    />
+                </Space>
+            </Card>
 
             <Row gutter={[16, 16]} align="stretch">
                 <Col xs={24} xl={10}>
                     <Card title="ListTree 树列表" styles={{ body: { padding: 16 } }}>
                         <ListTree<ScenicTreeNode>
                             height={520}
-                            treeData={treeData}
+                            treeData={filteredTreeData}
                             defaultExpandedKeys={['0-0', '0-0-0', '0-1', '0-2']}
                             defaultSelectedKeys={['0-0']}
+                            showAddButton={showAddButton}
+                            showSearchInput={showSearchInput}
+                            showToolbarSelect={showToolbarSelect}
                             onAdd={() => showAction('添加')}
+                            toolbarSelectProps={{
+                                value: treeNodeType,
+                                options: [
+                                    { value: 'all', label: '全部' },
+                                    { value: 'scenic', label: '景区' },
+                                    { value: 'station', label: '售票站' },
+                                    { value: 'window', label: '售票窗口' },
+                                ],
+                                onChange: setTreeNodeType,
+                            }}
                             onSelect={(_, info) => {
                                 setSelectedNode(info.node as unknown as ScenicTreeNode);
                             }}
@@ -211,6 +272,9 @@ const TreeSelectPage = () => {
                             title="部门列表"
                             height={430}
                             defaultSelectedKey="product-toc"
+                            showAddButton={showAddButton}
+                            showSearchInput={showSearchInput}
+                            showToolbarSelect={showToolbarSelect}
                             onAdd={() => showAction('添加列表项')}
                             toolbarSelectProps={{
                                 value: departmentCategory,
@@ -238,7 +302,7 @@ const TreeSelectPage = () => {
                         <Alert
                             showIcon
                             type="info"
-                            message="点击树箭头展开或收起；两个组件均可搜索；右键节点或列表项可操作，删除前会二次确认。"
+                            message="点击树箭头展开或收起；上方开关可实时控制两个组件的工具栏控件；右键菜单由 contextMenu 独立开启，树复选框使用 checkable。"
                             style={{ marginBottom: 16 }}
                         />
                         <Descriptions

@@ -22,6 +22,7 @@ import {
   useListDeleteConfirm,
   type ListDeleteConfirmOptions,
 } from '../shared/listDeleteConfirm';
+import { resolveListToolbarVisibility } from '../shared/listToolbar';
 import './style.css';
 
 type MenuClickInfo = Parameters<NonNullable<MenuProps['onClick']>>[0];
@@ -68,6 +69,8 @@ export interface ListPanelProps<ItemType extends object = ListPanelDataItem> {
   onSelect?: (item: ItemType, selectedKey: Key | null) => void;
 
   searchable?: boolean;
+  /** 是否显示搜索输入框，优先级高于 searchable。 */
+  showSearchInput?: boolean;
   searchValue?: string;
   defaultSearchValue?: string;
   searchPlaceholder?: string;
@@ -75,8 +78,11 @@ export interface ListPanelProps<ItemType extends object = ListPanelDataItem> {
   getItemSearchText?: (item: ItemType) => string;
   onSearchChange?: (value: string) => void;
 
-  /** 传入后在搜索框前显示下拉筛选。 */
+  /** 下拉筛选配置，传入后默认显示。 */
   toolbarSelectProps?: SelectProps;
+  /** 是否显示已配置的下拉筛选。 */
+  showToolbarSelect?: boolean;
+  /** 是否显示添加按钮，默认显示。 */
   showAddButton?: boolean;
   addButtonProps?: Omit<ButtonProps, 'onClick'>;
   onAdd?: () => void;
@@ -127,6 +133,7 @@ export function ListPanel<ItemType extends object = ListPanelDataItem>({
   allowDeselect = true,
   onSelect,
   searchable = true,
+  showSearchInput,
   searchValue,
   defaultSearchValue = '',
   searchPlaceholder = '请输入内容',
@@ -134,6 +141,7 @@ export function ListPanel<ItemType extends object = ListPanelDataItem>({
   getItemSearchText,
   onSearchChange,
   toolbarSelectProps,
+  showToolbarSelect,
   showAddButton,
   addButtonProps,
   onAdd,
@@ -157,10 +165,14 @@ export function ListPanel<ItemType extends object = ListPanelDataItem>({
   const mergedSearchValue = searchValue ?? innerSearchValue;
   const resolvedFieldNames = { ...defaultFieldNames, ...fieldNames };
   const shouldShowAddButton = showAddButton ?? true;
-  const shouldShowToolbar = searchable
-    || shouldShowAddButton
-    || Boolean(toolbarSelectProps)
-    || Boolean(toolbarExtra);
+  const toolbarVisibility = resolveListToolbarVisibility({
+    searchable,
+    showSearchInput,
+    hasToolbarSelect: Boolean(toolbarSelectProps),
+    showToolbarSelect,
+    showAddButton: shouldShowAddButton,
+    hasToolbarExtra: Boolean(toolbarExtra),
+  });
   const {
     onChange: onSearchInputChange,
     ...restSearchInputProps
@@ -209,7 +221,7 @@ export function ListPanel<ItemType extends object = ListPanelDataItem>({
   return (
     <div className={joinClassNames('xc-list-panel', className)} style={style}>
       {contextHolder}
-      {shouldShowToolbar && (
+      {toolbarVisibility.toolbar && (
         <div className="xc-list-panel__toolbar">
           {shouldShowAddButton && (
             <Button
@@ -219,7 +231,7 @@ export function ListPanel<ItemType extends object = ListPanelDataItem>({
               onClick={onAdd}
             />
           )}
-          {toolbarSelectProps && (
+          {toolbarVisibility.toolbarSelect && (
             <Select
               placeholder="请选择"
               {...restToolbarSelectProps}
@@ -227,7 +239,7 @@ export function ListPanel<ItemType extends object = ListPanelDataItem>({
             />
           )}
           {toolbarExtra}
-          {searchable && (
+          {toolbarVisibility.searchInput && (
             <Input
               allowClear
               aria-label="搜索列表"

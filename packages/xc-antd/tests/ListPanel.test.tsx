@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { ListPanel } from '../src/ListPanel';
+import { resolveListToolbarVisibility } from '../src/shared/listToolbar';
 
 const data = [
   { id: 1, title: '产品1组', subTitle: '面向个人用户' },
@@ -59,5 +60,32 @@ describe('ListPanel', () => {
     );
 
     expect(html).toContain('ant-dropdown-trigger');
+  });
+
+  test('shows and hides toolbar controls independently', () => {
+    expect(resolveListToolbarVisibility({
+      searchable: true,
+      hasToolbarSelect: true,
+      showAddButton: true,
+      hasToolbarExtra: false,
+    })).toEqual({
+      searchInput: true,
+      toolbarSelect: true,
+      toolbar: true,
+    });
+
+    const hiddenHtml = renderToStaticMarkup(
+      <ListPanel
+        data={data}
+        showAddButton={false}
+        showSearchInput={false}
+        showToolbarSelect={false}
+        toolbarSelectProps={{
+          options: [{ value: 'all', label: '全部' }],
+        }}
+      />,
+    );
+
+    expect(hiddenHtml).not.toContain('xc-list-panel__toolbar');
   });
 });
