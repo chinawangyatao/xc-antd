@@ -5,16 +5,18 @@ import {
   Empty,
   Input,
   Select,
+  Spin,
   type SelectProps,
 } from 'antd';
 import type { CSSProperties } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GroupedSelectAddEditor } from './AddEditor';
 import { GroupedSelectDeleteButton } from './DeleteButton';
 import { GroupedSelectEditEditor } from './EditEditor';
 import type { ListDeleteConfirmOptions } from '../shared/listDeleteConfirm';
 import {
-  filterGroupedSelectGroups,
+  getVisibleGroupedSelectGroups,
+  resolveGroupedSelectOptions,
   toggleGroupedSelectValue,
   type GroupedSelectGroup,
   type GroupedSelectOption,
@@ -22,19 +24,28 @@ import {
 } from './utils';
 import './style.css';
 
+const EMPTY_SELECTED_OPTIONS: GroupedSelectOption[] = [];
+
 export interface GroupedSelectProps {
   groups: GroupedSelectGroup[];
   value?: GroupedSelectValue[];
   defaultValue?: GroupedSelectValue[];
   onChange?: (values: GroupedSelectValue[]) => void;
+  /** 远程模式下，初始已选项未包含在 groups 时可用它提供标签文案。 */
+  selectedOptions?: GroupedSelectOption[];
   placeholder?: string;
   searchPlaceholder?: string;
+  /** remote 模式只展示传入的 groups，不再执行本地筛选。 */
+  searchMode?: 'local' | 'remote';
+  onSearchChange?: (keyword: string) => void;
+  searchLoading?: boolean;
   /** 在下拉框内输入分组名并确认后调用。 */
   onAddGroup?: (label: string) => void | Promise<void>;
   /** 在下拉框内输入标签名并选择所属分组后调用。 */
   onAddOption?: (label: string, group: GroupedSelectGroup) => void | Promise<void>;
   /** 编辑分组名称，保存时调用；返回 Promise 时等待完成。 */
   onEditGroup?: (group: GroupedSelectGroup, label: string) => void | Promise<void>;
+  /** 远程模式下 groups 可能是部分结果，调用方还需清理该分组下的受控已选值。 */
   onDeleteGroup?: (group: GroupedSelectGroup) => void | Promise<void>;
   /** 编辑标签名称，保存时调用；返回 Promise 时等待完成。 */
   onEditOption?: (option: GroupedSelectOption, group: GroupedSelectGroup, label: string) => void | Promise<void>;
@@ -53,8 +64,12 @@ export function GroupedSelect({
   value,
   defaultValue = [],
   onChange,
+  selectedOptions = EMPTY_SELECTED_OPTIONS,
   placeholder = '请选择',
   searchPlaceholder = '请输入内容',
+  searchMode = 'local',
+  onSearchChange,
+  searchLoading = false,
   onAddGroup,
   onAddOption,
   onEditGroup,
@@ -82,13 +97,41 @@ export function GroupedSelect({
   const [editLabel, setEditLabel] = useState('');
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState('');
+  const [cachedOptions, setCachedOptions] = useState(
+    () => new Map<GroupedSelectValue, GroupedSelectOption>(),
+  );
   const selected = value === undefined ? innerValue : value;
-  const visibleGroups = filterGroupedSelectGroups(groups, search);
-  const options = groups.flatMap((group) => group.options.map((option) => ({
-    value: option.value,
-    label: option.label,
-    disabled: option.disabled,
-  })));
+  const visibleGroups = getVisibleGroupedSelectGroups(groups, search, searchMode);
+  const options = resolveGroupedSelectOptions(
+    groups, selected, selectedOptions, cachedOptions,
+  );
+
+  useEffect(() => {
+    const selectedValues = new Set(selected);
+    // The cache is only for labels of selected values that may disappear from remote results.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCachedOptions((previous) => {
+      const next = new Map(
+        [...previous].filter(([key]) => selectedValues.has(key)),
+      );
+      selectedOptions.forEach((option) => {
+        if (selectedValues.has(option.value) && !next.has(option.value)) {
+          next.set(option.value, option);
+        }
+      });
+      groups.forEach((group) => group.options.forEach((option) => {
+        if (selectedValues.has(option.value)) next.set(option.value, option);
+      }));
+      if (next.size === previous.size && [...next].every(([key, option]) =>
+        previous.get(key) === option)) return previous;
+      return next;
+    });
+  }, [groups, selected, selectedOptions]);
+
+  const updateSearch = (keyword: string) => {
+    setSearch(keyword);
+    onSearchChange?.(keyword);
+  };
 
   const commit = (next: GroupedSelectValue[]) => {
     if (value === undefined) setInnerValue(next);
@@ -109,6 +152,7 @@ export function GroupedSelect({
       if (editing.kind === 'group') await onEditGroup?.(editing.group, label);
       else if (editing.option) await onEditOption?.(editing.option, editing.group, label);
       setEditing(null);
+      if (searchMode === 'remote' && search) onSearchChange?.(search);
     } catch (error) {
       setEditError(error instanceof Error ? error.message : '编辑失败，请重试');
     } finally {
@@ -134,7 +178,7 @@ export function GroupedSelect({
       else if (group) await onAddOption?.(label, group);
       setAddMode(null);
       setDraftLabel('');
-      setSearch('');
+      updateSearch('');
     } catch (error) {
       setAddError(error instanceof Error ? error.message : '新增失败，请重试');
     } finally {
@@ -144,15 +188,19 @@ export function GroupedSelect({
   const deleteGroup = async (group: GroupedSelectGroup) => {
     await onDeleteGroup?.(group);
     if (editing?.group.id === group.id) setEditing(null);
-    const removed = new Set(group.options.map((option) => option.value));
-    const next = selected.filter((item) => !removed.has(item));
-    if (next.length !== selected.length) commit(next);
+    if (searchMode === 'local') {
+      const removed = new Set(group.options.map((option) => option.value));
+      const next = selected.filter((item) => !removed.has(item));
+      if (next.length !== selected.length) commit(next);
+    }
+    if (searchMode === 'remote' && search) onSearchChange?.(search);
   };
   const deleteOption = async (option: GroupedSelectOption, group: GroupedSelectGroup) => {
     await onDeleteOption?.(option, group);
     if (editing?.option?.value === option.value) setEditing(null);
     const next = selected.filter((item) => item !== option.value);
     if (next.length !== selected.length) commit(next);
+    if (searchMode === 'remote' && search) onSearchChange?.(search);
   };
 
   return (
@@ -170,7 +218,7 @@ export function GroupedSelect({
         onOpenChange={(nextOpen) => {
           setOpen(nextOpen);
           if (!nextOpen) {
-            setSearch('');
+            if (search) updateSearch('');
             setAddMode(null);
             setAddError('');
             setEditing(null);
@@ -187,11 +235,15 @@ export function GroupedSelect({
                 placeholder={searchPlaceholder}
                 suffix={<SearchOutlined />}
                 value={search}
-                onChange={(event) => setSearch(event.target.value)}
+                onChange={(event) => updateSearch(event.target.value)}
               />
             </div>
             <div className="xc-grouped-select__list">
-              {visibleGroups.length === 0 ? (
+              {searchLoading ? (
+                <div className="xc-grouped-select__loading" role="status">
+                  <Spin size="small" /> 正在搜索...
+                </div>
+              ) : visibleGroups.length === 0 ? (
                 <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无匹配选项" />
               ) : visibleGroups.map((group) => (
                 <section key={group.id} className="xc-grouped-select__group">

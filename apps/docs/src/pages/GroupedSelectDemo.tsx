@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Card, Space, Typography } from 'antd';
 import {
   GroupedSelect,
   type GroupedSelectGroup,
+  type GroupedSelectOption,
   type GroupedSelectValue,
 } from '@zhilv/xc-antd';
 
@@ -17,9 +18,80 @@ const initialGroups: GroupedSelectGroup[] = [
   { id: 'group-b', label: '分组B', options: [{ value: 'b-1', label: '选项B-1' }] },
 ];
 
+const initialSelectedOption = initialGroups[0].options[0];
+const initialSelectedOptions = [initialSelectedOption];
+
+function mockSearchGroups(
+  keyword: string,
+  catalog: GroupedSelectGroup[],
+  signal: AbortSignal,
+) {
+  return new Promise<GroupedSelectGroup[]>((resolve, reject) => {
+    const timer = window.setTimeout(() => {
+      const query = keyword.trim().toLocaleLowerCase();
+      resolve(catalog.flatMap((group) => {
+        if (!query || group.label.toLocaleLowerCase().includes(query)) return [group];
+        const options = group.options.filter((option) =>
+          option.label.toLocaleLowerCase().includes(query));
+        return options.length ? [{ ...group, options }] : [];
+      }));
+    }, 320);
+    signal.addEventListener('abort', () => {
+      window.clearTimeout(timer);
+      reject(new DOMException('请求已取消', 'AbortError'));
+    }, { once: true });
+  });
+}
+
+function mockCreateGroup(label: string) {
+  return new Promise<GroupedSelectGroup>((resolve) => {
+    window.setTimeout(() => resolve({
+      id: `group-${crypto.randomUUID()}`,
+      label,
+      options: [],
+    }), 320);
+  });
+}
+
+function mockCreateOption(label: string) {
+  return new Promise<GroupedSelectOption>((resolve) => {
+    window.setTimeout(() => resolve({
+      value: `option-${crypto.randomUUID()}`,
+      label,
+    }), 320);
+  });
+}
+
 export default function GroupedSelectDemo() {
   const [groups, setGroups] = useState(initialGroups);
   const [value, setValue] = useState<GroupedSelectValue[]>([]);
+  const [remoteCatalog, setRemoteCatalog] = useState(initialGroups);
+  const [remoteGroups, setRemoteGroups] = useState(initialGroups);
+  const [remoteValue, setRemoteValue] = useState<GroupedSelectValue[]>([
+    initialSelectedOption.value,
+  ]);
+  const [remoteQuery, setRemoteQuery] = useState('');
+  const [remoteLoading, setRemoteLoading] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const debounce = window.setTimeout(() => {
+      void mockSearchGroups(remoteQuery, remoteCatalog, controller.signal)
+        .then(setRemoteGroups)
+        .catch((error: unknown) => {
+          if (!controller.signal.aborted) {
+            console.error('模拟远程搜索失败', error);
+          }
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setRemoteLoading(false);
+        });
+    }, 250);
+    return () => {
+      window.clearTimeout(debounce);
+      controller.abort();
+    };
+  }, [remoteCatalog, remoteQuery]);
 
   return (
     <Space orientation="vertical" size="large" style={{ width: '100%' }}>
@@ -70,6 +142,35 @@ export default function GroupedSelectDemo() {
         />
         <Alert style={{ marginTop: 20 }} type="info"
           message={`当前选中：${value.length ? value.join('、') : '暂无'}`} />
+      </Card>
+      <Card title="远程搜索（模拟接口）" style={{ maxWidth: 600 }}>
+        <Typography.Paragraph type="secondary">
+          搜索请求延迟 320ms，输入防抖 250ms；连续输入会取消过期请求。可以在下拉框中异步添加分组、标签，然后再次搜索新内容；已选的 A-1 跨搜索结果仍会显示名称。
+        </Typography.Paragraph>
+        <GroupedSelect
+          groups={remoteGroups}
+          value={remoteValue}
+          onChange={setRemoteValue}
+          selectedOptions={initialSelectedOptions}
+          searchMode="remote"
+          searchLoading={remoteLoading}
+          onSearchChange={(keyword) => {
+            setRemoteLoading(true);
+            setRemoteQuery(keyword);
+          }}
+          onAddGroup={async (label) => {
+            const saved = await mockCreateGroup(label);
+            setRemoteCatalog((current) => [...current, saved]);
+          }}
+          onAddOption={async (label, group) => {
+            const saved = await mockCreateOption(label);
+            setRemoteCatalog((current) => current.map((item) => item.id === group.id
+              ? { ...item, options: [...item.options, saved] }
+              : item));
+          }}
+        />
+        <Alert style={{ marginTop: 20 }} type="info"
+          message={`远程结果：${remoteGroups.length} 组；已选 ${remoteValue.length} 项`} />
       </Card>
     </Space>
   );

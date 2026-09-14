@@ -6,6 +6,8 @@ import { GroupedSelectDeleteButton } from '../src/GroupedSelect/DeleteButton';
 import { GroupedSelectEditEditor } from '../src/GroupedSelect/EditEditor';
 import {
   filterGroupedSelectGroups,
+  getVisibleGroupedSelectGroups,
+  resolveGroupedSelectOptions,
   toggleGroupedSelectValue,
   type GroupedSelectGroup,
 } from '../src/GroupedSelect/utils';
@@ -28,6 +30,24 @@ describe('GroupedSelect', () => {
     expect(filterGroupedSelectGroups(groups, ' ')).toBe(groups);
   });
 
+  test('uses server groups directly and retains labels when a selected option leaves the results', () => {
+    expect(getVisibleGroupedSelectGroups(groups, 'a-2', 'remote')).toBe(groups);
+    expect(getVisibleGroupedSelectGroups(groups, 'a-2', 'local')).toEqual([
+      { ...groups[0], options: [groups[0].options[1]] },
+    ]);
+    const cached = new Map([['a-1', groups[0].options[0]]]);
+    expect(resolveGroupedSelectOptions([groups[1]], ['a-1'], [], cached)).toEqual([
+      ...groups[1].options,
+      groups[0].options[0],
+    ]);
+    expect(resolveGroupedSelectOptions([], ['a-2'], [groups[0].options[1]], new Map()))
+      .toEqual([groups[0].options[1]]);
+    const renamed = { ...groups[0].options[0], label: '接口更新后的名称' };
+    expect(resolveGroupedSelectOptions(
+      [], ['a-1'], [groups[0].options[0]], new Map([['a-1', renamed]]),
+    )).toEqual([renamed]);
+  });
+
   test('toggles checkbox selection without changing its source array', () => {
     const selected = ['a-1'];
     expect(toggleGroupedSelectValue(selected, 'a-2')).toEqual(['a-1', 'a-2']);
@@ -43,6 +63,15 @@ describe('GroupedSelect', () => {
       <GroupedSelect groups={groups} value={['a-1']} />,
     );
     expect(selected).toContain('选项A-1');
+    const remoteSelected = renderToStaticMarkup(
+      <GroupedSelect
+        groups={[]}
+        searchMode="remote"
+        value={['a-1']}
+        selectedOptions={[groups[0].options[0]]}
+      />,
+    );
+    expect(remoteSelected).toContain('选项A-1');
   });
 
   test('renders both addition forms inside the Select popup', () => {

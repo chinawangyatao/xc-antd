@@ -78,4 +78,7 @@ Use `GroupedSelect` for multi-select from labeled groups, with a searchable Sele
 - `onEditGroup(group, label)` and `onEditOption(option, group, label)` receive the updated name from an inline editor; async failures keep that row editable. The Select popup stays open during edits.
 - Deletion uses Ant Design `Popconfirm` inside the Select popup by default; use `deleteConfirm={false}` only when the caller owns confirmation. Missing action callbacks hide their buttons.
 - The caller updates `groups` after CRUD; successful deletion removes affected selected values via `onChange`.
+- For remote search, pass `searchMode="remote"`, `onSearchChange={setKeyword}`, server response groups, and `searchLoading`. The component skips local filtering; the caller debounces requests and discards stale responses. On closing a nonempty search it emits `onSearchChange('')` to restore the list.
+- Supply `selectedOptions` for preselected values not present in initial remote results. Labels of selected options seen in previous results are cached while they remain selected.
+- Remote `groups` may contain only part of a group. If deleting a group remotely, use controlled `value` and remove all of its selected values in `onDeleteGroup`; the component cannot infer off-screen options from partial search results.
 - Customize the Select trigger via `selectProps`. Live interactive example: `/grouped-select`.
