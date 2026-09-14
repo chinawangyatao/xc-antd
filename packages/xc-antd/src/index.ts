@@ -12,6 +12,7 @@ export * from './FormGroup';
 export * from './SchemaForm';
 export * from './ListPanel';
 export * from './ListTree';
+export * from './GroupedSelect';
 export * from './ImageUpload';
 export type {
   ListDeleteConfirmConfig,

@@ -12,6 +12,7 @@ import FormGroupDemo from './pages/FormGroupDemo'
 import SchemaFormDemo from './pages/SchemaFormDemo'
 import TreeSelectPage from "./pages/TreeSelectPage.tsx";
 import ImageUploadDemo from './pages/ImageUploadDemo'
+import GroupedSelectDemo from './pages/GroupedSelectDemo'
 
 const { Header, Sider, Content } = Layout
 
@@ -24,6 +25,7 @@ const menuItems = [
   { key: '/form-group', icon: <FormOutlined />, label: 'FormGroup 示例' },
   { key: '/schema-form', icon: <ProfileOutlined />, label: 'SchemaForm 示例' },
   { key: '/tree-select', icon: <AppstoreOutlined />, label: 'List / ListTree 示例' },
+  { key: '/grouped-select', icon: <AppstoreOutlined />, label: 'GroupedSelect 示例' },
   { key: '/image-upload', icon: <PictureOutlined />, label: 'ImageUpload 示例' },
 ]
 
@@ -121,6 +123,7 @@ function App() {
             <Route path="/form-group" element={<FormGroupDemo />} />
             <Route path="/schema-form" element={<SchemaFormDemo />} />
             <Route path="/tree-select" element={<TreeSelectPage />} />
+            <Route path="/grouped-select" element={<GroupedSelectDemo />} />
             <Route path="/image-upload" element={<ImageUploadDemo />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

@@ -57,3 +57,25 @@ Use `ListTree<NodeType>` for hierarchical navigation and search.
 - `InputTree` was removed; do not import or recreate it.
 
 Source: `packages/xc-antd/src/ListPanel/` and `packages/xc-antd/src/ListTree/`. Live example: `apps/docs/src/pages/TreeSelectPage.tsx`.
+
+## GroupedSelect
+
+Use `GroupedSelect` for multi-select from labeled groups, with a searchable Select popup.
+
+```tsx
+<GroupedSelect
+  groups={[{ id: 'a', label: '分组A', options: [{ value: 'a1', label: '选项A-1' }] }]}
+  value={selectedValues}
+  onChange={setSelectedValues}
+  onAddGroup={(label) => createGroup(label)}
+  onAddOption={(label, group) => createOption(label, group.id)}
+  onEditOption={(option, group, label) => updateOption(option.value, group.id, label)}
+/>
+```
+
+- `value`/`onChange` or `defaultValue` control selected option values (`string | number` arrays). Option values must be unique across groups.
+- Search matches group or option labels. `onAddGroup(label)` and `onAddOption(label, group)` are called after in-popup input and confirmation.
+- `onEditGroup(group, label)` and `onEditOption(option, group, label)` receive the updated name from an inline editor; async failures keep that row editable. The Select popup stays open during edits.
+- Deletion uses Ant Design `Popconfirm` inside the Select popup by default; use `deleteConfirm={false}` only when the caller owns confirmation. Missing action callbacks hide their buttons.
+- The caller updates `groups` after CRUD; successful deletion removes affected selected values via `onChange`.
+- Customize the Select trigger via `selectProps`. Live interactive example: `/grouped-select`.

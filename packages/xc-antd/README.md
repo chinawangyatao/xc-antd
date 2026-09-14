@@ -39,6 +39,7 @@ Main components include:
 - `FormGroup`: grouped form layout
 - `ActionDrawer` and `ActionModal`: standardized action overlays
 - `ImageUpload`: image upload, preview, validation and advanced cropping
+- `GroupedSelect`: searchable grouped multi-select with optional editing actions
 
 See the repository documentation app for complete examples.
 

@@ -1,6 +1,6 @@
 ---
 name: xc-antd
-description: Build and troubleshoot React interfaces with @zhilv/xc-antd. Use when a task mentions xc-antd, TextField, SchemaForm, FormGroup, CrudTable, HocTable, ListPanel, ListTree, ActionDrawer, or ActionModal. Covers component selection, current APIs, typed usage, examples, and verification; do not use for generic Ant Design work that does not use this library.
+description: Build and troubleshoot React interfaces with @zhilv/xc-antd. Use when a task mentions xc-antd, TextField, SchemaForm, FormGroup, CrudTable, HocTable, ListPanel, ListTree, GroupedSelect, ActionDrawer, or ActionModal. Covers component selection, current APIs, typed usage, examples, and verification; do not use for generic Ant Design work that does not use this library.
 ---
 
 # xc-antd
@@ -13,7 +13,7 @@ Read [references/component-map.md](references/component-map.md) when component s
 
 - Fields and schema-driven forms: read [references/text-field.md](references/text-field.md) for `TextField`; read [references/forms.md](references/forms.md) for `SchemaForm` or `FormGroup`.
 - Tables: read [references/crud-table.md](references/crud-table.md) for request/query CRUD flows; read [references/hoc-table.md](references/hoc-table.md) for local data and inline new rows.
-- Lists and trees: read [references/lists.md](references/lists.md).
+- Lists, trees, and grouped selection: read [references/lists.md](references/lists.md).
 - Image upload or cropping: prefer the dedicated `xc-antd-image-upload` Skill.
 - Drawers, modals, async confirmation, or unsaved-change prompts: read [references/overlays.md](references/overlays.md).
 
