@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Button, Drawer, Grid, Layout, Menu } from 'antd'
-import { HomeOutlined, AppstoreOutlined, ExportOutlined, FormOutlined, MenuOutlined, ProfileOutlined, TableOutlined } from '@ant-design/icons'
+import { HomeOutlined, AppstoreOutlined, ExportOutlined, FormOutlined, MenuOutlined, PictureOutlined, ProfileOutlined, TableOutlined } from '@ant-design/icons'
 import Home from './pages/Home'
 import ProFieldDemo from './pages/ProFieldDemo'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -11,18 +11,22 @@ import ActionOverlayDemo from './pages/ActionOverlayDemo'
 import FormGroupDemo from './pages/FormGroupDemo'
 import SchemaFormDemo from './pages/SchemaFormDemo'
 import TreeSelectPage from "./pages/TreeSelectPage.tsx";
+import ImageUploadDemo from './pages/ImageUploadDemo'
+import GroupedSelectDemo from './pages/GroupedSelectDemo'
 
 const { Header, Sider, Content } = Layout
 
 const menuItems = [
   { key: '/', icon: <HomeOutlined />, label: '首页' },
   { key: '/pro-field', icon: <AppstoreOutlined />, label: 'TextField 示例' },
-  { key: '/table', icon: <AppstoreOutlined />, label: 'Table 示例' },
+  { key: '/table', icon: <AppstoreOutlined />, label: 'HocTable 示例' },
   { key: '/crud-table', icon: <TableOutlined />, label: 'CrudTable 示例' },
   { key: '/action-overlay', icon: <ExportOutlined />, label: '抽屉与弹窗' },
   { key: '/form-group', icon: <FormOutlined />, label: 'FormGroup 示例' },
   { key: '/schema-form', icon: <ProfileOutlined />, label: 'SchemaForm 示例' },
-  { key: '/tree-select', icon: <AppstoreOutlined />, label: 'TreeSelect 示例' },
+  { key: '/tree-select', icon: <AppstoreOutlined />, label: 'List / ListTree 示例' },
+  { key: '/grouped-select', icon: <AppstoreOutlined />, label: 'GroupedSelect 示例' },
+  { key: '/image-upload', icon: <PictureOutlined />, label: 'ImageUpload 示例' },
 ]
 
 function App() {
@@ -119,6 +123,8 @@ function App() {
             <Route path="/form-group" element={<FormGroupDemo />} />
             <Route path="/schema-form" element={<SchemaFormDemo />} />
             <Route path="/tree-select" element={<TreeSelectPage />} />
+            <Route path="/grouped-select" element={<GroupedSelectDemo />} />
+            <Route path="/image-upload" element={<ImageUploadDemo />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Content>

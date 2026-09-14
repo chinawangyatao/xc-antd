@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import dts from 'vite-plugin-dts'
 import { resolve } from 'node:path'
 import tailwindcss from "@tailwindcss/vite";
 
@@ -8,10 +7,6 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    dts({
-      rollupTypes: true,
-      tsconfigPath: './tsconfig.json',
-    }),
   ],
   build: {
     lib: {
@@ -22,7 +17,13 @@ export default defineConfig({
       cssFileName: 'style',
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'antd', '@ant-design/icons'],
+      external: [
+        'react',
+        'react-dom',
+        'antd',
+        '@ant-design/icons',
+        'react-advanced-cropper',
+      ],
       output: {
         globals: {
           react: 'React',

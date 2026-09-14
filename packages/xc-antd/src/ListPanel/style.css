@@ -1,0 +1,119 @@
+.xc-list-panel {
+  min-width: 0;
+  width: 100%;
+}
+
+.xc-list-panel__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.xc-list-panel__toolbar > .ant-btn {
+  flex: 0 0 auto;
+}
+
+.xc-list-panel__search {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 0;
+}
+
+.xc-list-panel__select {
+  flex: 0 0 104px;
+  width: 104px;
+}
+
+.xc-list-panel__header {
+  margin-top: 16px;
+}
+
+.xc-list-panel__header-title {
+  display: block;
+  overflow: hidden;
+  padding: 0 8px;
+  color: #1d2129;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.xc-list-panel__header .ant-divider {
+  margin: 8px 0 12px;
+}
+
+.xc-list-panel__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  overflow: auto;
+}
+
+.xc-list-panel__header + .xc-list-panel__body {
+  margin-top: 0;
+}
+
+.xc-list-panel__item {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 4px;
+  color: #1d2129;
+  background: transparent;
+  font: inherit;
+  line-height: 22px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.xc-list-panel__item:hover {
+  background: #f7f8fa;
+}
+
+.xc-list-panel__item:active {
+  background: #e7e7e7;
+}
+
+.xc-list-panel__item:focus-visible {
+  outline: 2px solid #1677ff;
+  outline-offset: -2px;
+}
+
+.xc-list-panel__item--selected,
+.xc-list-panel__item--selected:hover {
+  color: #1677ff;
+  background: #e6f4ff;
+}
+
+.xc-list-panel__item--disabled,
+.xc-list-panel__item--disabled:hover {
+  color: #c9cdd4;
+  background: transparent;
+  cursor: not-allowed;
+}
+
+.xc-list-panel__item-title,
+.xc-list-panel__item-description {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.xc-list-panel__item-description {
+  margin-top: 2px;
+  color: #86909c;
+  font-size: 12px;
+}
+
+.xc-list-panel__item--selected .xc-list-panel__item-description {
+  color: inherit;
+}
+
+.xc-list-panel__item--disabled .xc-list-panel__item-description {
+  color: #c9cdd4;
+}

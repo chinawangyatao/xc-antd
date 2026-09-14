@@ -1,0 +1,406 @@
+import {
+  Button,
+  Dropdown,
+  Input,
+  Select,
+  Tree,
+  type ButtonProps,
+  type InputProps,
+  type MenuProps,
+  type SelectProps,
+  type TreeProps,
+} from 'antd';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
+import type { CSSProperties, Key, ReactNode } from 'react';
+import { useMemo, useState } from 'react';
+import {
+  useListDeleteConfirm,
+  type ListDeleteConfirmOptions,
+} from '../shared/listDeleteConfirm';
+import { resolveListToolbarVisibility } from '../shared/listToolbar';
+import './style.css';
+
+type MenuClickInfo = Parameters<NonNullable<MenuProps['onClick']>>[0];
+
+export interface ListTreeDataNode {
+  key: Key;
+  title?: ReactNode;
+  children?: ListTreeDataNode[];
+}
+
+export type ListTreeContextMenuClickInfo<TreeDataType extends object = ListTreeDataNode> =
+  MenuClickInfo & {
+    node: TreeDataType;
+  };
+
+export interface ListTreeContextMenu<TreeDataType extends object = ListTreeDataNode> {
+  /** 不传时默认显示 addChild / edit / delete 三个菜单项。 */
+  items?: MenuProps['items'] | ((node: TreeDataType) => MenuProps['items']);
+  onClick?: (info: ListTreeContextMenuClickInfo<TreeDataType>) => void | Promise<void>;
+}
+
+export interface ListTreeProps<TreeDataType extends object = ListTreeDataNode>
+  extends Omit<TreeProps, 'className' | 'style' | 'titleRender' | 'treeData'> {
+  treeData?: TreeDataType[];
+  className?: string;
+  style?: CSSProperties;
+  treeClassName?: string;
+  treeStyle?: CSSProperties;
+
+  searchable?: boolean;
+  /** 是否显示搜索输入框，优先级高于 searchable。 */
+  showSearchInput?: boolean;
+  searchValue?: string;
+  defaultSearchValue?: string;
+  searchPlaceholder?: string;
+  searchInputProps?: Omit<InputProps, 'defaultValue' | 'value'>;
+  onSearchChange?: (value: string) => void;
+  getNodeSearchText?: (node: TreeDataType) => string;
+  autoExpandOnSearch?: boolean;
+
+  /** 下拉筛选配置，传入后默认显示。 */
+  toolbarSelectProps?: SelectProps;
+  /** 是否显示已配置的下拉筛选。 */
+  showToolbarSelect?: boolean;
+  /** 默认显示左上角的添加按钮。 */
+  showAddButton?: boolean;
+  addButtonProps?: Omit<ButtonProps, 'onClick'>;
+  onAdd?: () => void;
+  toolbarExtra?: ReactNode;
+
+  /** 用于按节点数据生成图标；treeData 中的 icon 优先级更高。 */
+  nodeIcon?: ReactNode | ((node: TreeDataType) => ReactNode);
+  /** 启用节点右键菜单；传 true 使用默认菜单。 */
+  contextMenu?: true | ListTreeContextMenu<TreeDataType>;
+  /** 右键删除的二次确认，默认开启。 */
+  deleteConfirm?: ListDeleteConfirmOptions;
+  titleRender?: (node: TreeDataType) => ReactNode;
+}
+
+interface FilterTreeOptions<TreeDataType extends object> {
+  childrenField?: string;
+  keyField?: string;
+  titleField?: string;
+  getNodeSearchText?: (node: TreeDataType) => string;
+}
+
+export interface FilterListTreeResult<TreeDataType extends object> {
+  treeData: TreeDataType[];
+  expandedKeys: Key[];
+}
+
+const defaultContextMenuItems: MenuProps['items'] = [
+  { key: 'addChild', label: '添加子级', icon: <PlusOutlined /> },
+  { key: 'edit', label: '编辑', icon: <EditOutlined /> },
+  { key: 'delete', label: '删除', icon: <DeleteOutlined />, danger: true },
+];
+
+function getRecord(node: object): Record<string, unknown> {
+  return node as Record<string, unknown>;
+}
+
+function getChildren<TreeDataType extends object>(
+  node: TreeDataType,
+  childrenField: string,
+): TreeDataType[] | undefined {
+  const children = getRecord(node)[childrenField];
+  return Array.isArray(children) ? children as TreeDataType[] : undefined;
+}
+
+function getDefaultSearchText<TreeDataType extends object>(
+  node: TreeDataType,
+  titleField: string,
+): string {
+  const title = getRecord(node)[titleField];
+  return typeof title === 'string' || typeof title === 'number' ? String(title) : '';
+}
+
+/**
+ * 按关键字过滤树，保留命中节点的祖先链。
+ * 函数不修改原始 treeData，可用于单独测试或业务层预处理。
+ */
+export function filterListTreeData<TreeDataType extends object>(
+  treeData: TreeDataType[],
+  searchValue: string,
+  options: FilterTreeOptions<TreeDataType> = {},
+): FilterListTreeResult<TreeDataType> {
+  const keyword = searchValue.trim().toLocaleLowerCase();
+  if (!keyword) {
+    return { treeData, expandedKeys: [] };
+  }
+
+  const childrenField = options.childrenField ?? 'children';
+  const keyField = options.keyField ?? 'key';
+  const titleField = options.titleField ?? 'title';
+  const expandedKeys: Key[] = [];
+
+  const filterNodes = (nodes: TreeDataType[]): TreeDataType[] => {
+    const result: TreeDataType[] = [];
+
+    for (const node of nodes) {
+      const children = getChildren(node, childrenField);
+      const filteredChildren = children ? filterNodes(children) : [];
+      const searchText = options.getNodeSearchText?.(node)
+        ?? getDefaultSearchText(node, titleField);
+      const matches = searchText.toLocaleLowerCase().includes(keyword);
+
+      if (!matches && filteredChildren.length === 0) continue;
+
+      const visibleChildren = matches ? children : filteredChildren;
+      if (visibleChildren?.length) {
+        const nodeKey = getRecord(node)[keyField];
+        if (typeof nodeKey === 'string' || typeof nodeKey === 'number') {
+          expandedKeys.push(nodeKey);
+        }
+      }
+
+      if (visibleChildren === children) {
+        result.push(node);
+      } else {
+        result.push({
+          ...node,
+          [childrenField]: visibleChildren,
+        });
+      }
+    }
+
+    return result;
+  };
+
+  return { treeData: filterNodes(treeData), expandedKeys };
+}
+
+function decorateNodeIcons<TreeDataType extends object>(
+  treeData: TreeDataType[],
+  childrenField: string,
+  nodeIcon: NonNullable<ListTreeProps<TreeDataType>['nodeIcon']>,
+): TreeDataType[] {
+  return treeData.map((node) => {
+    const record = getRecord(node);
+    const children = getChildren(node, childrenField);
+    const resolvedIcon = record.icon !== undefined
+      ? record.icon
+      : typeof nodeIcon === 'function'
+        ? nodeIcon(node)
+        : nodeIcon;
+
+    return {
+      ...node,
+      icon: resolvedIcon,
+      ...(children
+        ? { [childrenField]: decorateNodeIcons(children, childrenField, nodeIcon) }
+        : {}),
+    };
+  });
+}
+
+function hasNodeIcon<TreeDataType extends object>(
+  treeData: TreeDataType[],
+  childrenField: string,
+): boolean {
+  return treeData.some((node) => {
+    if (getRecord(node).icon !== undefined) return true;
+    const children = getChildren(node, childrenField);
+    return children ? hasNodeIcon(children, childrenField) : false;
+  });
+}
+
+function joinClassNames(...classNames: Array<string | undefined>): string {
+  return classNames.filter(Boolean).join(' ');
+}
+
+export function ListTree<TreeDataType extends object = ListTreeDataNode>({
+  treeData = [],
+  className,
+  style,
+  treeClassName,
+  treeStyle,
+  searchable = true,
+  showSearchInput,
+  searchValue,
+  defaultSearchValue = '',
+  searchPlaceholder = '请输入',
+  searchInputProps,
+  onSearchChange,
+  getNodeSearchText,
+  autoExpandOnSearch = true,
+  toolbarSelectProps,
+  showToolbarSelect,
+  showAddButton,
+  addButtonProps,
+  onAdd,
+  toolbarExtra,
+  nodeIcon,
+  contextMenu,
+  deleteConfirm,
+  fieldNames,
+  defaultExpandedKeys,
+  expandedKeys,
+  onExpand,
+  titleRender,
+  showIcon,
+  blockNode,
+  ...treeProps
+}: ListTreeProps<TreeDataType>) {
+  const [innerSearchValue, setInnerSearchValue] = useState(defaultSearchValue);
+  const { confirmDelete, contextHolder } = useListDeleteConfirm({
+    title: '确认删除该节点吗？',
+    content: '删除后该节点及其下级数据将无法恢复。',
+  });
+  const mergedSearchValue = searchValue ?? innerSearchValue;
+  const childrenField = fieldNames?.children ?? 'children';
+  const keyField = fieldNames?.key ?? 'key';
+  const titleField = fieldNames?.title ?? 'title';
+
+  const filteredResult = useMemo(
+    () => filterListTreeData(treeData, mergedSearchValue, {
+      childrenField,
+      keyField,
+      titleField,
+      getNodeSearchText,
+    }),
+    [childrenField, getNodeSearchText, keyField, mergedSearchValue, titleField, treeData],
+  );
+
+  const visibleTreeData = useMemo(
+    () => nodeIcon
+      ? decorateNodeIcons(filteredResult.treeData, childrenField, nodeIcon)
+      : filteredResult.treeData,
+    [childrenField, filteredResult.treeData, nodeIcon],
+  );
+  const treeDataHasIcon = useMemo(
+    () => hasNodeIcon(treeData, childrenField),
+    [childrenField, treeData],
+  );
+
+  const resolvedExpandedKeys = expandedKeys
+    ?? (mergedSearchValue.trim() && autoExpandOnSearch
+      ? filteredResult.expandedKeys
+      : undefined);
+  const controlledExpansionProps = resolvedExpandedKeys === undefined
+    ? {}
+    : { expandedKeys: resolvedExpandedKeys };
+  const shouldShowAddButton = showAddButton ?? true;
+  const toolbarVisibility = resolveListToolbarVisibility({
+    searchable,
+    showSearchInput,
+    hasToolbarSelect: Boolean(toolbarSelectProps),
+    showToolbarSelect,
+    showAddButton: shouldShowAddButton,
+    hasToolbarExtra: Boolean(toolbarExtra),
+  });
+  const {
+    onChange: onSearchInputChange,
+    ...restSearchInputProps
+  } = searchInputProps ?? {};
+  const {
+    className: selectClassName,
+    ...restToolbarSelectProps
+  } = toolbarSelectProps ?? {};
+
+  const renderTitle = (node: TreeDataType) => {
+    const rawTitle = titleRender
+      ? titleRender(node)
+      : getRecord(node)[titleField];
+    const title = typeof rawTitle === 'function' ? rawTitle(node) : rawTitle as ReactNode;
+
+    if (!contextMenu) return title;
+
+    const contextMenuOptions = contextMenu === true ? {} : contextMenu;
+    const items = typeof contextMenuOptions.items === 'function'
+      ? contextMenuOptions.items(node)
+      : contextMenuOptions.items ?? defaultContextMenuItems;
+
+    if (!items?.length) return title;
+
+    const handleContextMenuClick: NonNullable<MenuProps['onClick']> = (info) => {
+      const emitClick = () => contextMenuOptions.onClick?.({ ...info, node });
+      if (info.key === 'delete') {
+        confirmDelete(deleteConfirm, emitClick);
+      } else {
+        void emitClick();
+      }
+    };
+
+    return (
+      <Dropdown
+        trigger={['contextMenu']}
+        menu={{
+          items,
+          onClick: handleContextMenuClick,
+        }}
+      >
+        <span className="xc-list-tree__node-title">{title}</span>
+      </Dropdown>
+    );
+  };
+
+  return (
+    <div className={joinClassNames('xc-list-tree', className)} style={style}>
+      {contextHolder}
+      {toolbarVisibility.toolbar && (
+        <div className="xc-list-tree__toolbar">
+          {shouldShowAddButton && (
+            <Button
+              aria-label="添加"
+              {...addButtonProps}
+              icon={addButtonProps?.icon ?? <PlusOutlined />}
+              onClick={onAdd}
+            />
+          )}
+          {toolbarVisibility.toolbarSelect && (
+            <Select
+              placeholder="请选择"
+              {...restToolbarSelectProps}
+              className={joinClassNames('xc-list-tree__select', selectClassName)}
+            />
+          )}
+          {toolbarExtra}
+          {toolbarVisibility.searchInput && (
+            <Input
+              allowClear
+              aria-label="搜索树节点"
+              placeholder={searchPlaceholder}
+              suffix={<SearchOutlined />}
+              {...restSearchInputProps}
+              className={joinClassNames(
+                'xc-list-tree__search',
+                restSearchInputProps.className,
+              )}
+              value={mergedSearchValue}
+              onChange={(event) => {
+                onSearchInputChange?.(event);
+                const value = event.target.value;
+                if (searchValue === undefined) setInnerSearchValue(value);
+                onSearchChange?.(value);
+              }}
+            />
+          )}
+        </div>
+      )}
+
+      <Tree
+        {...treeProps}
+        className={joinClassNames('xc-list-tree__tree', treeClassName)}
+        style={treeStyle}
+        fieldNames={fieldNames}
+        treeData={visibleTreeData as unknown as NonNullable<TreeProps['treeData']>}
+        blockNode={blockNode ?? true}
+        showIcon={showIcon ?? (Boolean(nodeIcon) || treeDataHasIcon)}
+        defaultExpandedKeys={defaultExpandedKeys}
+        {...controlledExpansionProps}
+        onExpand={(keys, info) => {
+          onExpand?.(keys, info);
+        }}
+        titleRender={renderTitle as TreeProps['titleRender']}
+      />
+    </div>
+  );
+}
+
+export default ListTree;

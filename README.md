@@ -17,7 +17,7 @@ XC-AntD 是一个现代化的前端组件库，采用 monorepo 架构组织代�
 - **代码检查**: ESLint 10.3.0
 - **状态请求**: SWR 2.3.0
 - **路由**: React Router DOM 7.6.0
-- **表格**: TanStack React Table 8.21.3
+- **表格**: Ant Design Table 6.4.3
 
 ## 项目结构
 
@@ -41,8 +41,10 @@ xc-view/
 │       │   │   ├── provider/   # Context Provider
 │       │   │   └── utils/      # 工具函数和 hooks
 │       │   ├── HocTable/       # 高级表格组件
-│       │   │   ├── table/      # 表格核心实现
-│       │   │   └── utils/      # 表格工具类型
+│       │   │   ├── HocTable.tsx
+│       │   │   ├── types.ts
+│       │   │   ├── utils.ts
+│       │   │   └── style.css
 │       │   ├── index.ts
 │       │   └── index.css
 │       ├── package.json        # @zhilv/xc-antd
@@ -95,14 +97,27 @@ xc-view/
 
 ### 2. HocTable 高级表格组件
 
-基于 TanStack Table 封装的高级表格，提供：
+基于 Ant Design Table 的本地数据与行内新增表格，提供：
 
-- **CRUDTable** - 增删改查表格
-- **SimpleTable** - 简单表格
-- **TableFilter** - 表格筛选器
-- **TableHeaderTool** - 表格头部工具
-- **useTableFilter** - 表格筛选 Hook
-- **useXcTable** - 表格核心 Hook
+- 全局搜索与 input / select / date / switch 列级筛选
+- 列显隐、拖拽排序与表格密度设置
+- 行内新增、实时校验、单行或批量保存
+- `SimpleTable` 作为旧 API 的兼容别名
+
+请求分页、查询表单与完整 CRUD 工作流由 `CrudTable` 负责。
+
+### AI Agent Skills
+
+仓库在 `packages/xc-antd/skills/` 维护与 npm 包版本一致的 Agent Skills，`.agents/skills` 指向该目录：
+
+- `xc-antd` - 帮助 AI 选择并正确使用组件。
+- `xc-antd-image-upload` - 专门处理 ImageUpload、图片裁剪、Canvas 输出与上传问题。
+- `xc-antd-component-authoring` - 约束组件库目录、API、样式、兼容与测试方式。
+
+新的 AI Agent 会话可自动发现这三个 Skills。详细组件资料位于各 Skill 的 `references/` 中，按任务需要加载。
+
+使用方安装 npm 包后，在其项目根目录执行 `npx xc-antd-skills install`
+即可安装使用 Skill；升级包后使用 `--force` 同步新版本。
 
 ## 快速开始
 
@@ -221,16 +236,13 @@ import '@zhilv/xc-antd/style';
 }
 ```
 
-## 构建配置
+## 发布与构建
 
-### Vite 库模式
+`@zhilv/xc-antd` 以 ESM TypeScript/TSX 源码发布，包入口为
+`src/index.ts`，使用方由 Vite 等现代构建器编译。发布前执行测试和
+TypeScript 类型检查，不发布 `dist/` 或 CommonJS 产物。
 
-组件库使用 Vite Library 模式构建：
-
-- 输出格式：ES Module + CommonJS
-- 自动生成 TypeScript 声明文件
-- 外部化 React、ReactDOM、Ant Design 依赖
-- 支持 CSS 代码分割
+Vite Library 模式仅用于仓库内部的浏览器打包验证。
 
 ### ESLint 配置
 
