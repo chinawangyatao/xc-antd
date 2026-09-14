@@ -1,7 +1,7 @@
 {
   "name": "xc-antd",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "workspaces": [
     "packages/*",
@@ -14,7 +14,7 @@
     "lint": "eslint .",
     "test": "bun test packages/xc-antd/tests",
     "pack:private": "bun run test && bun run --filter @zhilv/xc-antd typecheck && npm pack --dry-run --workspace @zhilv/xc-antd",
-    "publish:private": "bun run test && bun run --filter @zhilv/xc-antd typecheck && npm publish --workspace @zhilv/xc-antd",
+    "publish:private": "bun run test && bun run --filter @zhilv/xc-antd typecheck && pnpm version patch --no-git-checks && npm publish --workspace @zhilv/xc-antd",
     "preview": "bun run --filter @xc-antd/docs preview"
   },
   "devDependencies": {
