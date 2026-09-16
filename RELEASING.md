@@ -14,6 +14,8 @@ still signed through GitHub OIDC.
 
 Pushes affecting `packages/xc-antd/` on `master` publish a patch version
 automatically. A manual workflow run can select patch, minor, or major.
+Version calculation includes the unpublished historical `2.2.x` releases, so
+the first restored public release continues at `2.2.19` instead of `0.0.9`.
 
 ## Private registry
 
