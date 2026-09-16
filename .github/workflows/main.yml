@@ -110,7 +110,22 @@ jobs:
               process.stdin.on("data", (chunk) => { input += chunk })
               process.stdin.on("end", () => {
                 const metadata = JSON.parse(input)
-                process.stdout.write(metadata["dist-tags"]?.latest ?? "")
+                const versions = [
+                  metadata["dist-tags"]?.latest,
+                  ...Object.keys(metadata.versions ?? {}),
+                  ...Object.keys(metadata.time ?? {}),
+                  ...(metadata.time?.unpublished?.versions ?? []),
+                ].filter((version) => /^\d+\.\d+\.\d+$/.test(version ?? ""))
+
+                versions.sort((left, right) => {
+                  const a = left.split(".").map(Number)
+                  const b = right.split(".").map(Number)
+                  for (let index = 0; index < 3; index += 1) {
+                    if (a[index] !== b[index]) return a[index] - b[index]
+                  }
+                  return 0
+                })
+                process.stdout.write(versions.at(-1) ?? "")
               })
             ')
           else
@@ -156,7 +171,7 @@ jobs:
           echo "package=$PACKAGE_NAME" >> "$GITHUB_OUTPUT"
           echo "version=$NEXT_VERSION" >> "$GITHUB_OUTPUT"
           echo "Local version: $LOCAL_VERSION"
-          echo "Published version: ${PUBLISHED_VERSION:-not published}"
+          echo "Registry version baseline: ${PUBLISHED_VERSION:-no previous version}"
           echo "Next version: $NEXT_VERSION"
 
       - name: Update package version
@@ -186,7 +201,27 @@ jobs:
 
       - name: Publish public package
         working-directory: packages/xc-antd
-        run: npm publish --access public --provenance --registry=https://registry.npmjs.org
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            PUBLISH_LOG=$(mktemp)
+            set +e
+            npm publish --access public --provenance \
+              --registry=https://registry.npmjs.org 2>&1 | tee "$PUBLISH_LOG"
+            PUBLISH_STATUS=${PIPESTATUS[0]}
+            set -e
+
+            if [[ "$PUBLISH_STATUS" -eq 0 ]]; then
+              exit 0
+            fi
+            if ! grep -Eq 'E409|409 Conflict' "$PUBLISH_LOG" || [[ "$attempt" -eq 3 ]]; then
+              exit "$PUBLISH_STATUS"
+            fi
+
+            WAIT_SECONDS=$((attempt * 45))
+            echo "npm registry returned E409; retrying in $WAIT_SECONDS seconds."
+            sleep "$WAIT_SECONDS"
+          done
 
       - name: Commit version and create tag
         shell: bash
