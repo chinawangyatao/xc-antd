@@ -1,4 +1,21 @@
-# Publishing xc-antd to the private registry
+# Publishing xc-antd
+
+## Public npm registry
+
+`.github/workflows/main.yml` authenticates with the repository secret
+`NPM_PUBLIC_TOKEN`. Create the token from the npm account that will own
+`xc-antd`, grant it package read/write permission, and add it under GitHub
+`Settings -> Secrets and variables -> Actions -> Repository secrets`.
+
+The workflow verifies the token with `npm whoami` before installing dependencies.
+Publishing must not require an interactive one-time password; this repository's
+current setup uses an npm account with publishing 2FA disabled. Provenance is
+still signed through GitHub OIDC.
+
+Pushes affecting `packages/xc-antd/` on `master` publish a patch version
+automatically. A manual workflow run can select patch, minor, or major.
+
+## Private registry
 
 The npm package is published by `.github/workflows/publish.yml`.
 

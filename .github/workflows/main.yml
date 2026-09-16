@@ -58,7 +58,7 @@ jobs:
         with:
           node-version: 24
 
-      - name: Configure public npm authentication
+      - name: Configure and verify public npm token
         shell: bash
         env:
           NPM_PUBLIC_TOKEN: ${{ secrets.NPM_PUBLIC_TOKEN }}
@@ -71,6 +71,8 @@ jobs:
           printf 'registry=https://registry.npmjs.org/\n//registry.npmjs.org/:_authToken=%s\n' \
             "$NPM_PUBLIC_TOKEN" > "$NPMRC_PATH"
           echo "NPM_CONFIG_USERCONFIG=$NPMRC_PATH" >> "$GITHUB_ENV"
+          NPM_CONFIG_USERCONFIG="$NPMRC_PATH" npm whoami \
+            --registry=https://registry.npmjs.org
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
