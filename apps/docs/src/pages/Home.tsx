@@ -13,7 +13,7 @@ function Home() {
           xc-antd 组件库
         </Title>
         <Paragraph style={{ color: '#666', marginTop: 8 }}>
-          基于 Ant Design 5.x 的 TextField 原子字段组件库。
+          基于 Ant Design 6.x 的 TextField 原子字段组件库。
         </Paragraph>
       </Card>
 
