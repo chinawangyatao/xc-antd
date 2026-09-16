@@ -5,7 +5,7 @@ import {
   type GroupedSelectGroup,
   type GroupedSelectOption,
   type GroupedSelectValue,
-} from '@zhilv/xc-antd';
+} from 'xc-antd';
 
 const initialGroups: GroupedSelectGroup[] = [
   {

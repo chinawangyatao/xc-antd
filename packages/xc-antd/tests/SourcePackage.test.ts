@@ -8,14 +8,23 @@ const packageJson = JSON.parse(
 ) as {
   exports: Record<string, unknown>;
   dependencies: Record<string, string>;
+  bin: Record<string, string>;
   files: string[];
   main: string;
   module: string;
+  name: string;
+  publishConfig?: Record<string, string>;
   source: string;
   types: string;
 };
 
 describe('xc-antd source package', () => {
+  test('uses the public unscoped package identity', () => {
+    expect(packageJson.name).toBe('xc-antd');
+    expect(packageJson.publishConfig).toBeUndefined();
+    expect(packageJson.bin['xc-antd-skills']).toBe('scripts/install-skills.mjs');
+  });
+
   test('publishes the TypeScript source entry instead of dist', () => {
     const rootExport = packageJson.exports['.'] as Record<string, string>;
     expect(packageJson.main).toBe('./src/index.ts');

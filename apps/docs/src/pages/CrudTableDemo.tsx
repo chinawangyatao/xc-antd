@@ -25,7 +25,7 @@ import {
   type CrudTableAction,
   type CrudTableColumn,
   type CrudTableRequest,
-} from '@zhilv/xc-antd';
+} from 'xc-antd';
 import type { Dayjs } from 'dayjs';
 
 interface UserRecord {

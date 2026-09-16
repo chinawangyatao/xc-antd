@@ -1,6 +1,6 @@
 ---
 name: xc-antd-image-upload
-description: Build, integrate, or troubleshoot @zhilv/xc-antd ImageUpload and ImageCropDrawer in React. Use for image upload, preview, validation, custom upload requests, batch cropping, avatar cropping, crop ratios, Canvas output, or react-advanced-cropper behavior. Do not use for generic file uploads that do not use xc-antd.
+description: Build, integrate, or troubleshoot xc-antd ImageUpload and ImageCropDrawer in React. Use for image upload, preview, validation, custom upload requests, batch cropping, avatar cropping, crop ratios, Canvas output, or react-advanced-cropper behavior. Do not use for generic file uploads that do not use xc-antd.
 ---
 
 # xc-antd ImageUpload
@@ -21,7 +21,7 @@ Inside this repository, inspect:
 - `packages/xc-antd/src/ImageUpload/ImageCropDrawer.tsx`
 - `apps/docs/src/pages/ImageUploadDemo.tsx`
 
-In a consuming project, inspect its installed `node_modules/@zhilv/xc-antd/src/ImageUpload/` source and types; installed source wins over this reference.
+In a consuming project, inspect its installed `node_modules/xc-antd/src/ImageUpload/` source and types; installed source wins over this reference.
 
 ## Working rules
 

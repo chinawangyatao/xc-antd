@@ -5,7 +5,7 @@
     "jsx": "react-jsx",
     "types": ["vite/client", "react", "react-dom"],
     "paths": {
-      "@zhilv/xc-antd": ["../../packages/xc-antd/src/index.ts"]
+      "xc-antd": ["../../packages/xc-antd/src/index.ts"]
     },
     // 开发模式下关闭引起大量红线的严格检查，改善 IDE 体验
     "noUnusedLocals": false,

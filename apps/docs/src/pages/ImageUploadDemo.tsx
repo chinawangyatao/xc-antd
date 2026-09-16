@@ -11,7 +11,7 @@ import {
   ImageUpload,
   type ImageUploadFile,
   type ImageUploadRequestContext,
-} from '@zhilv/xc-antd';
+} from 'xc-antd';
 
 interface DemoUploadResponse {
   name: string;

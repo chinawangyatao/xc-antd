@@ -16,7 +16,7 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@zhilv/xc-antd": ["./packages/xc-antd/src/index.ts"]
+      "xc-antd": ["./packages/xc-antd/src/index.ts"]
     }
   }
 }

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ListPanel, ListTree } from '@zhilv/xc-antd';
+import { ListPanel, ListTree } from 'xc-antd';
 import {
     Alert,
     Card,

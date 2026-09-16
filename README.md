@@ -47,7 +47,7 @@ xc-view/
 │       │   │   └── style.css
 │       │   ├── index.ts
 │       │   └── index.css
-│       ├── package.json        # @zhilv/xc-antd
+│       ├── package.json        # xc-antd
 │       └── vite.config.ts
 │
 ├── package.json                # 根配置
@@ -171,15 +171,14 @@ bun run lint
 ### 安装组件库
 
 ```bash
-bun add @zhilv/xc-antd \
-  --registry http://repo.zhihuiwenlvyun.com/repository/npm-hosted/
+bun add xc-antd
 ```
 
 ### 引入组件
 
 ```tsx
-import { ProField, HocTable } from '@zhilv/xc-antd';
-import '@zhilv/xc-antd/style';
+import { ProField, HocTable } from 'xc-antd';
+import 'xc-antd/style';
 
 // 使用字段组件
 <ProField value="Hello" valueType="text" />
@@ -220,7 +219,7 @@ import '@zhilv/xc-antd/style';
 
 ### 包说明
 
-- **@zhilv/xc-antd** - 核心组件库，可独立发布
+- **xc-antd** - 核心组件库，可独立发布
 - **@xc-antd/docs** - 文档站点应用
 
 ### TypeScript Project References
@@ -238,7 +237,7 @@ import '@zhilv/xc-antd/style';
 
 ## 发布与构建
 
-`@zhilv/xc-antd` 以 ESM TypeScript/TSX 源码发布，包入口为
+`xc-antd` 以 ESM TypeScript/TSX 源码发布，包入口为
 `src/index.ts`，使用方由 Vite 等现代构建器编译。发布前执行测试和
 TypeScript 类型检查，不发布 `dist/` 或 CommonJS 产物。
 

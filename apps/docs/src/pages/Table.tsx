@@ -18,7 +18,7 @@ import {
   type HocTableColumn,
   type HocTableNewRowFieldConfig,
   type HocTableValidationRule,
-} from '@zhilv/xc-antd';
+} from 'xc-antd';
 import TreeDemo from "./treeDemo.tsx";
 
 interface VoucherRecord {

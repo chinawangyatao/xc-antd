@@ -1,5 +1,5 @@
 {
-  "name": "@zhilv/xc-antd",
+  "name": "xc-antd",
   "version": "0.0.8",
   "description": "React and Ant Design enterprise components for forms, tables and business workflows",
   "keywords": [
@@ -12,15 +12,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chinawangyatao/xc-view.git",
+    "url": "git+https://github.com/chinawangyatao/xc-antd.git",
     "directory": "packages/xc-antd"
   },
-  "homepage": "https://github.com/chinawangyatao/xc-view#readme",
+  "homepage": "https://github.com/chinawangyatao/xc-antd#readme",
   "bugs": {
-    "url": "https://github.com/chinawangyatao/xc-view/issues"
-  },
-  "publishConfig": {
-    "registry": "http://repo.zhihuiwenlvyun.com/repository/npm-hosted/"
+    "url": "https://github.com/chinawangyatao/xc-antd/issues"
   },
   "engines": {
     "node": ">=20"
@@ -31,7 +28,7 @@
   "source": "./src/index.ts",
   "types": "./src/index.ts",
   "bin": {
-    "xc-antd-skills": "./scripts/install-skills.mjs"
+    "xc-antd-skills": "scripts/install-skills.mjs"
   },
   "exports": {
     ".": {
