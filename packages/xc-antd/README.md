@@ -41,6 +41,7 @@ Main components include:
 - `ActionDrawer` and `ActionModal`: standardized action overlays
 - `ImageUpload`: image upload, preview, validation and advanced cropping
 - `GroupedSelect`: searchable grouped multi-select with optional editing actions
+- `SensitiveData`: sensitive text/image masking with local or requested reveal
 
 See the repository documentation app for complete examples.
 

@@ -12,6 +12,7 @@ Choose one primary component family before coding.
 | Searchable flat navigation list | `ListPanel` | Default data fields are `id`, `title`, `subTitle`, `disabled`. |
 | Searchable hierarchy | `ListTree` | Flat `treeData` also works, but use `ListPanel` for list subtitles and disabled list styling. |
 | Grouped multi-select with search and editable options | `GroupedSelect` | Use for choosing labels from groups; groups and CRUD callbacks are owned by the caller. |
+| Mask sensitive text or images and reveal on demand | `SensitiveData` | Use `request` mode when plaintext must not be present in the initial frontend payload. |
 | Upload, validate, preview, or crop images | `ImageUpload` | Use `ImageCropDrawer` directly only when upload is owned elsewhere. |
 | Async-confirming drawer | `ActionDrawer` | Controlled through `open` and `onOpenChange`. |
 | Async-confirming modal | `ActionModal` | Same action contract as `ActionDrawer`. |
@@ -23,6 +24,7 @@ Choose one primary component family before coding.
 - Tables: `packages/xc-antd/src/CrudTable/`, `packages/xc-antd/src/HocTable/`
 - Lists: `packages/xc-antd/src/ListPanel/`, `packages/xc-antd/src/ListTree/`, `packages/xc-antd/src/GroupedSelect/`
 - Media: `packages/xc-antd/src/ImageUpload/`
+- Sensitive data: `packages/xc-antd/src/SensitiveData/`
 - Overlays: `packages/xc-antd/src/ActionOverlay/`
 - Public barrel: `packages/xc-antd/src/index.ts`
 
@@ -36,4 +38,5 @@ Choose one primary component family before coding.
 - Lists: `/tree-select`
 - Grouped multi-select: `/grouped-select`
 - Image upload: `/image-upload`
+- Sensitive data: `/sensitive-data`
 - Overlays: `/action-overlay`
