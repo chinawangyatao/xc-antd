@@ -1,6 +1,9 @@
 .xc-list-tree {
   min-width: 0;
   width: 100%;
+  --xc-list-tree-drag-color: #1677ff;
+  --xc-list-tree-drag-background: #e6f4ff;
+  --xc-list-tree-drag-forbidden-color: #86909c;
 }
 
 .xc-list-tree__toolbar {
@@ -43,4 +46,146 @@
   width: 100%;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.xc-list-tree__drag-node {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+}
+
+.xc-list-tree__drag-node[draggable='true'] {
+  cursor: grab;
+  user-select: none;
+}
+
+/* 源节点同时作为浏览器原生拖动预览，收紧宽度避免整行空白跟随指针。 */
+.xc-list-tree__drag-node--dragging {
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding-inline: 8px;
+  border-radius: 3px;
+  color: var(--xc-list-tree-drag-color);
+  background: var(--xc-list-tree-drag-background);
+  cursor: grabbing;
+  transition: none;
+}
+
+.xc-list-tree__drag-node--dragging [data-list-tree-drag-ignore='true'] {
+  display: none;
+}
+
+/* 中部落点使用完整边框，不修改节点自身背景，避免选中态和拖拽态互相覆盖。 */
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(.xc-list-tree__drag-node--drop-inside) {
+  position: relative;
+}
+
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(.xc-list-tree__drag-node--drop-inside)::before {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border: 2px solid var(--xc-list-tree-drag-color);
+  border-radius: inherit;
+  pointer-events: none;
+  transition: none;
+}
+
+/* 上下边缘落点使用横线和前置圆点，明确表达同级排序位置。 */
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(.xc-list-tree__drag-node--drop-before),
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(.xc-list-tree__drag-node--drop-after) {
+  position: relative;
+}
+
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(.xc-list-tree__drag-node--drop-before)::before,
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(.xc-list-tree__drag-node--drop-after)::before {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  left: 0;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--xc-list-tree-drag-color);
+  pointer-events: none;
+}
+
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(.xc-list-tree__drag-node--drop-before)::after,
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(.xc-list-tree__drag-node--drop-after)::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  left: -6px;
+  width: 8px;
+  height: 8px;
+  box-sizing: border-box;
+  border: 2px solid var(--xc-list-tree-drag-color);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(.xc-list-tree__drag-node--drop-before)::before {
+  top: -3px;
+}
+
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(.xc-list-tree__drag-node--drop-before)::after {
+  top: -6px;
+}
+
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(.xc-list-tree__drag-node--drop-after)::before {
+  bottom: -3px;
+}
+
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(.xc-list-tree__drag-node--drop-after)::after {
+  bottom: -6px;
+}
+
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(.xc-list-tree__drag-node--drop-forbidden),
+.xc-list-tree__drag-node--drop-forbidden {
+  cursor: not-allowed;
+}
+
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(
+    .xc-list-tree__drag-node--drop-inside.xc-list-tree__drag-node--drop-forbidden
+  )::before {
+  border-color: var(--xc-list-tree-drag-forbidden-color);
+}
+
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(
+    .xc-list-tree__drag-node--drop-before.xc-list-tree__drag-node--drop-forbidden
+  )::before,
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(
+    .xc-list-tree__drag-node--drop-after.xc-list-tree__drag-node--drop-forbidden
+  )::before {
+  background: var(--xc-list-tree-drag-forbidden-color);
+}
+
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(
+    .xc-list-tree__drag-node--drop-before.xc-list-tree__drag-node--drop-forbidden
+  )::after,
+.xc-list-tree__tree
+  .ant-tree-node-content-wrapper:has(
+    .xc-list-tree__drag-node--drop-after.xc-list-tree__drag-node--drop-forbidden
+  )::after {
+  border-color: var(--xc-list-tree-drag-forbidden-color);
 }

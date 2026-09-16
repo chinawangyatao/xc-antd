@@ -19,8 +19,6 @@ import {
   type HocTableNewRowFieldConfig,
   type HocTableValidationRule,
 } from 'xc-antd';
-import TreeDemo from "./treeDemo.tsx";
-
 interface VoucherRecord {
   id: string;
   createdAt: string;
