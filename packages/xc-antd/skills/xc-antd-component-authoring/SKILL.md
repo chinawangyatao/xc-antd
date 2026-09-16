@@ -1,6 +1,6 @@
 ---
 name: xc-antd-component-authoring
-description: Create, refactor, or review components in the @zhilv/xc-antd library. Use for component architecture, directory structure, public TypeScript APIs, compatibility migrations, docs examples, styling, and tests inside this repository; do not use merely to consume an existing xc-antd component.
+description: Create, refactor, or review components in the xc-antd library. Use for component architecture, directory structure, public TypeScript APIs, compatibility migrations, docs examples, styling, and tests inside this repository; do not use merely to consume an existing xc-antd component.
 ---
 
 # xc-antd component authoring

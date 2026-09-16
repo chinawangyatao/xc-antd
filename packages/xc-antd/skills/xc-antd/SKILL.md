@@ -1,6 +1,6 @@
 ---
 name: xc-antd
-description: Build and troubleshoot React interfaces with @zhilv/xc-antd. Use when a task mentions xc-antd, TextField, SchemaForm, FormGroup, CrudTable, HocTable, ListPanel, ListTree, GroupedSelect, ActionDrawer, or ActionModal. Covers component selection, current APIs, typed usage, examples, and verification; do not use for generic Ant Design work that does not use this library.
+description: Build and troubleshoot React interfaces with xc-antd. Use when a task mentions xc-antd, TextField, SchemaForm, FormGroup, CrudTable, HocTable, ListPanel, ListTree, GroupedSelect, ActionDrawer, or ActionModal. Covers component selection, current APIs, typed usage, examples, and verification; do not use for generic Ant Design work that does not use this library.
 ---
 
 # xc-antd
@@ -30,14 +30,14 @@ Inside this repository:
 In a consuming repository, inspect the installed version first:
 
 ```bash
-npm ls @zhilv/xc-antd --depth=0
+npm ls xc-antd --depth=0
 ```
 
-Then read `node_modules/@zhilv/xc-antd/src/index.ts` and the relevant source `types.ts`. The package publishes ESM TypeScript/TSX source, so installed source is authoritative when it differs from this repository.
+Then read `node_modules/xc-antd/src/index.ts` and the relevant source `types.ts`. The package publishes ESM TypeScript/TSX source, so installed source is authoritative when it differs from this repository.
 
 ## Implementation rules
 
-- Import public components and types from `@zhilv/xc-antd`; import `@zhilv/xc-antd/style` once and ensure the consumer build handles ESM TS/TSX and Tailwind CSS v4.
+- Import public components and types from `xc-antd`; import `xc-antd/style` once and ensure the consumer build handles ESM TS/TSX and Tailwind CSS v4.
 - Preserve generic record/value types instead of falling back to `any`.
 - Prefer canonical names. `SimpleTable`, `CRUDTable`, `XcColumnDef`, and related names are compatibility aliases; new code uses `HocTable`, `CrudTable`, and `HocTableColumn`.
 - `InputTree` no longer exists. Use `ListTree`.

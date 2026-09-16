@@ -97,11 +97,10 @@ function Home() {
           }}
         >
 {`// 1. 安装依赖
-npm install @zhilv/xc-antd antd dayjs swr \\
-  --registry http://repo.zhihuiwenlvyun.com/repository/npm-hosted/
+npm install xc-antd antd dayjs swr
 
 // 2. 引入并使用
-import { TextField } from '@zhilv/xc-antd'
+import { TextField } from 'xc-antd'
 
 // 只读
 <TextField valueType="money" text={9999.99} />

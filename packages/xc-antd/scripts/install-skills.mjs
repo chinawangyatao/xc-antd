@@ -16,7 +16,7 @@ const consumerSkills = ['xc-antd', 'xc-antd-image-upload'];
 const authoringSkill = 'xc-antd-component-authoring';
 
 function printHelp() {
-  console.log(`Install @zhilv/xc-antd Agent Skills into the current project.
+  console.log(`Install xc-antd Agent Skills into the current project.
 
 Usage:
   xc-antd-skills install [--target <directory>] [--all] [--force]

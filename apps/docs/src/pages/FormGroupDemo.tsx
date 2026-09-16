@@ -1,6 +1,6 @@
 import { Button, Col, Form, Input, Select, Typography } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
-import { FormGroup } from '@zhilv/xc-antd';
+import { FormGroup } from 'xc-antd';
 
 const FormGroupDemo = () => (
   <div>

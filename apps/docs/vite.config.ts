@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(),tailwindcss()],
   resolve: {
     alias: {
-      '@zhilv/xc-antd': resolve(__dirname, '../../packages/xc-antd/src/index.ts'),
+      'xc-antd': resolve(__dirname, '../../packages/xc-antd/src/index.ts'),
     },
     // 避免与子包产生 React 双实例（hooks 报 null dispatcher）
     dedupe: ['react', 'react-dom'],

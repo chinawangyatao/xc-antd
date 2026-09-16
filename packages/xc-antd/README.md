@@ -1,4 +1,4 @@
-# @zhilv/xc-antd
+# xc-antd
 
 React 19 + Ant Design 6 enterprise component library, published as ESM
 TypeScript/TSX source.
@@ -6,15 +6,14 @@ TypeScript/TSX source.
 ## Install
 
 ```bash
-npm install @zhilv/xc-antd antd @ant-design/icons react react-dom \
-  --registry http://repo.zhihuiwenlvyun.com/repository/npm-hosted/
+npm install xc-antd antd @ant-design/icons react react-dom
 ```
 
 ## Usage
 
 ```tsx
-import { CrudTable, SchemaForm, TextField } from '@zhilv/xc-antd'
-import '@zhilv/xc-antd/style'
+import { CrudTable, SchemaForm, TextField } from 'xc-antd'
+import 'xc-antd/style'
 ```
 
 The package exports `src/index.ts` directly and does not provide a CommonJS

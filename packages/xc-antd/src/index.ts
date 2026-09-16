@@ -1,6 +1,6 @@
 import './index.css'
 /**
- * @zhilv/xc-antd - TextField 组件库
+ * xc-antd - TextField 组件库
  */
 
 // TextField

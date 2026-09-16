@@ -11,7 +11,7 @@ Use `TextField` when one value needs consistent read/edit rendering selected by 
 ## Core pattern
 
 ```tsx
-import { TextField } from '@zhilv/xc-antd';
+import { TextField } from 'xc-antd';
 
 <TextField
   mode="edit"

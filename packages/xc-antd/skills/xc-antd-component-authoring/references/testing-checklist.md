@@ -33,7 +33,7 @@ When package metadata, the installer, or Skills change, also run:
 
 ```bash
 bun test packages/xc-antd/tests/SkillInstaller.test.ts
-npm pack --dry-run --workspace @zhilv/xc-antd --json
+npm pack --dry-run --workspace xc-antd --json
 ```
 
 Confirm the pack list contains `src/`, `skills/`, and `scripts/install-skills.mjs`.
