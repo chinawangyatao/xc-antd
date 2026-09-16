@@ -23,6 +23,8 @@ import {
   type ListDeleteConfirmOptions,
 } from '../shared/listDeleteConfirm';
 import { resolveListToolbarVisibility } from '../shared/listToolbar';
+import type { ListTreeDragDropConfig } from './dragDrop';
+import { useListTreeDragDrop } from './useListTreeDragDrop';
 import './style.css';
 
 type MenuClickInfo = Parameters<NonNullable<MenuProps['onClick']>>[0];
@@ -79,6 +81,11 @@ export interface ListTreeProps<TreeDataType extends object = ListTreeDataNode>
   contextMenu?: true | ListTreeContextMenu<TreeDataType>;
   /** 右键删除的二次确认，默认开启。 */
   deleteConfirm?: ListDeleteConfirmOptions;
+  /**
+   * 标准三段式拖拽配置。传入后由 ListTree 管理拖拽预览、落点反馈和不可变树变换，
+   * 并暂停 Ant Design Tree 自身的 draggable 行为。
+   */
+  dragDrop?: ListTreeDragDropConfig<TreeDataType>;
   titleRender?: (node: TreeDataType) => ReactNode;
 }
 
@@ -238,6 +245,7 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
   nodeIcon,
   contextMenu,
   deleteConfirm,
+  dragDrop,
   fieldNames,
   defaultExpandedKeys,
   expandedKeys,
@@ -245,6 +253,7 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
   titleRender,
   showIcon,
   blockNode,
+  draggable: nativeDraggable,
   ...treeProps
 }: ListTreeProps<TreeDataType>) {
   const [innerSearchValue, setInnerSearchValue] = useState(defaultSearchValue);
@@ -256,6 +265,12 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
   const childrenField = fieldNames?.children ?? 'children';
   const keyField = fieldNames?.key ?? 'key';
   const titleField = fieldNames?.title ?? 'title';
+  const { getDragNodeProps } = useListTreeDragDrop({
+    treeData,
+    childrenField,
+    keyField,
+    dragDrop,
+  });
 
   const filteredResult = useMemo(
     () => filterListTreeData(treeData, mergedSearchValue, {
@@ -308,35 +323,45 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
       ? titleRender(node)
       : getRecord(node)[titleField];
     const title = typeof rawTitle === 'function' ? rawTitle(node) : rawTitle as ReactNode;
+    let renderedTitle = title;
 
-    if (!contextMenu) return title;
+    if (contextMenu) {
+      const contextMenuOptions = contextMenu === true ? {} : contextMenu;
+      const items = typeof contextMenuOptions.items === 'function'
+        ? contextMenuOptions.items(node)
+        : contextMenuOptions.items ?? defaultContextMenuItems;
 
-    const contextMenuOptions = contextMenu === true ? {} : contextMenu;
-    const items = typeof contextMenuOptions.items === 'function'
-      ? contextMenuOptions.items(node)
-      : contextMenuOptions.items ?? defaultContextMenuItems;
+      if (items?.length) {
+        const handleContextMenuClick: NonNullable<MenuProps['onClick']> = (info) => {
+          const emitClick = () => contextMenuOptions.onClick?.({ ...info, node });
+          if (info.key === 'delete') {
+            confirmDelete(deleteConfirm, emitClick);
+          } else {
+            void emitClick();
+          }
+        };
 
-    if (!items?.length) return title;
-
-    const handleContextMenuClick: NonNullable<MenuProps['onClick']> = (info) => {
-      const emitClick = () => contextMenuOptions.onClick?.({ ...info, node });
-      if (info.key === 'delete') {
-        confirmDelete(deleteConfirm, emitClick);
-      } else {
-        void emitClick();
+        renderedTitle = (
+          <Dropdown
+            trigger={['contextMenu']}
+            menu={{
+              items,
+              onClick: handleContextMenuClick,
+            }}
+          >
+            <span className="xc-list-tree__node-title">{title}</span>
+          </Dropdown>
+        );
       }
-    };
+    }
+
+    const dragNodeProps = getDragNodeProps(node);
+    if (!dragNodeProps) return renderedTitle;
 
     return (
-      <Dropdown
-        trigger={['contextMenu']}
-        menu={{
-          items,
-          onClick: handleContextMenuClick,
-        }}
-      >
-        <span className="xc-list-tree__node-title">{title}</span>
-      </Dropdown>
+      <span {...dragNodeProps}>
+        {renderedTitle}
+      </span>
     );
   };
 
@@ -391,6 +416,7 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
         fieldNames={fieldNames}
         treeData={visibleTreeData as unknown as NonNullable<TreeProps['treeData']>}
         blockNode={blockNode ?? true}
+        draggable={dragDrop ? false : nativeDraggable}
         showIcon={showIcon ?? (Boolean(nodeIcon) || treeDataHasIcon)}
         defaultExpandedKeys={defaultExpandedKeys}
         {...controlledExpansionProps}

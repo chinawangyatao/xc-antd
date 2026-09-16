@@ -1,17 +1,23 @@
 import { useMemo, useState } from 'react';
-import { ListPanel, ListTree } from 'xc-antd';
+import {
+    ListPanel,
+    ListTree,
+} from 'xc-antd';
 import {
     Alert,
+    Button,
     Card,
     Col,
     Descriptions,
     message,
+    Modal,
     Row,
     Space,
     Switch,
     Typography,
     type TreeDataNode,
 } from 'antd';
+import { ReloadOutlined } from '@ant-design/icons';
 
 type ScenicNodeType = 'scenic' | 'station' | 'window';
 
@@ -28,7 +34,9 @@ interface ScenicTreeNode extends Omit<TreeDataNode, 'children'> {
   children?: ScenicTreeNode[];
 }
 
-const treeData: ScenicTreeNode[] = [
+const ROOT_NODE_KEY = '0-0';
+
+const initialTreeData: ScenicTreeNode[] = [
     {
         title: '崂山风景区',
         key: '0-0',
@@ -169,17 +177,21 @@ const departmentData: DepartmentItem[] = [
 
 const TreeSelectPage = () => {
     const [messageApi, contextHolder] = message.useMessage();
-    const [selectedNode, setSelectedNode] = useState<ScenicTreeNode>(treeData[0]);
+    const [dropModal, dropModalContextHolder] = Modal.useModal();
+    const [scenicTreeData, setScenicTreeData] = useState(initialTreeData);
+    const [selectedNode, setSelectedNode] = useState<ScenicTreeNode>(initialTreeData[0]);
     const [selectedDepartment, setSelectedDepartment] = useState<DepartmentItem>(departmentData[0]);
     const [departmentCategory, setDepartmentCategory] = useState<'all' | DepartmentItem['category']>('all');
     const [treeNodeType, setTreeNodeType] = useState<'all' | ScenicNodeType>('all');
     const [showAddButton, setShowAddButton] = useState(true);
     const [showSearchInput, setShowSearchInput] = useState(true);
     const [showToolbarSelect, setShowToolbarSelect] = useState(true);
+    const [dragEnabled, setDragEnabled] = useState(true);
+    const [dropConfirmEnabled, setDropConfirmEnabled] = useState(false);
     const [lastAction, setLastAction] = useState('尚未操作');
     const filteredTreeData = useMemo(
-        () => filterTreeByNodeType(treeData, treeNodeType),
-        [treeNodeType],
+        () => filterTreeByNodeType(scenicTreeData, treeNodeType),
+        [scenicTreeData, treeNodeType],
     );
 
     const showAction = (action: string, node?: ScenicTreeNode) => {
@@ -192,14 +204,16 @@ const TreeSelectPage = () => {
     return (
         <>
             {contextHolder}
+            {dropModalContextHolder}
             <Typography.Title level={3} style={{ marginTop: 0 }}>
                 ListPanel / ListTree 列表组件
             </Typography.Title>
             <Typography.Paragraph type="secondary">
-                ListPanel 用于平铺列表，ListTree 用于层级树；两者的添加按钮、搜索框和下拉选择都可独立显隐。
+                ListPanel 用于平铺列表，ListTree 用于层级树；ListTree 支持前方、子级、后方三段式拖拽，
+                拖拽规则和持久化由业务回调注入。
             </Typography.Paragraph>
 
-            <Card size="small" title="工具栏显隐配置" style={{ marginBottom: 16 }}>
+            <Card size="small" title="交互配置" style={{ marginBottom: 16 }}>
                 <Space wrap>
                     <Switch
                         checked={showAddButton}
@@ -219,6 +233,30 @@ const TreeSelectPage = () => {
                         unCheckedChildren="下拉隐藏"
                         onChange={setShowToolbarSelect}
                     />
+                    <Switch
+                        checked={dragEnabled}
+                        checkedChildren="拖拽开启"
+                        unCheckedChildren="拖拽关闭"
+                        onChange={setDragEnabled}
+                    />
+                    <Switch
+                        checked={dropConfirmEnabled}
+                        checkedChildren="二次确认开启"
+                        unCheckedChildren="二次确认关闭"
+                        disabled={!dragEnabled}
+                        onChange={setDropConfirmEnabled}
+                    />
+                    <Button
+                        icon={<ReloadOutlined />}
+                        onClick={() => {
+                            setScenicTreeData(initialTreeData);
+                            setSelectedNode(initialTreeData[0]);
+                            setLastAction('树结构已重置');
+                            void messageApi.success('树结构已重置');
+                        }}
+                    >
+                        重置树
+                    </Button>
                 </Space>
             </Card>
 
@@ -247,6 +285,37 @@ const TreeSelectPage = () => {
                             onSelect={(_, info) => {
                                 setSelectedNode(info.node as unknown as ScenicTreeNode);
                             }}
+                            dragDrop={dragEnabled && treeNodeType === 'all'
+                                ? {
+                                    nodeDraggable: (node) => node.key !== ROOT_NODE_KEY,
+                                    dropEdgeRatio: 0.25,
+                                    onDrop: ({ dragNode, targetParentNode, nextTreeData }) => {
+                                        const parentTitle = targetParentNode?.title ?? '根层级';
+                                        const actionText = `移动 ${String(dragNode.title)} 到 ${String(parentTitle)}`;
+                                        const applyDrop = () => {
+                                            setScenicTreeData(nextTreeData);
+                                            setLastAction(actionText);
+                                            void messageApi.success(actionText);
+                                        };
+                                        if (!dropConfirmEnabled) {
+                                            applyDrop();
+                                            return;
+                                        }
+                                        dropModal.confirm({
+                                            title: '确认保存拖动结果',
+                                            content: `是否将“${String(dragNode.title)}”移动到“${String(parentTitle)}”？`,
+                                            okText: '确认',
+                                            cancelText: '取消',
+                                            onOk: applyDrop,
+                                        });
+                                    },
+                                    onDropRejected: () => {
+                                        const text = '不能拖到节点自身或其后代';
+                                        setLastAction(`拖拽被拒绝：${text}`);
+                                        void messageApi.warning(text);
+                                    },
+                                }
+                                : undefined}
                             nodeIcon={(node) => node.nodeType
                                 ? <TreeIcon type={node.nodeType} />
                                 : null}
@@ -302,7 +371,13 @@ const TreeSelectPage = () => {
                         <Alert
                             showIcon
                             type="info"
-                            message="点击树箭头展开或收起；上方开关可实时控制两个组件的工具栏控件；右键菜单由 contextMenu 独立开启，树复选框使用 checkable。"
+                            title={!dragEnabled
+                                ? '拖拽已关闭，树恢复为普通导航模式。'
+                                : treeNodeType !== 'all'
+                                    ? '类型筛选展示的是局部树，切换到“全部”后可进行拖拽。'
+                                    : dropConfirmEnabled
+                                        ? '二次确认已开启：拖拽完成后确认才会更新树结构。'
+                                        : '自由拖拽已开启：可调整同级顺序或父级，业务规则可按需注入。'}
                             style={{ marginBottom: 16 }}
                         />
                         <Descriptions
@@ -331,6 +406,15 @@ const TreeSelectPage = () => {
                                     key: 'icon',
                                     label: '图标规则',
                                     children: '景区=景、售票站=点、售票窗口=窗',
+                                },
+                                {
+                                    key: 'drag',
+                                    label: '拖拽规则',
+                                    children: dragEnabled
+                                        ? dropConfirmEnabled
+                                            ? '根节点不可拖；组件阻止成环；移动结果需弹窗确认后生效'
+                                            : '根节点不可拖；组件阻止成环；其余层级和排序不受限制'
+                                        : '拖拽功能已关闭',
                                 },
                             ]}
                         />

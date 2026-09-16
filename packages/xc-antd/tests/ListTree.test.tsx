@@ -2,6 +2,8 @@ import { describe, expect, test } from 'bun:test';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
   ListTree,
+  moveListTreeNode,
+  resolveListTreeDropPlacement,
   type ListTreeProps,
 } from '../src/ListTree';
 import { filterListTreeData } from '../src/ListTree/ListTree';
@@ -22,6 +24,21 @@ const treeData: TestNode[] = [
     children: [
       { key: 'taiqing', title: '太清游览区', type: 'area' },
       { key: 'jufeng', title: '巨峰游览区', type: 'area' },
+    ],
+  },
+];
+
+const draggableTreeData: TestNode[] = [
+  {
+    key: 'root',
+    title: '根节点',
+    children: [
+      {
+        key: 'parent-a',
+        title: '父节点 A',
+        children: [{ key: 'child-a', title: '子节点 A' }],
+      },
+      { key: 'parent-b', title: '父节点 B' },
     ],
   },
 ];
@@ -128,5 +145,90 @@ describe('ListTree', () => {
     );
 
     expect(hiddenHtml).not.toContain('xc-list-tree__toolbar');
+  });
+
+  test('resolves before, inside and after drop areas', () => {
+    expect(resolveListTreeDropPlacement(2, 20)).toBe('before');
+    expect(resolveListTreeDropPlacement(10, 20)).toBe('inside');
+    expect(resolveListTreeDropPlacement(18, 20)).toBe('after');
+    expect(resolveListTreeDropPlacement(4, 20, 0.2)).toBe('inside');
+  });
+
+  test('moves a node immutably into another node', () => {
+    const result = moveListTreeNode(
+      draggableTreeData,
+      'child-a',
+      'parent-b',
+      'inside',
+    );
+
+    expect(result?.dragParentNode?.key).toBe('parent-a');
+    expect(result?.targetParentNode?.key).toBe('parent-b');
+    expect(result?.nextTreeData[0].children?.[0].children).toEqual([]);
+    expect(result?.nextTreeData[0].children?.[1].children?.[0].key).toBe('child-a');
+    expect(draggableTreeData[0].children?.[0].children?.[0].key).toBe('child-a');
+  });
+
+  test('moves a node before a sibling and rejects descendant drops', () => {
+    const moved = moveListTreeNode(
+      draggableTreeData,
+      'parent-b',
+      'parent-a',
+      'before',
+    );
+
+    expect(moved?.nextTreeData[0].children?.map((node) => node.key)).toEqual([
+      'parent-b',
+      'parent-a',
+    ]);
+    expect(moveListTreeNode(
+      draggableTreeData,
+      'parent-a',
+      'child-a',
+      'inside',
+    )).toBeNull();
+  });
+
+  test('supports custom key and children field names', () => {
+    const aliasedTree = [
+      {
+        id: 'root',
+        label: '根节点',
+        nodes: [
+          { id: 'first', label: '节点一' },
+          { id: 'second', label: '节点二' },
+        ],
+      },
+    ];
+    const result = moveListTreeNode(
+      aliasedTree,
+      'second',
+      'first',
+      'before',
+      { keyField: 'id', childrenField: 'nodes' },
+    );
+
+    expect(result?.nextTreeData[0].nodes.map((node) => node.id)).toEqual([
+      'second',
+      'first',
+    ]);
+  });
+
+  test('renders the high-level draggable node contract', () => {
+    const html = renderToStaticMarkup(
+      <ListTree
+        searchable={false}
+        showAddButton={false}
+        defaultExpandAll
+        treeData={draggableTreeData}
+        dragDrop={{
+          nodeDraggable: (node) => node.key !== 'root',
+          onDrop: () => undefined,
+        }}
+      />,
+    );
+
+    expect(html).toContain('xc-list-tree__drag-node');
+    expect(html).toContain('draggable="true"');
   });
 });

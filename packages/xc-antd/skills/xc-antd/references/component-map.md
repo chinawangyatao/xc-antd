@@ -10,7 +10,7 @@ Choose one primary component family before coding.
 | Remote request, query form, pagination, selection, actions | `CrudTable` | The request callback owns server filtering and paging. |
 | Local rows, global/column filtering, inline new rows | `HocTable` | It does not provide the `CrudTable` request/query workflow. |
 | Searchable flat navigation list | `ListPanel` | Default data fields are `id`, `title`, `subTitle`, `disabled`. |
-| Searchable hierarchy | `ListTree` | Flat `treeData` also works, but use `ListPanel` for list subtitles and disabled list styling. |
+| Searchable or draggable hierarchy | `ListTree` | `dragDrop` adds generic three-zone movement; keep domain hierarchy and ordering rules in caller callbacks. |
 | Grouped multi-select with search and editable options | `GroupedSelect` | Use for choosing labels from groups; groups and CRUD callbacks are owned by the caller. |
 | Mask sensitive text or images and reveal on demand | `SensitiveData` | Use `request` mode when plaintext must not be present in the initial frontend payload. |
 | Upload, validate, preview, or crop images | `ImageUpload` | Use `ImageCropDrawer` directly only when upload is owned elsewhere. |

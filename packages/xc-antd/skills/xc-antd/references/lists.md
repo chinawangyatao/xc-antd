@@ -43,6 +43,10 @@ Use `ListTree<NodeType>` for hierarchical navigation and search.
   contextMenu={{
     onClick: ({ key, node }) => handleNodeAction(key, node),
   }}
+  dragDrop={{
+    nodeDraggable: (node) => node.key !== 'root',
+    onDrop: ({ nextTreeData }) => setTreeData(nextTreeData),
+  }}
 />
 ```
 
@@ -53,6 +57,14 @@ Use `ListTree<NodeType>` for hierarchical navigation and search.
 - Right-click dropdowns remain independently controlled by `contextMenu`; tree checkboxes use the inherited Ant Design `checkable` prop.
 - Default right-click keys are `addChild`, `edit`, and `delete`.
 - Delete confirmation is enabled for both list components. Customize `deleteConfirm` or use `false` only when the caller intentionally owns confirmation.
+- `dragDrop` enables the standard three-zone drag interaction. The default upper/lower edge ratio is `0.3`; set `dropEdgeRatio` from `0` to `0.5` when a product needs a wider child or sibling target. `ListTree` prevents self/descendant cycles and passes immutable `nextTreeData` to `onDrop`.
+- Use `nodeDraggable(node)` for roots and read-only nodes. Use `getDropStatus(info)` for business rules: `allowed` shows the primary indicator, `forbidden` keeps a gray rejected indicator, and `invalid` hides the indicator. Handle rejected drops with `onDropRejected` when user feedback is needed.
+- All drag callbacks are optional except `onDrop`; omitting `nodeDraggable` and `getDropStatus` gives unrestricted structural dragging. Do not encode domain types, permissions, or fixed sibling priorities inside `ListTree`.
+- Product switches should compose the API instead of changing the component: use `dragDrop={dragEnabled ? config : undefined}` for a drag toggle. Optional drop confirmation belongs in the caller's `onDrop`; apply `nextTreeData` only after the modal resolves successfully.
+- `dragDrop` owns the high-level interaction and temporarily disables Ant Design Tree's native `draggable` path. Without `dragDrop`, inherited native Tree drag props continue to pass through unchanged.
+- Mark buttons or custom controls inside `titleRender` with `data-list-tree-drag-ignore="true"` when they should be hidden from the native drag preview; standard interactive elements already do not start a node drag.
+- Override `--xc-list-tree-drag-color`, `--xc-list-tree-drag-background`, and `--xc-list-tree-drag-forbidden-color` on the component root when a product theme needs different feedback colors.
+- `moveListTreeNode` and `resolveListTreeDropPlacement` are exported for reducers and focused tests. Do not pass a filtered/cropped tree to `onDrop` unless replacing the hidden nodes is intentional.
 - Do not pass `expandedKeys={undefined}`. Omit it for an uncontrolled tree.
 - `InputTree` was removed; do not import or recreate it.
 
