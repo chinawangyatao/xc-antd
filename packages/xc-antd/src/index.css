@@ -9,5 +9,6 @@
 @import "./ListPanel/style.css";
 @import "./ListTree/style.css";
 @import "./SchemaForm/style.css";
+@import "./SensitiveData/style.css";
 
 @source "./";

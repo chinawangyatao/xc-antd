@@ -14,6 +14,7 @@ export * from './ListPanel';
 export * from './ListTree';
 export * from './GroupedSelect';
 export * from './ImageUpload';
+export * from './SensitiveData';
 export type {
   ListDeleteConfirmConfig,
   ListDeleteConfirmOptions,
