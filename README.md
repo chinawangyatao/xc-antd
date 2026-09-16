@@ -1,5 +1,7 @@
 # XC-AntD 组件库
 
+[在线组件示例](https://chinawangyatao.github.io/xc-antd/)
+
 一个基于 React 19、TypeScript 6.0、Vite 8.0 和 Ant Design 6.x 的企业级组件库 monorepo 项目。
 
 ## 项目概述
