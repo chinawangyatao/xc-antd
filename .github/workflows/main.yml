@@ -1,0 +1,168 @@
+name: Publish public npm package
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'packages/xc-antd/**'
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: Version increment
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: public-npm-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Version, verify and publish
+    if: github.event_name == 'workflow_dispatch' || github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require the default branch
+        shell: bash
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          if [[ "$GITHUB_REF_NAME" != "$DEFAULT_BRANCH" ]]; then
+            echo "Public releases must run from $DEFAULT_BRANCH, not $GITHUB_REF_NAME."
+            exit 1
+          fi
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Setup Node.js and public npm registry
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          always-auth: true
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Test and typecheck
+        run: |
+          bun run test
+          bun run --filter @zhilv/xc-antd typecheck
+
+      - name: Build package and docs
+        run: |
+          bun run build
+          bun run build:docs
+
+      - name: Calculate next public version
+        id: version
+        shell: bash
+        env:
+          RELEASE_TYPE: ${{ github.event_name == 'workflow_dispatch' && inputs.release_type || 'patch' }}
+        run: |
+          PACKAGE_NAME=$(node -p "require('./packages/xc-antd/package.json').name")
+          LOCAL_VERSION=$(node -p "require('./packages/xc-antd/package.json').version")
+          PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME" version \
+            --registry=https://registry.npmjs.org 2>/dev/null || true)
+
+          NEXT_VERSION=$(node - "$LOCAL_VERSION" "$PUBLISHED_VERSION" "$RELEASE_TYPE" <<'NODE'
+          const [localVersion, publishedVersion, releaseType] = process.argv.slice(2)
+
+          function parse(version) {
+            const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(version || '')
+            if (!match) return [0, 0, 0]
+            return match.slice(1).map(Number)
+          }
+
+          function compare(left, right) {
+            for (let index = 0; index < 3; index += 1) {
+              if (left[index] !== right[index]) return left[index] - right[index]
+            }
+            return 0
+          }
+
+          const local = parse(localVersion)
+          const published = parse(publishedVersion)
+          const next = [...(compare(local, published) >= 0 ? local : published)]
+
+          if (releaseType === 'major') {
+            next[0] += 1
+            next[1] = 0
+            next[2] = 0
+          } else if (releaseType === 'minor') {
+            next[1] += 1
+            next[2] = 0
+          } else {
+            next[2] += 1
+          }
+
+          process.stdout.write(next.join('.'))
+          NODE
+          )
+
+          echo "package=$PACKAGE_NAME" >> "$GITHUB_OUTPUT"
+          echo "version=$NEXT_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Local version: $LOCAL_VERSION"
+          echo "Published version: ${PUBLISHED_VERSION:-not published}"
+          echo "Next version: $NEXT_VERSION"
+
+      - name: Update package version
+        shell: bash
+        env:
+          NEXT_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          npm version "$NEXT_VERSION" \
+            --workspace @zhilv/xc-antd \
+            --no-git-tag-version \
+            --ignore-scripts
+
+      - name: Verify package contents
+        working-directory: packages/xc-antd
+        run: npm pack --dry-run --json
+
+      - name: Ensure release tag is new
+        shell: bash
+        env:
+          NEXT_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/v$NEXT_VERSION" >/dev/null 2>&1; then
+            echo "Tag v$NEXT_VERSION already exists."
+            exit 1
+          fi
+
+      - name: Publish public package
+        working-directory: packages/xc-antd
+        run: npm publish --access public --provenance --registry=https://registry.npmjs.org
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLIC_TOKEN }}
+
+      - name: Commit version and create tag
+        shell: bash
+        env:
+          NEXT_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add packages/xc-antd/package.json
+          git commit -m "chore(release): v$NEXT_VERSION [skip ci]"
+          git tag -a "v$NEXT_VERSION" -m "Release v$NEXT_VERSION"
+          git push origin "HEAD:$GITHUB_REF_NAME" "v$NEXT_VERSION"
