@@ -51,6 +51,7 @@ Use `ListTree<NodeType>` for hierarchical navigation and search.
 ```
 
 - It passes through Ant Design Tree props except wrapper-specific class/style/tree data handling.
+- `horizontalScroll` defaults to `true`: the component fills its parent and horizontally scrolls when deep levels or long titles overflow. Set it to `false` to restore title truncation with a full-title Tooltip and inherited virtual scrolling; when enabled it takes precedence over `virtual`.
 - `nodeIcon(node)` supplies per-node icons; an explicit `treeData[].icon` wins.
 - Search preserves matching ancestor chains and auto-expands them.
 - It uses the same `showAddButton`, `showSearchInput`, `showToolbarSelect`, and `toolbarSelectProps` toolbar API as `ListPanel`.
@@ -87,6 +88,7 @@ Use `GroupedSelect` for multi-select from labeled groups, with a searchable Sele
 
 - `value`/`onChange` or `defaultValue` control selected option values (`string | number` arrays). Option values must be unique across groups.
 - Search matches group or option labels. `onAddGroup(label)` and `onAddOption(label, group)` are called after in-popup input and confirmation.
+- Use `groupLabelMaxLength` and `optionLabelMaxLength` to set different limits for group and option name inputs during creation and editing. Omit either prop to leave that input unrestricted.
 - `onEditGroup(group, label)` and `onEditOption(option, group, label)` receive the updated name from an inline editor; async failures keep that row editable. The Select popup stays open during edits.
 - Deletion uses Ant Design `Popconfirm` inside the Select popup by default; use `deleteConfirm={false}` only when the caller owns confirmation. Missing action callbacks hide their buttons.
 - The caller updates `groups` after CRUD; successful deletion removes affected selected values via `onChange`.

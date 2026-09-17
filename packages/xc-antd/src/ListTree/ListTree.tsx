@@ -3,6 +3,7 @@ import {
   Dropdown,
   Input,
   Select,
+  Tooltip,
   Tree,
   type ButtonProps,
   type InputProps,
@@ -53,6 +54,8 @@ export interface ListTreeProps<TreeDataType extends object = ListTreeDataNode>
   style?: CSSProperties;
   treeClassName?: string;
   treeStyle?: CSSProperties;
+  /** 是否允许树内容超出父容器后横向滚动，默认开启；开启时优先于 virtual。 */
+  horizontalScroll?: boolean;
 
   searchable?: boolean;
   /** 是否显示搜索输入框，优先级高于 searchable。 */
@@ -227,6 +230,7 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
   style,
   treeClassName,
   treeStyle,
+  horizontalScroll = true,
   searchable = true,
   showSearchInput,
   searchValue,
@@ -254,6 +258,7 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
   showIcon,
   blockNode,
   draggable: nativeDraggable,
+  virtual,
   ...treeProps
 }: ListTreeProps<TreeDataType>) {
   const [innerSearchValue, setInnerSearchValue] = useState(defaultSearchValue);
@@ -323,7 +328,9 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
       ? titleRender(node)
       : getRecord(node)[titleField];
     const title = typeof rawTitle === 'function' ? rawTitle(node) : rawTitle as ReactNode;
-    let renderedTitle = title;
+    let renderedTitle = (
+      <span className="xc-list-tree__node-title">{title}</span>
+    );
 
     if (contextMenu) {
       const contextMenuOptions = contextMenu === true ? {} : contextMenu;
@@ -349,10 +356,18 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
               onClick: handleContextMenuClick,
             }}
           >
-            <span className="xc-list-tree__node-title">{title}</span>
+            {renderedTitle}
           </Dropdown>
         );
       }
+    }
+
+    if (!horizontalScroll) {
+      renderedTitle = (
+        <Tooltip placement="topLeft" title={title}>
+          {renderedTitle}
+        </Tooltip>
+      );
     }
 
     const dragNodeProps = getDragNodeProps(node);
@@ -366,7 +381,14 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
   };
 
   return (
-    <div className={joinClassNames('xc-list-tree', className)} style={style}>
+    <div
+      className={joinClassNames(
+        'xc-list-tree',
+        horizontalScroll ? 'xc-list-tree--horizontal-scroll' : undefined,
+        className,
+      )}
+      style={style}
+    >
       {contextHolder}
       {toolbarVisibility.toolbar && (
         <div className="xc-list-tree__toolbar">
@@ -417,6 +439,7 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
         treeData={visibleTreeData as unknown as NonNullable<TreeProps['treeData']>}
         blockNode={blockNode ?? true}
         draggable={dragDrop ? false : nativeDraggable}
+        virtual={horizontalScroll ? false : virtual}
         showIcon={showIcon ?? (Boolean(nodeIcon) || treeDataHasIcon)}
         defaultExpandedKeys={defaultExpandedKeys}
         {...controlledExpansionProps}

@@ -106,6 +106,8 @@ export default function GroupedSelectDemo() {
           groups={groups}
           value={value}
           onChange={setValue}
+          groupLabelMaxLength={12}
+          optionLabelMaxLength={20}
           onAddGroup={(nextLabel) => {
             setGroups((current) => [...current, {
               id: `group-${crypto.randomUUID()}`,

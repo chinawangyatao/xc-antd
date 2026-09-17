@@ -1,6 +1,8 @@
 .xc-list-tree {
+  box-sizing: border-box;
   min-width: 0;
   width: 100%;
+  max-width: 100%;
   --xc-list-tree-drag-color: #1677ff;
   --xc-list-tree-drag-background: #e6f4ff;
   --xc-list-tree-drag-forbidden-color: #86909c;
@@ -9,8 +11,21 @@
 .xc-list-tree__toolbar {
   display: flex;
   align-items: center;
+  min-width: 0;
+  width: 100%;
   gap: 8px;
   margin-bottom: 12px;
+}
+
+/* 横向滚动模式使用内容实际宽度，浅层树仍至少铺满父容器。 */
+.xc-list-tree--horizontal-scroll .xc-list-tree__tree .ant-tree-list-holder {
+  overflow-x: auto;
+}
+
+.xc-list-tree--horizontal-scroll .xc-list-tree__tree .ant-tree-list-holder-inner,
+.xc-list-tree--horizontal-scroll .xc-list-tree__tree .ant-tree-treenode {
+  min-width: 100%;
+  width: max-content;
 }
 
 .xc-list-tree__search {
@@ -40,6 +55,16 @@
   align-items: center;
 }
 
+.xc-list-tree--horizontal-scroll .xc-list-tree__tree .ant-tree-node-content-wrapper {
+  min-width: max-content;
+}
+
+.xc-list-tree--horizontal-scroll .xc-list-tree__tree .ant-tree-title {
+  flex: none;
+  overflow: visible;
+  white-space: nowrap;
+}
+
 .xc-list-tree__node-title {
   display: block;
   overflow: hidden;
@@ -48,12 +73,24 @@
   white-space: nowrap;
 }
 
+.xc-list-tree--horizontal-scroll .xc-list-tree__node-title {
+  overflow: visible;
+  width: max-content;
+  min-width: max-content;
+  text-overflow: clip;
+}
+
 .xc-list-tree__drag-node {
   position: relative;
   display: flex;
   width: 100%;
   min-width: 0;
   align-items: center;
+}
+
+.xc-list-tree--horizontal-scroll .xc-list-tree__drag-node {
+  width: max-content;
+  min-width: max-content;
 }
 
 .xc-list-tree__drag-node[draggable='true'] {
