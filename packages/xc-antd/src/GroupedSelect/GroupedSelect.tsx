@@ -35,6 +35,10 @@ export interface GroupedSelectProps {
   selectedOptions?: GroupedSelectOption[];
   placeholder?: string;
   searchPlaceholder?: string;
+  /** 新增或编辑分组时允许输入的最大字符数；不传则不限制。 */
+  groupLabelMaxLength?: number;
+  /** 新增或编辑标签时允许输入的最大字符数；不传则不限制。 */
+  optionLabelMaxLength?: number;
   /** remote 模式只展示传入的 groups，不再执行本地筛选。 */
   searchMode?: 'local' | 'remote';
   onSearchChange?: (keyword: string) => void;
@@ -67,6 +71,8 @@ export function GroupedSelect({
   selectedOptions = EMPTY_SELECTED_OPTIONS,
   placeholder = '请选择',
   searchPlaceholder = '请输入内容',
+  groupLabelMaxLength,
+  optionLabelMaxLength,
   searchMode = 'local',
   onSearchChange,
   searchLoading = false,
@@ -254,6 +260,7 @@ export function GroupedSelect({
                       <GroupedSelectEditEditor
                         kind="group"
                         label={editLabel}
+                        maxLength={groupLabelMaxLength}
                         saving={editSaving}
                         error={editError}
                         onChange={setEditLabel}
@@ -282,6 +289,7 @@ export function GroupedSelect({
                         <GroupedSelectEditEditor
                           kind="option"
                           label={editLabel}
+                          maxLength={optionLabelMaxLength}
                           saving={editSaving}
                           error={editError}
                           onChange={setEditLabel}
@@ -320,6 +328,9 @@ export function GroupedSelect({
                     mode={addMode}
                     groups={groups}
                     label={draftLabel}
+                    maxLength={addMode === 'group'
+                      ? groupLabelMaxLength
+                      : optionLabelMaxLength}
                     groupId={draftGroupId}
                     adding={adding}
                     error={addError}

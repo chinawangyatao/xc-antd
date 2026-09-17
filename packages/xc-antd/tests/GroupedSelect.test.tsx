@@ -85,14 +85,22 @@ describe('GroupedSelect', () => {
       onSubmit: () => undefined,
       onCancel: () => undefined,
     };
-    const groupHtml = renderToStaticMarkup(<GroupedSelectAddEditor {...props} mode="group" />);
+    const unlimitedGroupHtml = renderToStaticMarkup(
+      <GroupedSelectAddEditor {...props} mode="group" />,
+    );
+    const groupHtml = renderToStaticMarkup(
+      <GroupedSelectAddEditor {...props} mode="group" maxLength={4} />,
+    );
     const optionHtml = renderToStaticMarkup(
-      <GroupedSelectAddEditor {...props} mode="option" groupId="a" />,
+      <GroupedSelectAddEditor {...props} mode="option" groupId="a" maxLength={6} />,
     );
     expect(groupHtml).toContain('新分组名称');
     expect(groupHtml).not.toContain('所属分组');
+    expect(unlimitedGroupHtml).not.toContain('maxLength=');
+    expect(groupHtml).toContain('maxLength="4"');
     expect(optionHtml).toContain('新标签名称');
     expect(optionHtml).toContain('所属分组');
+    expect(optionHtml).toContain('maxLength="6"');
     expect(optionHtml).toContain('xc-grouped-select__editor');
   });
 
@@ -105,11 +113,13 @@ describe('GroupedSelect', () => {
       onSave: () => undefined,
       onCancel: () => undefined,
     };
-    const groupEditor = GroupedSelectEditEditor({ ...props, kind: 'group' });
-    const optionEditor = GroupedSelectEditEditor({ ...props, kind: 'option' });
+    const groupEditor = GroupedSelectEditEditor({ ...props, kind: 'group', maxLength: 4 });
+    const optionEditor = GroupedSelectEditEditor({ ...props, kind: 'option', maxLength: 8 });
     expect(groupEditor.props.className).toBe('xc-grouped-select__inline-editor');
     expect(groupEditor.props.children[0].props['aria-label']).toBe('编辑分组名称');
+    expect(groupEditor.props.children[0].props.maxLength).toBe(4);
     expect(optionEditor.props.children[0].props['aria-label']).toBe('编辑标签名称');
+    expect(optionEditor.props.children[0].props.maxLength).toBe(8);
     expect(optionEditor.props.children[1].props['aria-label']).toBe('保存编辑');
     expect(optionEditor.props.children[2].props['aria-label']).toBe('取消编辑');
   });

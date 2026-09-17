@@ -5,6 +5,7 @@ interface AddEditorProps {
   mode: 'group' | 'option';
   groups: GroupedSelectGroup[];
   label: string;
+  maxLength?: number;
   groupId?: GroupedSelectValue;
   adding: boolean;
   error: string;
@@ -18,6 +19,7 @@ export function GroupedSelectAddEditor({
   mode,
   groups,
   label,
+  maxLength,
   groupId,
   adding,
   error,
@@ -44,6 +46,7 @@ export function GroupedSelectAddEditor({
         aria-label={mode === 'group' ? '新分组名称' : '新标签名称'}
         placeholder={mode === 'group' ? '请输入分组名称' : '请输入标签名称'}
         value={label}
+        maxLength={maxLength}
         onChange={(event) => onLabelChange(event.target.value)}
         onPressEnter={onSubmit}
       />

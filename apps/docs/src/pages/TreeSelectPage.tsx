@@ -62,7 +62,7 @@ const initialTreeData: ScenicTreeNode[] = [
                                         nodeType: 'window',
                                     },
                                     {
-                                        title: '八水河普通窗口01',
+                                        title: '八水河普通窗口01（团队及旅行社综合服务）',
                                         key: '0-0-0-0-0-1',
                                         nodeType: 'window',
                                     }]
@@ -186,6 +186,7 @@ const TreeSelectPage = () => {
     const [showAddButton, setShowAddButton] = useState(true);
     const [showSearchInput, setShowSearchInput] = useState(true);
     const [showToolbarSelect, setShowToolbarSelect] = useState(true);
+    const [horizontalScroll, setHorizontalScroll] = useState(true);
     const [dragEnabled, setDragEnabled] = useState(true);
     const [dropConfirmEnabled, setDropConfirmEnabled] = useState(false);
     const [lastAction, setLastAction] = useState('尚未操作');
@@ -234,6 +235,12 @@ const TreeSelectPage = () => {
                         onChange={setShowToolbarSelect}
                     />
                     <Switch
+                        checked={horizontalScroll}
+                        checkedChildren="横向滚动开启"
+                        unCheckedChildren="横向滚动关闭"
+                        onChange={setHorizontalScroll}
+                    />
+                    <Switch
                         checked={dragEnabled}
                         checkedChildren="拖拽开启"
                         unCheckedChildren="拖拽关闭"
@@ -265,8 +272,16 @@ const TreeSelectPage = () => {
                     <Card title="ListTree 树列表" styles={{ body: { padding: 16 } }}>
                         <ListTree<ScenicTreeNode>
                             height={520}
+                            horizontalScroll={horizontalScroll}
                             treeData={filteredTreeData}
-                            defaultExpandedKeys={['0-0', '0-0-0', '0-1', '0-2']}
+                            defaultExpandedKeys={[
+                                '0-0',
+                                '0-0-0',
+                                '0-0-0-0',
+                                '0-0-0-0-0',
+                                '0-1',
+                                '0-2',
+                            ]}
                             defaultSelectedKeys={['0-0']}
                             showAddButton={showAddButton}
                             showSearchInput={showSearchInput}

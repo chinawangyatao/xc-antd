@@ -4,6 +4,7 @@ import { Button, Input } from 'antd';
 interface EditEditorProps {
   kind: 'group' | 'option';
   label: string;
+  maxLength?: number;
   saving: boolean;
   error: string;
   onChange: (label: string) => void;
@@ -14,6 +15,7 @@ interface EditEditorProps {
 export function GroupedSelectEditEditor({
   kind,
   label,
+  maxLength,
   saving,
   error,
   onChange,
@@ -27,6 +29,7 @@ export function GroupedSelectEditEditor({
         size="small"
         aria-label={kind === 'group' ? '编辑分组名称' : '编辑标签名称'}
         value={label}
+        maxLength={maxLength}
         onChange={(event) => onChange(event.target.value)}
         onPressEnter={onSave}
         onKeyDown={(event) => {

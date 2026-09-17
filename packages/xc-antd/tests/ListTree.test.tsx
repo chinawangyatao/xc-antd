@@ -105,6 +105,25 @@ describe('ListTree', () => {
     expect(html).toContain('太清游览区');
   });
 
+  test('enables horizontal scrolling by default and allows disabling it', () => {
+    const defaultHtml = renderToStaticMarkup(
+      <ListTree searchable={false} showAddButton={false} treeData={treeData} />,
+    );
+    const disabledHtml = renderToStaticMarkup(
+      <ListTree
+        searchable={false}
+        showAddButton={false}
+        horizontalScroll={false}
+        treeData={treeData}
+      />,
+    );
+
+    expect(defaultHtml).toContain('xc-list-tree--horizontal-scroll');
+    expect(disabledHtml).not.toContain('xc-list-tree--horizontal-scroll');
+    expect(defaultHtml).toContain('xc-list-tree__node-title');
+    expect(disabledHtml).toContain('xc-list-tree__node-title');
+  });
+
   test('wraps node titles with a context-menu trigger', () => {
     const html = renderToStaticMarkup(
       <ListTree
