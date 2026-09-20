@@ -61,8 +61,16 @@
 
 .xc-list-tree--horizontal-scroll .xc-list-tree__tree .ant-tree-title {
   flex: none;
+  width: max-content;
+  min-width: 100%;
   overflow: visible;
   white-space: nowrap;
+}
+
+/* 行级交互需要覆盖标题右侧的空白区域，长标题仍按内容宽度参与横向滚动。 */
+.xc-list-tree__tree .ant-tree-title .ant-dropdown-trigger {
+  display: block;
+  width: 100%;
 }
 
 .xc-list-tree__node-title {
@@ -89,8 +97,8 @@
 }
 
 .xc-list-tree--horizontal-scroll .xc-list-tree__drag-node {
-  width: max-content;
-  min-width: max-content;
+  width: 100%;
+  min-width: 100%;
 }
 
 .xc-list-tree__drag-node[draggable='true'] {
