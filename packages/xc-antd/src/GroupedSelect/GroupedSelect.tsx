@@ -51,8 +51,13 @@ export interface GroupedSelectProps {
   onEditGroup?: (group: GroupedSelectGroup, label: string) => void | Promise<void>;
   /** 远程模式下 groups 可能是部分结果，调用方还需清理该分组下的受控已选值。 */
   onDeleteGroup?: (group: GroupedSelectGroup) => void | Promise<void>;
-  /** 编辑标签名称，保存时调用；返回 Promise 时等待完成。 */
-  onEditOption?: (option: GroupedSelectOption, group: GroupedSelectGroup, label: string) => void | Promise<void>;
+  /** 编辑标签名称或所属分组，保存时调用；返回 Promise 时等待完成。 */
+  onEditOption?: (
+    option: GroupedSelectOption,
+    group: GroupedSelectGroup,
+    label: string,
+    nextGroup: GroupedSelectGroup,
+  ) => void | Promise<void>;
   onDeleteOption?: (option: GroupedSelectOption, group: GroupedSelectGroup) => void | Promise<void>;
   deleteConfirm?: ListDeleteConfirmOptions;
   selectProps?: Omit<SelectProps<GroupedSelectValue[]>,
@@ -100,6 +105,7 @@ export function GroupedSelect({
     group: GroupedSelectGroup;
     option?: GroupedSelectOption;
   } | null>(null);
+  const [editingGroupId, setEditingGroupId] = useState<GroupedSelectValue>();
   const [editLabel, setEditLabel] = useState('');
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState('');
@@ -146,6 +152,7 @@ export function GroupedSelect({
   const beginEdit = (group: GroupedSelectGroup, option?: GroupedSelectOption) => {
     setAddMode(null);
     setEditing({ kind: option ? 'option' : 'group', group, option });
+    setEditingGroupId(group.id);
     setEditLabel(option?.label ?? group.label);
     setEditError('');
   };
@@ -156,8 +163,13 @@ export function GroupedSelect({
     setEditError('');
     try {
       if (editing.kind === 'group') await onEditGroup?.(editing.group, label);
-      else if (editing.option) await onEditOption?.(editing.option, editing.group, label);
+      else if (editing.option) {
+        const nextGroup = groups.find((group) => group.id === editingGroupId)
+          ?? editing.group;
+        await onEditOption?.(editing.option, editing.group, label, nextGroup);
+      }
       setEditing(null);
+      setEditingGroupId(undefined);
       if (searchMode === 'remote' && search) onSearchChange?.(search);
     } catch (error) {
       setEditError(error instanceof Error ? error.message : '编辑失败，请重试');
@@ -167,6 +179,7 @@ export function GroupedSelect({
   };
   const beginAdd = (mode: 'group' | 'option') => {
     setEditing(null);
+    setEditingGroupId(undefined);
     setAddMode(mode);
     setDraftLabel('');
     setDraftGroupId(groups[0]?.id);
@@ -193,7 +206,10 @@ export function GroupedSelect({
   };
   const deleteGroup = async (group: GroupedSelectGroup) => {
     await onDeleteGroup?.(group);
-    if (editing?.group.id === group.id) setEditing(null);
+    if (editing?.group.id === group.id) {
+      setEditing(null);
+      setEditingGroupId(undefined);
+    }
     if (searchMode === 'local') {
       const removed = new Set(group.options.map((option) => option.value));
       const next = selected.filter((item) => !removed.has(item));
@@ -203,7 +219,10 @@ export function GroupedSelect({
   };
   const deleteOption = async (option: GroupedSelectOption, group: GroupedSelectGroup) => {
     await onDeleteOption?.(option, group);
-    if (editing?.option?.value === option.value) setEditing(null);
+    if (editing?.option?.value === option.value) {
+      setEditing(null);
+      setEditingGroupId(undefined);
+    }
     const next = selected.filter((item) => item !== option.value);
     if (next.length !== selected.length) commit(next);
     if (searchMode === 'remote' && search) onSearchChange?.(search);
@@ -228,6 +247,7 @@ export function GroupedSelect({
             setAddMode(null);
             setAddError('');
             setEditing(null);
+            setEditingGroupId(undefined);
             setEditError('');
           }
         }}
@@ -265,7 +285,10 @@ export function GroupedSelect({
                         error={editError}
                         onChange={setEditLabel}
                         onSave={() => void submitEdit()}
-                        onCancel={() => setEditing(null)}
+                        onCancel={() => {
+                          setEditing(null);
+                          setEditingGroupId(undefined);
+                        }}
                       />
                     ) : (
                       <>
@@ -288,13 +311,19 @@ export function GroupedSelect({
                       {editing?.kind === 'option' && editing.option?.value === option.value ? (
                         <GroupedSelectEditEditor
                           kind="option"
+                          groups={groups}
+                          groupId={editingGroupId}
                           label={editLabel}
                           maxLength={optionLabelMaxLength}
                           saving={editSaving}
                           error={editError}
                           onChange={setEditLabel}
+                          onGroupChange={setEditingGroupId}
                           onSave={() => void submitEdit()}
-                          onCancel={() => setEditing(null)}
+                          onCancel={() => {
+                            setEditing(null);
+                            setEditingGroupId(undefined);
+                          }}
                         />
                       ) : (
                         <>

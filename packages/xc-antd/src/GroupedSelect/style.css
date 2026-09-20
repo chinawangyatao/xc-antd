@@ -13,6 +13,7 @@
 .xc-grouped-select__row .ant-btn { flex: 0 0 auto; }
 .xc-grouped-select__inline-editor { display: flex; flex: 1; min-width: 0; flex-wrap: wrap; align-items: center; gap: 6px; padding: 4px 0; }
 .xc-grouped-select__inline-editor .ant-input { flex: 1; min-width: 80px; }
+.xc-grouped-select__edit-group-picker { flex: 1 1 130px; min-width: 0; }
 .xc-grouped-select__footer { box-sizing: border-box; display: flex; width: 100%; gap: 8px; padding: 12px; border-top: 1px solid #f0f0f0; }
 .xc-grouped-select__footer .ant-btn { flex: 1; min-width: 0; }
 .xc-grouped-select__editor { box-sizing: border-box; display: flex; width: 100%; flex-wrap: wrap; gap: 8px; padding: 12px; border-top: 1px solid #f0f0f0; }
