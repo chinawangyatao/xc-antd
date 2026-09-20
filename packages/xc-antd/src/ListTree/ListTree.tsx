@@ -442,7 +442,7 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
                     onClick={(event: ReactMouseEvent<HTMLButtonElement>) => {
                       event.preventDefault();
                       event.stopPropagation();
-                      handleContextMenuClick?.({
+                      const rowActionInfo = {
                         key: String(item.key),
                         keyPath: [String(item.key)],
                         item: item as unknown as MenuClickInfo['item'],
@@ -452,7 +452,8 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
                           label: item.label,
                           title: typeof item.label === 'string' ? item.label : undefined,
                         },
-                      });
+                      } as unknown as MenuClickInfo;
+                      handleContextMenuClick?.(rowActionInfo);
                     }}
                   >
                     {!item.icon && item.label}
