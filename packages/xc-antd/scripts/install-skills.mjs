@@ -18,6 +18,7 @@ const consumerSkills = [
   'xc-antd-rich-text-editor',
   'xc-antd-amap-editor',
   'xc-antd-qr-code',
+  'xc-antd-media-player',
 ];
 const authoringSkill = 'xc-antd-component-authoring';
 

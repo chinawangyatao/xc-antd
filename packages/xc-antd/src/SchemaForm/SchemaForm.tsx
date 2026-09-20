@@ -56,9 +56,7 @@ function SchemaFieldControl<
     field,
   };
 
-  if (field.renderFormItem) return field.renderFormItem(context);
-
-  return (
+  const control = field.renderFormItem ? field.renderFormItem(context) : (
     <TextField
       mode={fieldMode}
       text={value as React.ReactNode}
@@ -79,6 +77,12 @@ function SchemaFieldControl<
       }}
     />
   );
+
+  if (fieldMode === 'read' || readonly) {
+    return <div className="xc-schema-form__read-value">{control}</div>;
+  }
+
+  return control;
 }
 
 export function SchemaForm<

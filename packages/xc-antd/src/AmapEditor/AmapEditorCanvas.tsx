@@ -41,6 +41,10 @@ import {
   toAmapLngLatTuple,
   undoAmapPath,
 } from './utils';
+import {
+  installAmapMapTeardownGuard,
+  type AmapMapTeardownController,
+} from './mapLifecycle';
 
 const DEFAULT_CENTER: AmapLngLat = [120.312786, 36.064812];
 const DEFAULT_CONTROLS: AmapEditorControls = {};
@@ -106,6 +110,14 @@ const AmapEditorCanvas = React.forwardRef<AmapEditorRef, AmapEditorProps>(
     const [locating, setLocating] = React.useState(false);
     const mapRef = React.useRef<MapRef | null>(null);
     const readyMapRef = React.useRef<AMap.Map | undefined>(undefined);
+    const mapTeardownRef = React.useRef<AmapMapTeardownController | undefined>(
+      undefined,
+    );
+
+    React.useEffect(() => {
+      mapTeardownRef.current?.resume();
+      return () => mapTeardownRef.current?.beginUnmount();
+    }, []);
 
     const currentCenter = center ?? innerCenter;
     const currentZoom = zoom ?? innerZoom;
@@ -341,6 +353,7 @@ const AmapEditorCanvas = React.forwardRef<AmapEditorRef, AmapEditorProps>(
       mapRef.current = instance;
       const map = instance?.map;
       if (map && readyMapRef.current !== map) {
+        mapTeardownRef.current = installAmapMapTeardownGuard(map);
         readyMapRef.current = map;
         onReady?.(map);
       }

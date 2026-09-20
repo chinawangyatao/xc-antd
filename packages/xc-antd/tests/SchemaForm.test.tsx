@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
-import type { SchemaFormGroup } from '../src/SchemaForm';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { SchemaForm, type SchemaFormGroup } from '../src/SchemaForm';
 import {
   applySchemaTransforms,
   getSchemaColProps,
@@ -82,5 +83,22 @@ describe('SchemaForm', () => {
       startDate: '2026-01-01',
       endDate: '2026-12-31',
     });
+  });
+
+  test('wraps read-only field content with horizontal spacing', () => {
+    const html = renderToStaticMarkup(
+      <SchemaForm<FormValues, SubmitValues>
+        schema={schema}
+        mode="read"
+        initialValues={{
+          name: '项目',
+          status: 'active',
+          period: ['2026-01-01', '2026-12-31'],
+        }}
+        submitter={false}
+      />,
+    );
+    expect(html).toContain('xc-schema-form__read-value');
+    expect(html).toContain('ant-form-item-required');
   });
 });

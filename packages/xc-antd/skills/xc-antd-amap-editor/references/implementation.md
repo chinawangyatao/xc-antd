@@ -37,6 +37,9 @@ packages/xc-antd/src/AmapEditor/
   v2. Wait for the `AMap.plugin` callback before searching.
 - Keep Ant Design AutoComplete open state uncontrolled. Supply disabled loading
   and empty options so its built-in empty-options rule does not hide feedback.
+- Defer the map's final `clearMap`/`destroy` calls during React unmount so
+  `@uiw/react-amap` overlays and controls can remove themselves first. This
+  avoids route-change cleanup failures on React 19.
 - API keys are public browser credentials but still belong in deployment
   configuration. Security codes and domain restrictions must match the AMap
   console setup.
