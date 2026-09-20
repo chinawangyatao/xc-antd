@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Button, Drawer, Grid, Layout, Menu, type MenuProps } from 'antd'
-import { HomeOutlined, AppstoreOutlined, EnvironmentOutlined, ExportOutlined, FormOutlined, MenuOutlined, PictureOutlined, ProfileOutlined, SafetyCertificateOutlined, TableOutlined } from '@ant-design/icons'
+import { HomeOutlined, AppstoreOutlined, EnvironmentOutlined, ExportOutlined, FormOutlined, MenuOutlined, PictureOutlined, ProfileOutlined, QrcodeOutlined, SafetyCertificateOutlined, TableOutlined } from '@ant-design/icons'
 import Home from './pages/Home'
 import ProFieldDemo from './pages/ProFieldDemo'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -16,6 +16,7 @@ import GroupedSelectDemo from './pages/GroupedSelectDemo'
 import SensitiveDataDemo from './pages/SensitiveDataDemo'
 import RichTextEditorDemo from './pages/RichTextEditorDemo'
 import AmapEditorDemo from './pages/AmapEditorDemo'
+import QRCodeDemo from './pages/QRCodeDemo'
 
 const { Header, Sider, Content } = Layout
 
@@ -28,6 +29,7 @@ const menuItems: MenuProps['items'] = [
     children: [
       { key: '/pro-field', icon: <AppstoreOutlined />, label: 'TextField' },
       { key: '/sensitive-data', icon: <SafetyCertificateOutlined />, label: 'SensitiveData' },
+      { key: '/qr-code', icon: <QrcodeOutlined />, label: 'QRCode' },
     ],
   },
   {
@@ -66,6 +68,7 @@ const menuItems: MenuProps['items'] = [
 const menuCategoryByPath: Record<string, string> = {
   '/pro-field': 'display',
   '/sensitive-data': 'display',
+  '/qr-code': 'display',
   '/table': 'data',
   '/crud-table': 'data',
   '/tree-select': 'data',
@@ -181,6 +184,7 @@ function App() {
             <Route path="/sensitive-data" element={<SensitiveDataDemo />} />
             <Route path="/rich-text-editor" element={<RichTextEditorDemo />} />
             <Route path="/amap-editor" element={<AmapEditorDemo />} />
+            <Route path="/qr-code" element={<QRCodeDemo />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Content>

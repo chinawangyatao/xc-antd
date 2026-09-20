@@ -13,5 +13,6 @@
 @import "./SensitiveData/style.css";
 @import "./RichTextEditor/style.css";
 @import "./AmapEditor/style.css";
+@import "./QRCode/style.css";
 
 @source "./";

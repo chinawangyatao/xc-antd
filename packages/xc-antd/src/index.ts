@@ -17,6 +17,7 @@ export * from './ImageUpload';
 export * from './SensitiveData';
 export * from './RichTextEditor';
 export * from './AmapEditor';
+export * from './QRCode';
 export type {
   ListDeleteConfirmConfig,
   ListDeleteConfirmOptions,

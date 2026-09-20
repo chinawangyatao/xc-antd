@@ -1,0 +1,68 @@
+.xc-qr-code {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: #fff;
+  vertical-align: middle;
+}
+
+.xc-qr-code--borderless {
+  padding: 0;
+  border: 0;
+}
+
+.xc-qr-code__frame {
+  position: relative;
+  display: inline-flex;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.xc-qr-code__image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.xc-qr-code__empty {
+  display: flex;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  color: rgba(0, 0, 0, 0.45);
+  background: #fafafa;
+  font-size: 13px;
+  text-align: center;
+}
+
+.xc-qr-code__empty .anticon {
+  font-size: 28px;
+}
+
+.xc-qr-code__status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  text-align: center;
+}
+
+.xc-qr-code__status-message {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 13px;
+}
+
+.xc-qr-code__status-message--success {
+  color: #52c41a;
+}

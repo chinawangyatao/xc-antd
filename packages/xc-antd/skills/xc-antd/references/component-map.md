@@ -16,6 +16,7 @@ Choose one primary component family before coding.
 | Upload, validate, preview, or crop images | `ImageUpload` | Use `ImageCropDrawer` directly only when upload is owned elsewhere. |
 | Edit or preview HTML rich content | `RichTextEditor` | It owns the editor surface; callers own HTML persistence and sanitization at the trust boundary. |
 | Edit AMap markers and paths | `AmapEditor` | Persist coordinate tuples; the component owns AMap overlay instances and drawing interaction. |
+| Render SVG or Canvas QR codes | `QRCode` | Use visual statuses for loading/expiry/scanned flows; encoded content remains caller-owned. |
 | Async-confirming drawer | `ActionDrawer` | Controlled through `open` and `onOpenChange`. |
 | Async-confirming modal | `ActionModal` | Same action contract as `ActionDrawer`. |
 
@@ -28,6 +29,7 @@ Choose one primary component family before coding.
 - Media: `packages/xc-antd/src/ImageUpload/`
 - Rich content: `packages/xc-antd/src/RichTextEditor/`
 - Maps: `packages/xc-antd/src/AmapEditor/`
+- QR codes: `packages/xc-antd/src/QRCode/`
 - Sensitive data: `packages/xc-antd/src/SensitiveData/`
 - Overlays: `packages/xc-antd/src/ActionOverlay/`
 - Public barrel: `packages/xc-antd/src/index.ts`
@@ -44,5 +46,6 @@ Choose one primary component family before coding.
 - Image upload: `/image-upload`
 - Rich text editor: `/rich-text-editor`
 - AMap editor: `/amap-editor`
+- QR code: `/qr-code`
 - Sensitive data: `/sensitive-data`
 - Overlays: `/action-overlay`

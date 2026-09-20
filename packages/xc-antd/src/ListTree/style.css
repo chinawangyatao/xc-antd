@@ -81,45 +81,18 @@
   flex: 0 0 auto;
 }
 
-/* 标题、操作按钮和拖拽包装层共享同一行宽，避免只命中文字才触发交互。 */
+/* 默认标题内容铺满节点行；自定义 nodeContentRender 不使用此样式。 */
 .xc-list-tree__node-content {
   display: flex;
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
   align-items: center;
-  gap: 4px;
 }
 
 .xc-list-tree__node-content .xc-list-tree__node-title {
   flex: 1 1 auto;
   min-width: 0;
-}
-
-.xc-list-tree__row-actions {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 2px;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.15s ease, visibility 0s linear 0.15s;
-}
-
-.xc-list-tree__tree .ant-tree-node-content-wrapper:hover .xc-list-tree__row-actions,
-.xc-list-tree__tree .ant-tree-node-content-wrapper:focus-within .xc-list-tree__row-actions {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transition-delay: 0s;
-}
-
-.xc-list-tree__row-actions .ant-btn {
-  flex: 0 0 24px;
-  width: 24px;
-  height: 24px;
-  padding: 0;
 }
 
 .xc-list-tree--horizontal-scroll .xc-list-tree__tree .ant-tree-node-content-wrapper {
@@ -156,25 +129,6 @@
   width: max-content;
   min-width: max-content;
   text-overflow: clip;
-}
-
-.xc-list-tree--horizontal-scroll .xc-list-tree__row-actions {
-  position: sticky;
-  z-index: 1;
-  right: 0;
-  margin-inline-start: calc(-1 * var(--xc-list-tree-row-actions-width));
-  padding-inline-start: 4px;
-  background-color: var(--ant-color-bg-container);
-}
-
-.xc-list-tree--horizontal-scroll .xc-list-tree__tree
-  .ant-tree-node-content-wrapper:hover .xc-list-tree__row-actions {
-  background-color: var(--ant-tree-node-hover-bg);
-}
-
-.xc-list-tree--horizontal-scroll .xc-list-tree__tree
-  .ant-tree-node-content-wrapper.ant-tree-node-selected .xc-list-tree__row-actions {
-  background-color: var(--ant-tree-node-selected-bg);
 }
 
 .xc-list-tree__drag-node {
