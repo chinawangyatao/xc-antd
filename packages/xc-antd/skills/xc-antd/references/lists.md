@@ -53,6 +53,7 @@ Use `ListTree<NodeType>` for hierarchical navigation and search.
 - It passes through Ant Design Tree props except wrapper-specific class/style/tree data handling.
 - `horizontalScroll` defaults to `true`: the component fills its parent and horizontally scrolls when deep levels or long titles overflow. Set it to `false` to restore title truncation with a full-title Tooltip and inherited virtual scrolling; when enabled it takes precedence over `virtual`.
 - `nodeIcon(node)` supplies per-node icons; an explicit `treeData[].icon` wins.
+- When `contextMenu.onClick` is provided, `showRowActions` (default `true`) exposes the configured flat actions as icon buttons on row hover/focus; set it to `false` to keep right-click actions only.
 - Search preserves matching ancestor chains and auto-expands them.
 - It uses the same `showAddButton`, `showSearchInput`, `showToolbarSelect`, and `toolbarSelectProps` toolbar API as `ListPanel`.
 - Right-click dropdowns remain independently controlled by `contextMenu`; tree checkboxes use the inherited Ant Design `checkable` prop.

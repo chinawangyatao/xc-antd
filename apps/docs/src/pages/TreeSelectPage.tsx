@@ -286,6 +286,7 @@ const TreeSelectPage = () => {
                             showAddButton={showAddButton}
                             showSearchInput={showSearchInput}
                             showToolbarSelect={showToolbarSelect}
+                            showRowActions
                             onAdd={() => showAction('添加')}
                             toolbarSelectProps={{
                                 value: treeNodeType,

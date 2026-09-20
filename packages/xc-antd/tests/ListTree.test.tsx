@@ -137,6 +137,38 @@ describe('ListTree', () => {
     expect(html).toContain('ant-dropdown-trigger');
   });
 
+  test('renders row actions from the context menu callback', () => {
+    const html = renderToStaticMarkup(
+      <ListTree
+        searchable={false}
+        showAddButton={false}
+        contextMenu={{ onClick: () => undefined }}
+        treeData={[{ key: 'node', title: '可操作节点' }]}
+      />,
+    );
+
+    expect(html).toContain('xc-list-tree__node-content');
+    expect(html).toContain('xc-list-tree__row-actions');
+    expect(html).toContain('aria-label="添加子级"');
+    expect(html).toContain('aria-label="编辑"');
+    expect(html).toContain('aria-label="删除"');
+  });
+
+  test('can hide row actions without disabling the context menu', () => {
+    const html = renderToStaticMarkup(
+      <ListTree
+        searchable={false}
+        showAddButton={false}
+        showRowActions={false}
+        contextMenu={{ onClick: () => undefined }}
+        treeData={[{ key: 'node', title: '仅右键操作' }]}
+      />,
+    );
+
+    expect(html).toContain('ant-dropdown-trigger');
+    expect(html).not.toContain('xc-list-tree__row-actions');
+  });
+
   test('shows and hides toolbar controls independently', () => {
     expect(resolveListToolbarVisibility({
       searchable: true,
