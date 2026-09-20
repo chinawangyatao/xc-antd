@@ -1,6 +1,6 @@
 ---
 name: xc-antd
-description: Build and troubleshoot React interfaces with xc-antd. Use when a task mentions xc-antd, TextField, SchemaForm, FormGroup, CrudTable, HocTable, ListPanel, ListTree, GroupedSelect, SensitiveData, ActionDrawer, or ActionModal. Covers component selection, current APIs, typed usage, examples, and verification; do not use for generic Ant Design work that does not use this library.
+description: Build and troubleshoot React interfaces with xc-antd. Use when a task mentions xc-antd, TextField, SchemaForm, FormGroup, CrudTable, HocTable, ListPanel, ListTree, GroupedSelect, RichTextEditor, AmapEditor, SensitiveData, ActionDrawer, or ActionModal. Covers component selection, current APIs, typed usage, examples, and verification; do not use for generic Ant Design work that does not use this library.
 ---
 
 # xc-antd
@@ -15,6 +15,8 @@ Read [references/component-map.md](references/component-map.md) when component s
 - Tables: read [references/crud-table.md](references/crud-table.md) for request/query CRUD flows; read [references/hoc-table.md](references/hoc-table.md) for local data and inline new rows.
 - Lists, trees, and grouped selection: read [references/lists.md](references/lists.md).
 - Image upload or cropping: prefer the dedicated `xc-antd-image-upload` Skill.
+- HTML rich content editing or read-only preview: prefer the dedicated `xc-antd-rich-text-editor` Skill.
+- AMap markers, paths, search, or map controls: prefer the dedicated `xc-antd-amap-editor` Skill.
 - Sensitive text/image masking and requested reveal: read [references/sensitive-data.md](references/sensitive-data.md).
 - Drawers, modals, async confirmation, or unsaved-change prompts: read [references/overlays.md](references/overlays.md).
 

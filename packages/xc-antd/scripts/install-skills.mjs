@@ -12,7 +12,12 @@ import { fileURLToPath } from 'node:url';
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const sourceRoot = join(packageRoot, 'skills');
-const consumerSkills = ['xc-antd', 'xc-antd-image-upload'];
+const consumerSkills = [
+  'xc-antd',
+  'xc-antd-image-upload',
+  'xc-antd-rich-text-editor',
+  'xc-antd-amap-editor',
+];
 const authoringSkill = 'xc-antd-component-authoring';
 
 function printHelp() {

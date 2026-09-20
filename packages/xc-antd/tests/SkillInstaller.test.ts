@@ -34,7 +34,7 @@ afterEach(() => {
 });
 
 describe('xc-antd skill installer', () => {
-  test('installs both consumer skills by default', () => {
+  test('installs all consumer skills by default', () => {
     const project = createTemporaryProject();
     const result = runInstaller(project);
 
@@ -42,6 +42,12 @@ describe('xc-antd skill installer', () => {
     expect(existsSync(join(project, '.agents/skills/xc-antd/SKILL.md'))).toBe(true);
     expect(existsSync(
       join(project, '.agents/skills/xc-antd-image-upload/SKILL.md'),
+    )).toBe(true);
+    expect(existsSync(
+      join(project, '.agents/skills/xc-antd-rich-text-editor/SKILL.md'),
+    )).toBe(true);
+    expect(existsSync(
+      join(project, '.agents/skills/xc-antd-amap-editor/SKILL.md'),
     )).toBe(true);
     expect(existsSync(
       join(project, '.agents/skills/xc-antd-component-authoring/SKILL.md'),

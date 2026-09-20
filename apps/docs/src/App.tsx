@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { Button, Drawer, Grid, Layout, Menu } from 'antd'
-import { HomeOutlined, AppstoreOutlined, ExportOutlined, FormOutlined, MenuOutlined, PictureOutlined, ProfileOutlined, SafetyCertificateOutlined, TableOutlined } from '@ant-design/icons'
+import { Button, Drawer, Grid, Layout, Menu, type MenuProps } from 'antd'
+import { HomeOutlined, AppstoreOutlined, EnvironmentOutlined, ExportOutlined, FormOutlined, MenuOutlined, PictureOutlined, ProfileOutlined, SafetyCertificateOutlined, TableOutlined } from '@ant-design/icons'
 import Home from './pages/Home'
 import ProFieldDemo from './pages/ProFieldDemo'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -14,22 +14,69 @@ import TreeSelectPage from "./pages/TreeSelectPage.tsx";
 import ImageUploadDemo from './pages/ImageUploadDemo'
 import GroupedSelectDemo from './pages/GroupedSelectDemo'
 import SensitiveDataDemo from './pages/SensitiveDataDemo'
+import RichTextEditorDemo from './pages/RichTextEditorDemo'
+import AmapEditorDemo from './pages/AmapEditorDemo'
 
 const { Header, Sider, Content } = Layout
 
-const menuItems = [
+const menuItems: MenuProps['items'] = [
   { key: '/', icon: <HomeOutlined />, label: '首页' },
-  { key: '/pro-field', icon: <AppstoreOutlined />, label: 'TextField 示例' },
-  { key: '/table', icon: <AppstoreOutlined />, label: 'HocTable 示例' },
-  { key: '/crud-table', icon: <TableOutlined />, label: 'CrudTable 示例' },
-  { key: '/action-overlay', icon: <ExportOutlined />, label: '抽屉与弹窗' },
-  { key: '/form-group', icon: <FormOutlined />, label: 'FormGroup 示例' },
-  { key: '/schema-form', icon: <ProfileOutlined />, label: 'SchemaForm 示例' },
-  { key: '/tree-select', icon: <AppstoreOutlined />, label: 'List / ListTree 示例' },
-  { key: '/grouped-select', icon: <AppstoreOutlined />, label: 'GroupedSelect 示例' },
-  { key: '/image-upload', icon: <PictureOutlined />, label: 'ImageUpload 示例' },
-  { key: '/sensitive-data', icon: <SafetyCertificateOutlined />, label: 'SensitiveData 示例' },
+  {
+    key: 'display',
+    icon: <SafetyCertificateOutlined />,
+    label: '展示类',
+    children: [
+      { key: '/pro-field', icon: <AppstoreOutlined />, label: 'TextField' },
+      { key: '/sensitive-data', icon: <SafetyCertificateOutlined />, label: 'SensitiveData' },
+    ],
+  },
+  {
+    key: 'data',
+    icon: <TableOutlined />,
+    label: '数据类',
+    children: [
+      { key: '/table', icon: <AppstoreOutlined />, label: 'HocTable' },
+      { key: '/crud-table', icon: <TableOutlined />, label: 'CrudTable' },
+      { key: '/tree-select', icon: <AppstoreOutlined />, label: 'List / ListTree' },
+    ],
+  },
+  {
+    key: 'interaction',
+    icon: <AppstoreOutlined />,
+    label: '交互类',
+    children: [
+      { key: '/action-overlay', icon: <ExportOutlined />, label: '抽屉与弹窗' },
+      { key: '/grouped-select', icon: <AppstoreOutlined />, label: 'GroupedSelect' },
+      { key: '/image-upload', icon: <PictureOutlined />, label: 'ImageUpload' },
+      { key: '/rich-text-editor', icon: <FormOutlined />, label: 'RichTextEditor' },
+      { key: '/amap-editor', icon: <EnvironmentOutlined />, label: 'AmapEditor' },
+    ],
+  },
+  {
+    key: 'layout',
+    icon: <ProfileOutlined />,
+    label: '布局类',
+    children: [
+      { key: '/form-group', icon: <FormOutlined />, label: 'FormGroup' },
+      { key: '/schema-form', icon: <ProfileOutlined />, label: 'SchemaForm' },
+    ],
+  },
 ]
+
+const menuCategoryByPath: Record<string, string> = {
+  '/pro-field': 'display',
+  '/sensitive-data': 'display',
+  '/table': 'data',
+  '/crud-table': 'data',
+  '/tree-select': 'data',
+  '/action-overlay': 'interaction',
+  '/grouped-select': 'interaction',
+  '/image-upload': 'interaction',
+  '/rich-text-editor': 'interaction',
+  '/amap-editor': 'interaction',
+  '/form-group': 'layout',
+  '/schema-form': 'layout',
+}
 
 function App() {
   const location = useLocation()
@@ -37,15 +84,16 @@ function App() {
   const screens = Grid.useBreakpoint()
   const isMobile = !screens.md
   const [menuOpen, setMenuOpen] = useState(false)
+  const activeCategory = menuCategoryByPath[location.pathname]
+  const [openKeys, setOpenKeys] = useState<string[]>()
+  const resolvedOpenKeys = openKeys ?? (activeCategory ? [activeCategory] : [])
 
   const handleMenuClick = ({ key }: { key: string }) => {
     navigate(key)
     setMenuOpen(false)
   }
 
-  // 根据当前路径展开对应菜单
   const selectedKeys = [location.pathname]
-  const openKeys = location.pathname !== '/' ? ['components'] : []
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -88,7 +136,8 @@ function App() {
           <Menu
             mode="inline"
             selectedKeys={selectedKeys}
-            defaultOpenKeys={openKeys}
+            openKeys={resolvedOpenKeys}
+            onOpenChange={(keys) => setOpenKeys(keys.map(String))}
             items={menuItems}
             onClick={handleMenuClick}
             style={{ borderRight: 0, marginTop: 8 }}
@@ -105,6 +154,8 @@ function App() {
           <Menu
             mode="inline"
             selectedKeys={selectedKeys}
+            openKeys={resolvedOpenKeys}
+            onOpenChange={(keys) => setOpenKeys(keys.map(String))}
             items={menuItems}
             onClick={handleMenuClick}
           />
@@ -128,6 +179,8 @@ function App() {
             <Route path="/grouped-select" element={<GroupedSelectDemo />} />
             <Route path="/image-upload" element={<ImageUploadDemo />} />
             <Route path="/sensitive-data" element={<SensitiveDataDemo />} />
+            <Route path="/rich-text-editor" element={<RichTextEditorDemo />} />
+            <Route path="/amap-editor" element={<AmapEditorDemo />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Content>

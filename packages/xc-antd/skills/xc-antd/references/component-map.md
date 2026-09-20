@@ -14,6 +14,8 @@ Choose one primary component family before coding.
 | Grouped multi-select with search and editable options | `GroupedSelect` | Use for choosing labels from groups; groups and CRUD callbacks are owned by the caller. |
 | Mask sensitive text or images and reveal on demand | `SensitiveData` | Use `request` mode when plaintext must not be present in the initial frontend payload. |
 | Upload, validate, preview, or crop images | `ImageUpload` | Use `ImageCropDrawer` directly only when upload is owned elsewhere. |
+| Edit or preview HTML rich content | `RichTextEditor` | It owns the editor surface; callers own HTML persistence and sanitization at the trust boundary. |
+| Edit AMap markers and paths | `AmapEditor` | Persist coordinate tuples; the component owns AMap overlay instances and drawing interaction. |
 | Async-confirming drawer | `ActionDrawer` | Controlled through `open` and `onOpenChange`. |
 | Async-confirming modal | `ActionModal` | Same action contract as `ActionDrawer`. |
 
@@ -24,6 +26,8 @@ Choose one primary component family before coding.
 - Tables: `packages/xc-antd/src/CrudTable/`, `packages/xc-antd/src/HocTable/`
 - Lists: `packages/xc-antd/src/ListPanel/`, `packages/xc-antd/src/ListTree/`, `packages/xc-antd/src/GroupedSelect/`
 - Media: `packages/xc-antd/src/ImageUpload/`
+- Rich content: `packages/xc-antd/src/RichTextEditor/`
+- Maps: `packages/xc-antd/src/AmapEditor/`
 - Sensitive data: `packages/xc-antd/src/SensitiveData/`
 - Overlays: `packages/xc-antd/src/ActionOverlay/`
 - Public barrel: `packages/xc-antd/src/index.ts`
@@ -38,5 +42,7 @@ Choose one primary component family before coding.
 - Lists: `/tree-select`
 - Grouped multi-select: `/grouped-select`
 - Image upload: `/image-upload`
+- Rich text editor: `/rich-text-editor`
+- AMap editor: `/amap-editor`
 - Sensitive data: `/sensitive-data`
 - Overlays: `/action-overlay`

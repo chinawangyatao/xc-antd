@@ -23,6 +23,8 @@ export default defineConfig({
         'antd',
         '@ant-design/icons',
         'react-advanced-cropper',
+        'react-quill-new',
+        '@uiw/react-amap',
       ],
       output: {
         globals: {
