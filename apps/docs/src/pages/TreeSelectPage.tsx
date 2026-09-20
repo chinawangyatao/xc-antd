@@ -14,10 +14,16 @@ import {
     Row,
     Space,
     Switch,
+    Tooltip,
     Typography,
     type TreeDataNode,
 } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
+import {
+    DeleteOutlined,
+    EditOutlined,
+    PlusOutlined,
+    ReloadOutlined,
+} from '@ant-design/icons';
 
 type ScenicNodeType = 'scenic' | 'station' | 'window';
 
@@ -201,6 +207,14 @@ const TreeSelectPage = () => {
         setLastAction(actionText);
         void messageApi.success(actionText);
     };
+    const showTreeAction = (key: string, node: ScenicTreeNode) => {
+        const actionLabels: Record<string, string> = {
+            addChild: '添加子级',
+            edit: '编辑',
+            delete: '删除',
+        };
+        showAction(actionLabels[key] ?? key, node);
+    };
 
     return (
         <>
@@ -286,7 +300,6 @@ const TreeSelectPage = () => {
                             showAddButton={showAddButton}
                             showSearchInput={showSearchInput}
                             showToolbarSelect={showToolbarSelect}
-                            showRowActions
                             onAdd={() => showAction('添加')}
                             toolbarSelectProps={{
                                 value: treeNodeType,
@@ -332,17 +345,58 @@ const TreeSelectPage = () => {
                                     },
                                 }
                                 : undefined}
-                            nodeIcon={(node) => node.nodeType
-                                ? <TreeIcon type={node.nodeType} />
-                                : null}
+                            nodeContentRender={(node) => (
+                                <span className="group flex w-full min-w-0 items-center gap-1">
+                                    {node.nodeType && (
+                                        <span className="size-6 shrink-0">
+                                            <TreeIcon type={node.nodeType} />
+                                        </span>
+                                    )}
+                                    <span className={horizontalScroll ? 'whitespace-nowrap' : 'truncate'}>
+                                        {typeof node.title === 'function' ? String(node.key) : node.title}
+                                    </span>
+                                    <span
+                                        className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+                                        style={{ marginInlineStart: 'auto' }}
+                                        data-list-tree-drag-ignore="true"
+                                        onClick={(event) => event.stopPropagation()}
+                                        onDoubleClick={(event) => event.stopPropagation()}
+                                        onMouseDown={(event) => event.stopPropagation()}
+                                    >
+                                        <Tooltip title="添加子级">
+                                            <Button
+                                                type="text"
+                                                size="small"
+                                                aria-label="添加子级"
+                                                icon={<PlusOutlined />}
+                                                onClick={() => showTreeAction('addChild', node)}
+                                            />
+                                        </Tooltip>
+                                        <Tooltip title="编辑">
+                                            <Button
+                                                type="text"
+                                                size="small"
+                                                aria-label="编辑"
+                                                icon={<EditOutlined />}
+                                                onClick={() => showTreeAction('edit', node)}
+                                            />
+                                        </Tooltip>
+                                        <Tooltip title="删除">
+                                            <Button
+                                                danger
+                                                type="text"
+                                                size="small"
+                                                aria-label="删除"
+                                                icon={<DeleteOutlined />}
+                                                onClick={() => showTreeAction('delete', node)}
+                                            />
+                                        </Tooltip>
+                                    </span>
+                                </span>
+                            )}
                             contextMenu={{
                                 onClick: ({ key, node }) => {
-                                    const actionLabels: Record<string, string> = {
-                                        addChild: '添加子级',
-                                        edit: '编辑',
-                                        delete: '删除',
-                                    };
-                                    showAction(actionLabels[key] ?? key, node);
+                                    showTreeAction(key, node);
                                 },
                             }}
                         />

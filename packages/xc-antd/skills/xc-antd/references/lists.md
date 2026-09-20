@@ -39,7 +39,13 @@ Use `ListTree<NodeType>` for hierarchical navigation and search.
   showSearchInput
   showToolbarSelect
   toolbarSelectProps={{ options: nodeTypes }}
-  nodeIcon={(node) => iconByType(node.type)}
+  nodeContentRender={(node) => (
+    <div className="tree-row">
+      {iconByType(node.type)}
+      <span>{node.title}</span>
+      <Button type="text" icon={<EditOutlined />} onClick={() => editNode(node)} />
+    </div>
+  )}
   contextMenu={{
     onClick: ({ key, node }) => handleNodeAction(key, node),
   }}
@@ -53,10 +59,10 @@ Use `ListTree<NodeType>` for hierarchical navigation and search.
 - It passes through Ant Design Tree props except wrapper-specific class/style/tree data handling.
 - `horizontalScroll` defaults to `true`: the component fills its parent and horizontally scrolls when deep levels or long titles overflow. Set it to `false` to restore title truncation with a full-title Tooltip and inherited virtual scrolling; when enabled it takes precedence over `virtual`.
 - `nodeIcon(node)` supplies per-node icons; an explicit `treeData[].icon` wins.
-- When `contextMenu.onClick` is provided, `showRowActions` (default `true`) exposes the configured flat actions as icon buttons on row hover/focus; set it to `false` to keep right-click actions only.
+- `nodeContentRender(node)` returns one element that replaces the complete node content area and takes precedence over `titleRender`. `ListTree` adds no wrapper, layout, action, permission, confirmation, loading, or event behavior; the caller owns the entire slot.
 - Search preserves matching ancestor chains and auto-expands them.
 - It uses the same `showAddButton`, `showSearchInput`, `showToolbarSelect`, and `toolbarSelectProps` toolbar API as `ListPanel`.
-- Right-click dropdowns remain independently controlled by `contextMenu`; tree checkboxes use the inherited Ant Design `checkable` prop.
+- Right-click dropdowns are independently controlled by `contextMenu` and do not define the node content slot; tree checkboxes use the inherited Ant Design `checkable` prop.
 - Default right-click keys are `addChild`, `edit`, and `delete`.
 - Delete confirmation is enabled for both list components. Customize `deleteConfirm` or use `false` only when the caller intentionally owns confirmation.
 - `dragDrop` enables the standard three-zone drag interaction. The default upper/lower edge ratio is `0.3`; set `dropEdgeRatio` from `0` to `0.5` when a product needs a wider child or sibling target. `ListTree` prevents self/descendant cycles and passes immutable `nextTreeData` to `onDrop`.
