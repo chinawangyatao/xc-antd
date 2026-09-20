@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test';
+import { Children, type ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { GroupedSelect } from '../src/GroupedSelect';
 import { GroupedSelectAddEditor } from '../src/GroupedSelect/AddEditor';
@@ -109,19 +110,26 @@ describe('GroupedSelect', () => {
       label: '新名称',
       saving: false,
       error: '',
+      groups,
+      groupId: 'a',
       onChange: () => undefined,
+      onGroupChange: () => undefined,
       onSave: () => undefined,
       onCancel: () => undefined,
     };
     const groupEditor = GroupedSelectEditEditor({ ...props, kind: 'group', maxLength: 4 });
     const optionEditor = GroupedSelectEditEditor({ ...props, kind: 'option', maxLength: 8 });
+    const groupChildren = Children.toArray(groupEditor.props.children) as ReactElement<Record<string, unknown>>[];
+    const optionChildren = Children.toArray(optionEditor.props.children) as ReactElement<Record<string, unknown>>[];
     expect(groupEditor.props.className).toBe('xc-grouped-select__inline-editor');
-    expect(groupEditor.props.children[0].props['aria-label']).toBe('编辑分组名称');
-    expect(groupEditor.props.children[0].props.maxLength).toBe(4);
-    expect(optionEditor.props.children[0].props['aria-label']).toBe('编辑标签名称');
-    expect(optionEditor.props.children[0].props.maxLength).toBe(8);
-    expect(optionEditor.props.children[1].props['aria-label']).toBe('保存编辑');
-    expect(optionEditor.props.children[2].props['aria-label']).toBe('取消编辑');
+    expect(groupChildren[0].props['aria-label']).toBe('编辑分组名称');
+    expect(groupChildren[0].props.maxLength).toBe(4);
+    expect(optionChildren[0].props['aria-label']).toBe('所属分组');
+    expect(optionChildren[0].props.value).toBe('a');
+    expect(optionChildren[1].props['aria-label']).toBe('编辑标签名称');
+    expect(optionChildren[1].props.maxLength).toBe(8);
+    expect(optionChildren[2].props['aria-label']).toBe('保存编辑');
+    expect(optionChildren[3].props['aria-label']).toBe('取消编辑');
   });
 
   test('renders delete actions with an optional confirmation bubble', () => {

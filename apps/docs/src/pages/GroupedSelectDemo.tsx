@@ -65,6 +65,7 @@ function mockCreateOption(label: string) {
 export default function GroupedSelectDemo() {
   const [groups, setGroups] = useState(initialGroups);
   const [value, setValue] = useState<GroupedSelectValue[]>([]);
+  const [readOnlyValue, setReadOnlyValue] = useState<GroupedSelectValue[]>(['a-1']);
   const [remoteCatalog, setRemoteCatalog] = useState(initialGroups);
   const [remoteGroups, setRemoteGroups] = useState(initialGroups);
   const [remoteValue, setRemoteValue] = useState<GroupedSelectValue[]>([
@@ -98,7 +99,7 @@ export default function GroupedSelectDemo() {
       <div>
         <Typography.Title level={3} style={{ marginTop: 0 }}>GroupedSelect 分组选择</Typography.Title>
         <Typography.Paragraph type="secondary">
-          对照原型：搜索、多选、新增、行内编辑和气泡确认删除都在下拉框内完成。数据仅保存在本页。
+          对照原型：搜索、多选、新增、行内编辑（支持切换标签所属分组）和气泡确认删除都在下拉框内完成。数据仅保存在本页。
         </Typography.Paragraph>
       </div>
       <Card title="可编辑的分组选择" style={{ maxWidth: 600 }}>
@@ -127,11 +128,34 @@ export default function GroupedSelectDemo() {
             setGroups((current) => current.map((group) => group.id === target.id
               ? { ...group, label: nextLabel } : group));
           }}
-          onEditOption={(target, group, nextLabel) => {
-            setGroups((current) => current.map((item) => item.id === group.id
-              ? { ...item, options: item.options.map((option) => option.value === target.value
-                ? { ...option, label: nextLabel } : option) }
-              : item));
+          onEditOption={(target, group, nextLabel, nextGroup) => {
+            setGroups((current) => {
+              const renamed = { ...target, label: nextLabel };
+              if (group.id === nextGroup.id) {
+                return current.map((item) => item.id === group.id
+                  ? { ...item, options: item.options.map((option) => option.value === target.value
+                    ? renamed : option) }
+                  : item);
+              }
+              return current.map((item) => {
+                if (item.id === group.id) {
+                  return {
+                    ...item,
+                    options: item.options.filter((option) => option.value !== target.value),
+                  };
+                }
+                if (item.id === nextGroup.id) {
+                  return {
+                    ...item,
+                    options: [
+                      ...item.options.filter((option) => option.value !== target.value),
+                      renamed,
+                    ],
+                  };
+                }
+                return item;
+              });
+            });
           }}
           onDeleteGroup={(target) => {
             setGroups((current) => current.filter((group) => group.id !== target.id));
@@ -144,6 +168,22 @@ export default function GroupedSelectDemo() {
         />
         <Alert style={{ marginTop: 20 }} type="info"
           message={`当前选中：${value.length ? value.join('、') : '暂无'}`} />
+      </Card>
+      <Card title="非编辑模式" style={{ maxWidth: 600 }}>
+        <Typography.Paragraph type="secondary">
+          只保留搜索和多选能力；不传新增、编辑、删除回调，因此下拉框内不会显示任何编辑操作。
+        </Typography.Paragraph>
+        <GroupedSelect
+          groups={initialGroups}
+          value={readOnlyValue}
+          onChange={setReadOnlyValue}
+          placeholder="请选择标签"
+        />
+        <Alert
+          style={{ marginTop: 20 }}
+          type="info"
+          message={`当前选中：${readOnlyValue.length ? readOnlyValue.join('、') : '暂无'}`}
+        />
       </Card>
       <Card title="远程搜索（模拟接口）" style={{ maxWidth: 600 }}>
         <Typography.Paragraph type="secondary">
