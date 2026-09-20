@@ -43,6 +43,8 @@ Main components include:
 - `GroupedSelect`: searchable grouped multi-select with optional editing actions
 - `ListPanel` and `ListTree`: searchable list navigation with context menus; `ListTree` also provides validated three-zone drag and immutable move results
 - `SensitiveData`: sensitive text/image masking with local or requested reveal
+- `RichTextEditor`: React 19-compatible rich HTML editing and read-only preview
+- `AmapEditor`: AMap marker, polyline, POI search and map-control workflows
 
 See the repository documentation app for complete examples.
 
@@ -55,7 +57,8 @@ install the consumer skill into the current project:
 npx xc-antd-skills install
 ```
 
-This installs `xc-antd` and the dedicated `xc-antd-image-upload` Skill under
+This installs `xc-antd` plus the dedicated `xc-antd-image-upload`,
+`xc-antd-rich-text-editor`, and `xc-antd-amap-editor` Skills under
 `.agents/skills`. Re-run with `--force` after upgrading the package.
 Component-library maintainers can also install the authoring Skill:
 

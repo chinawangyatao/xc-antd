@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "react-advanced-cropper/dist/style.css";
+@import "react-quill-new/dist/quill.snow.css";
 @import "./ActionOverlay/style.css";
 @import "./CrudTable/style.css";
 @import "./FormGroup/style.css";
@@ -10,5 +11,7 @@
 @import "./ListTree/style.css";
 @import "./SchemaForm/style.css";
 @import "./SensitiveData/style.css";
+@import "./RichTextEditor/style.css";
+@import "./AmapEditor/style.css";
 
 @source "./";

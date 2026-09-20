@@ -1,0 +1,30 @@
+export { AmapEditor, default } from './AmapEditor';
+export {
+  closeAmapPath,
+  findNearestAmapPoint,
+  getAmapDistance,
+  getAmapPathPoints,
+  isAmapPathClosed,
+  isValidAmapLngLat,
+  normalizeAmapPath,
+  undoAmapPath,
+  toAmapSearchResult,
+} from './utils';
+export type {
+  AmapEditorControls,
+  AmapEditorLinePointProps,
+  AmapEditorLoaderProps,
+  AmapEditorMapProps,
+  AmapEditorMarkerProps,
+  AmapEditorMode,
+  AmapEditorPolylineProps,
+  AmapEditorProps,
+  AmapEditorRef,
+  AmapEditorSearchOptions,
+  AmapLngLat,
+  AmapMarkersChangeAction,
+  AmapMarkersChangeInfo,
+  AmapPathChangeAction,
+  AmapPathChangeInfo,
+  AmapSearchResult,
+} from './types';

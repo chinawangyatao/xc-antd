@@ -15,6 +15,8 @@ export * from './ListTree';
 export * from './GroupedSelect';
 export * from './ImageUpload';
 export * from './SensitiveData';
+export * from './RichTextEditor';
+export * from './AmapEditor';
 export type {
   ListDeleteConfirmConfig,
   ListDeleteConfirmOptions,
