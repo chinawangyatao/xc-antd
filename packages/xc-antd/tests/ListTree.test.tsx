@@ -137,36 +137,42 @@ describe('ListTree', () => {
     expect(html).toContain('ant-dropdown-trigger');
   });
 
-  test('renders row actions from the context menu callback', () => {
+  test('renders the complete node content from an independent slot', () => {
     const html = renderToStaticMarkup(
       <ListTree
         searchable={false}
         showAddButton={false}
-        contextMenu={{ onClick: () => undefined }}
+        nodeContentRender={(node) => (
+          <span className="custom-node-content">
+            <strong>{node.title}</strong>
+            <button type="button">查看节点</button>
+          </span>
+        )}
         treeData={[{ key: 'node', title: '可操作节点' }]}
       />,
     );
 
-    expect(html).toContain('xc-list-tree__node-content');
-    expect(html).toContain('xc-list-tree__row-actions');
-    expect(html).toContain('aria-label="添加子级"');
-    expect(html).toContain('aria-label="编辑"');
-    expect(html).toContain('aria-label="删除"');
+    expect(html).toContain('custom-node-content');
+    expect(html).toContain('<strong>可操作节点</strong>');
+    expect(html).toContain('查看节点');
+    expect(html).not.toContain('xc-list-tree__node-content');
+    expect(html).not.toContain('xc-list-tree__node-title');
+    expect(html).not.toContain('ant-dropdown-trigger');
   });
 
-  test('can hide row actions without disabling the context menu', () => {
+  test('keeps the node content slot independent from the context menu', () => {
     const html = renderToStaticMarkup(
       <ListTree
         searchable={false}
         showAddButton={false}
-        showRowActions={false}
+        nodeContentRender={() => <span>完全自定义内容</span>}
         contextMenu={{ onClick: () => undefined }}
-        treeData={[{ key: 'node', title: '仅右键操作' }]}
+        treeData={[{ key: 'node', title: '右键节点' }]}
       />,
     );
 
     expect(html).toContain('ant-dropdown-trigger');
-    expect(html).not.toContain('xc-list-tree__row-actions');
+    expect(html).toContain('完全自定义内容');
   });
 
   test('shows and hides toolbar controls independently', () => {

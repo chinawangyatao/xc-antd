@@ -17,7 +17,7 @@ import {
   PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import type { CSSProperties, Key, MouseEvent as ReactMouseEvent, ReactNode } from 'react';
+import type { CSSProperties, Key, ReactElement, ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 import {
   useListDeleteConfirm,
@@ -82,8 +82,8 @@ export interface ListTreeProps<TreeDataType extends object = ListTreeDataNode>
   nodeIcon?: ReactNode | ((node: TreeDataType) => ReactNode);
   /** 启用节点右键菜单；传 true 使用默认菜单。 */
   contextMenu?: true | ListTreeContextMenu<TreeDataType>;
-  /** 是否在节点行悬停或聚焦时显示 contextMenu 中的快捷操作，默认开启。 */
-  showRowActions?: boolean;
+  /** 完整节点内容插槽，需返回单个元素；优先于 titleRender，布局和交互完全由调用方控制。 */
+  nodeContentRender?: (node: TreeDataType) => ReactElement;
   /** 右键删除的二次确认，默认开启。 */
   deleteConfirm?: ListDeleteConfirmOptions;
   /**
@@ -111,49 +111,6 @@ const defaultContextMenuItems: MenuProps['items'] = [
   { key: 'edit', label: '编辑', icon: <EditOutlined /> },
   { key: 'delete', label: '删除', icon: <DeleteOutlined />, danger: true },
 ];
-
-interface ListTreeRowActionItem {
-  key: string | number;
-  label?: ReactNode;
-  icon?: ReactNode;
-  danger?: boolean;
-  disabled?: boolean;
-}
-
-type ListTreeMenuItem = NonNullable<MenuProps['items']>[number];
-
-function getRowActionItems(items: MenuProps['items']): ListTreeRowActionItem[] {
-  return (items ?? []).flatMap((item: ListTreeMenuItem) => {
-    if (!item || typeof item !== 'object') return [];
-
-    const record = item as unknown as Record<string, unknown>;
-    if (
-      record.type === 'divider'
-      || record.type === 'group'
-      || record.type === 'submenu'
-      || Array.isArray(record.children)
-    ) {
-      return [];
-    }
-
-    const key = record.key;
-    if (typeof key !== 'string' && typeof key !== 'number') return [];
-
-    return [{
-      key,
-      label: record.label as ReactNode,
-      icon: record.icon as ReactNode,
-      danger: Boolean(record.danger),
-      disabled: Boolean(record.disabled),
-    }];
-  });
-}
-
-function getRowActionLabel(item: ListTreeRowActionItem): string {
-  return typeof item.label === 'string' || typeof item.label === 'number'
-    ? String(item.label)
-    : String(item.key);
-}
 
 function getRecord(node: object): Record<string, unknown> {
   return node as Record<string, unknown>;
@@ -293,7 +250,7 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
   toolbarExtra,
   nodeIcon,
   contextMenu,
-  showRowActions = true,
+  nodeContentRender,
   deleteConfirm,
   dragDrop,
   fieldNames,
@@ -383,12 +340,6 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
         ? contextMenuOptions.items(node)
         : contextMenuOptions.items ?? defaultContextMenuItems;
     }
-    const rowActionItems = contextMenuOptions?.onClick && showRowActions
-      ? getRowActionItems(contextMenuItems)
-      : [];
-    const rowActionWidth = rowActionItems.length > 0
-      ? rowActionItems.length * 24 + (rowActionItems.length - 1) * 2 + 4
-      : 0;
     const handleContextMenuClick: NonNullable<MenuProps['onClick']> | undefined = (
       contextMenuOptions && contextMenuItems?.length
     )
@@ -414,57 +365,13 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
       );
     }
 
-    const renderedNodeContent = (
-      <span className="xc-list-tree__node-content">
-        {renderedLabel}
-        {rowActionItems.length > 0 && (
-          <span
-            className="xc-list-tree__row-actions"
-            data-list-tree-drag-ignore="true"
-            style={{
-              '--xc-list-tree-row-actions-width': `${rowActionWidth}px`,
-            } as CSSProperties}
-          >
-            {rowActionItems.map((item) => {
-              const label = getRowActionLabel(item);
-              return (
-                <Tooltip key={item.key} title={item.label ?? label}>
-                  <Button
-                    type="text"
-                    size="small"
-                    aria-label={label}
-                    title={label}
-                    danger={item.danger}
-                    disabled={item.disabled}
-                    icon={item.icon}
-                    data-list-tree-drag-ignore="true"
-                    onMouseDown={(event) => event.stopPropagation()}
-                    onClick={(event: ReactMouseEvent<HTMLButtonElement>) => {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      const rowActionInfo = {
-                        key: String(item.key),
-                        keyPath: [String(item.key)],
-                        item: item as unknown as MenuClickInfo['item'],
-                        domEvent: event,
-                        itemData: {
-                          key: item.key,
-                          label: item.label,
-                          title: typeof item.label === 'string' ? item.label : undefined,
-                        },
-                      } as unknown as MenuClickInfo;
-                      handleContextMenuClick?.(rowActionInfo);
-                    }}
-                  >
-                    {!item.icon && item.label}
-                  </Button>
-                </Tooltip>
-              );
-            })}
-          </span>
-        )}
-      </span>
-    );
+    const renderedNodeContent = nodeContentRender
+      ? nodeContentRender(node)
+      : (
+        <span className="xc-list-tree__node-content">
+          {renderedLabel}
+        </span>
+      );
 
     let renderedTitle: ReactNode = renderedNodeContent;
     if (contextMenuItems?.length && handleContextMenuClick) {
