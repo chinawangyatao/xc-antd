@@ -18,6 +18,7 @@ export * from './SensitiveData';
 export * from './RichTextEditor';
 export * from './AmapEditor';
 export * from './QRCode';
+export * from './MediaPlayer';
 export type {
   ListDeleteConfirmConfig,
   ListDeleteConfirmOptions,

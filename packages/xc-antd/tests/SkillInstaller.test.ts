@@ -53,6 +53,9 @@ describe('xc-antd skill installer', () => {
       join(project, '.agents/skills/xc-antd-qr-code/SKILL.md'),
     )).toBe(true);
     expect(existsSync(
+      join(project, '.agents/skills/xc-antd-media-player/SKILL.md'),
+    )).toBe(true);
+    expect(existsSync(
       join(project, '.agents/skills/xc-antd-component-authoring/SKILL.md'),
     )).toBe(false);
   });

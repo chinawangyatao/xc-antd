@@ -43,6 +43,7 @@ Important behavior:
 - Use `renderFormItem` only when `valueType` and `fieldProps` cannot express the control.
 - Use `actionRef` for external validate/reset/get/set/submit operations.
 - Set `submitter={false}` when actions are owned by a surrounding overlay.
+- Read-mode values use a small horizontal inset so their content aligns more naturally below labels, including labels with the required marker.
 
 ## FormGroup
 

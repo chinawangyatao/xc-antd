@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Button, Drawer, Grid, Layout, Menu, type MenuProps } from 'antd'
-import { HomeOutlined, AppstoreOutlined, EnvironmentOutlined, ExportOutlined, FormOutlined, MenuOutlined, PictureOutlined, ProfileOutlined, QrcodeOutlined, SafetyCertificateOutlined, TableOutlined } from '@ant-design/icons'
+import { HomeOutlined, AppstoreOutlined, EnvironmentOutlined, ExportOutlined, FormOutlined, MenuOutlined, PictureOutlined, PlaySquareOutlined, ProfileOutlined, QrcodeOutlined, SafetyCertificateOutlined, TableOutlined } from '@ant-design/icons'
 import Home from './pages/Home'
 import ProFieldDemo from './pages/ProFieldDemo'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -17,6 +17,7 @@ import SensitiveDataDemo from './pages/SensitiveDataDemo'
 import RichTextEditorDemo from './pages/RichTextEditorDemo'
 import AmapEditorDemo from './pages/AmapEditorDemo'
 import QRCodeDemo from './pages/QRCodeDemo'
+import MediaPlayerDemo from './pages/MediaPlayerDemo'
 
 const { Header, Sider, Content } = Layout
 
@@ -52,6 +53,7 @@ const menuItems: MenuProps['items'] = [
       { key: '/image-upload', icon: <PictureOutlined />, label: 'ImageUpload' },
       { key: '/rich-text-editor', icon: <FormOutlined />, label: 'RichTextEditor' },
       { key: '/amap-editor', icon: <EnvironmentOutlined />, label: 'AmapEditor' },
+      { key: '/media-player', icon: <PlaySquareOutlined />, label: 'Video / Music' },
     ],
   },
   {
@@ -77,6 +79,7 @@ const menuCategoryByPath: Record<string, string> = {
   '/image-upload': 'interaction',
   '/rich-text-editor': 'interaction',
   '/amap-editor': 'interaction',
+  '/media-player': 'interaction',
   '/form-group': 'layout',
   '/schema-form': 'layout',
 }
@@ -185,6 +188,7 @@ function App() {
             <Route path="/rich-text-editor" element={<RichTextEditorDemo />} />
             <Route path="/amap-editor" element={<AmapEditorDemo />} />
             <Route path="/qr-code" element={<QRCodeDemo />} />
+            <Route path="/media-player" element={<MediaPlayerDemo />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Content>

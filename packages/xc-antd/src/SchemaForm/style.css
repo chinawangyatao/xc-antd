@@ -2,6 +2,11 @@
   width: 100%;
 }
 
+.xc-schema-form__read-value {
+  min-width: 0;
+  padding-inline: 8px;
+}
+
 .xc-schema-form__submitter {
   display: flex;
   align-items: center;

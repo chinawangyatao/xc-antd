@@ -26,6 +26,11 @@ export default defineConfig({
         'react-quill-new',
         '@uiw/react-amap',
         'qrcode.react',
+        'xgplayer',
+        'xgplayer-flv',
+        'xgplayer-hls',
+        'xgplayer-mp4',
+        'xgplayer-music',
       ],
       output: {
         globals: {

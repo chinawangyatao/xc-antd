@@ -12,6 +12,7 @@ import {
   undoAmapPath,
 } from '../src/AmapEditor/utils';
 import type { AmapLngLat } from '../src/AmapEditor/types';
+import { installAmapMapTeardownGuard } from '../src/AmapEditor/mapLifecycle';
 
 const path: AmapLngLat[] = [
   [120.3, 36.06],
@@ -80,5 +81,34 @@ describe('AmapEditor rendering', () => {
     const html = renderToStaticMarkup(<AmapEditor apiKey="test-key" />);
     expect(html).toContain('正在加载高德地图');
     expect(html).not.toContain('amap-container');
+  });
+});
+
+describe('AmapEditor teardown', () => {
+  test('defers map teardown until overlay cleanup has completed', () => {
+    const calls: string[] = [];
+    const pending: Array<() => void> = [];
+    const map = {
+      clearMap: () => calls.push('clear'),
+      destroy: () => calls.push('destroy'),
+    } as unknown as AMap.Map;
+    const controller = installAmapMapTeardownGuard(
+      map,
+      (callback) => pending.push(callback),
+    );
+
+    map.clearMap();
+    expect(calls).toEqual(['clear']);
+
+    controller.beginUnmount();
+    map.clearMap();
+    map.destroy();
+    map.destroy();
+    expect(calls).toEqual(['clear']);
+    expect(pending).toHaveLength(1);
+
+    calls.push('overlay-remove');
+    pending[0]();
+    expect(calls).toEqual(['clear', 'overlay-remove', 'clear', 'destroy']);
   });
 });
