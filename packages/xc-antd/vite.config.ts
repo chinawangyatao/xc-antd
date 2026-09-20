@@ -25,6 +25,7 @@ export default defineConfig({
         'react-advanced-cropper',
         'react-quill-new',
         '@uiw/react-amap',
+        'qrcode.react',
       ],
       output: {
         globals: {

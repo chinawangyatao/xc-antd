@@ -116,6 +116,7 @@ xc-view/
 - `xc-antd-image-upload` - 专门处理 ImageUpload、图片裁剪、Canvas 输出与上传问题。
 - `xc-antd-rich-text-editor` - 专门处理富文本编辑、Quill 配置、只读预览、SSR 与 HTML 安全边界。
 - `xc-antd-amap-editor` - 专门处理高德地图打点、路径绘制、搜索、凭证和 SSR 问题。
+- `xc-antd-qr-code` - 专门处理 SVG/Canvas 二维码、Logo、纠错等级与业务状态。
 - `xc-antd-component-authoring` - 约束组件库目录、API、样式、兼容与测试方式。
 
 新的 AI Agent 会话可自动发现这些 Skills。详细组件资料位于各 Skill 的 `references/` 中，按任务需要加载。

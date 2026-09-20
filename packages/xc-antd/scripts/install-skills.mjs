@@ -17,6 +17,7 @@ const consumerSkills = [
   'xc-antd-image-upload',
   'xc-antd-rich-text-editor',
   'xc-antd-amap-editor',
+  'xc-antd-qr-code',
 ];
 const authoringSkill = 'xc-antd-component-authoring';
 
