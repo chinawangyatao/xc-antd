@@ -18,6 +18,7 @@ import RichTextEditorDemo from './pages/RichTextEditorDemo'
 import AmapEditorDemo from './pages/AmapEditorDemo'
 import QRCodeDemo from './pages/QRCodeDemo'
 import MediaPlayerDemo from './pages/MediaPlayerDemo'
+import PermissionDemo from './pages/PermissionDemo'
 
 const { Header, Sider, Content } = Layout
 
@@ -54,6 +55,7 @@ const menuItems: MenuProps['items'] = [
       { key: '/rich-text-editor', icon: <FormOutlined />, label: 'RichTextEditor' },
       { key: '/amap-editor', icon: <EnvironmentOutlined />, label: 'AmapEditor' },
       { key: '/media-player', icon: <PlaySquareOutlined />, label: 'Video / Music' },
+      { key: '/permission', icon: <SafetyCertificateOutlined />, label: 'Permission' },
     ],
   },
   {
@@ -80,6 +82,7 @@ const menuCategoryByPath: Record<string, string> = {
   '/rich-text-editor': 'interaction',
   '/amap-editor': 'interaction',
   '/media-player': 'interaction',
+  '/permission': 'interaction',
   '/form-group': 'layout',
   '/schema-form': 'layout',
 }
@@ -189,6 +192,7 @@ function App() {
             <Route path="/amap-editor" element={<AmapEditorDemo />} />
             <Route path="/qr-code" element={<QRCodeDemo />} />
             <Route path="/media-player" element={<MediaPlayerDemo />} />
+            <Route path="/permission" element={<PermissionDemo />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Content>

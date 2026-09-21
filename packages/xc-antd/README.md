@@ -47,6 +47,7 @@ Main components include:
 - `AmapEditor`: AMap marker, polyline, POI search and map-control workflows
 - `QRCode`: SVG/Canvas QR codes with logo and business-state overlays
 - `VideoPlayer` and `MusicPlayer`: XGPlayer media playback with built-in and streaming plugin configuration
+- `PermissionProvider`, `PermissionGuard`, and `usePermission`: shared permission-code checks for rendering and business logic
 
 See the repository documentation app for complete examples.
 
@@ -60,8 +61,8 @@ npx xc-antd-skills install
 ```
 
 This installs `xc-antd` plus the dedicated `xc-antd-image-upload`,
-`xc-antd-rich-text-editor`, `xc-antd-amap-editor`, `xc-antd-qr-code`, and
-`xc-antd-media-player` Skills under `.agents/skills`. Re-run with `--force`
+`xc-antd-rich-text-editor`, `xc-antd-amap-editor`, `xc-antd-qr-code`,
+`xc-antd-media-player`, and `xc-antd-permission` Skills under `.agents/skills`. Re-run with `--force`
 after upgrading the package.
 Component-library maintainers can also install the authoring Skill:
 

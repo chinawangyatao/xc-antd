@@ -19,6 +19,7 @@ export * from './RichTextEditor';
 export * from './AmapEditor';
 export * from './QRCode';
 export * from './MediaPlayer';
+export * from './Permission';
 export type {
   ListDeleteConfirmConfig,
   ListDeleteConfirmOptions,
