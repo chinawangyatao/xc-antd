@@ -18,6 +18,7 @@ Choose one primary component family before coding.
 | Edit AMap markers and paths | `AmapEditor` | Persist coordinate tuples; the component owns AMap overlay instances and drawing interaction. |
 | Render SVG or Canvas QR codes | `QRCode` | Use visual statuses for loading/expiry/scanned flows; encoded content remains caller-owned. |
 | Play video streams or music | `VideoPlayer`, `MusicPlayer` | Use `pluginConfig` for built-ins and FLV/HLS/MP4; MusicPlayer uses MP4 for M4A. |
+| Inject and evaluate frontend permission codes | `PermissionProvider`, `PermissionGuard`, `usePermission` | UI checks fail closed; backend APIs still own authorization. |
 | Async-confirming drawer | `ActionDrawer` | Controlled through `open` and `onOpenChange`. |
 | Async-confirming modal | `ActionModal` | Same action contract as `ActionDrawer`. |
 
@@ -32,6 +33,7 @@ Choose one primary component family before coding.
 - Maps: `packages/xc-antd/src/AmapEditor/`
 - QR codes: `packages/xc-antd/src/QRCode/`
 - Media players: `packages/xc-antd/src/MediaPlayer/`
+- Permissions: `packages/xc-antd/src/Permission/`
 - Sensitive data: `packages/xc-antd/src/SensitiveData/`
 - Overlays: `packages/xc-antd/src/ActionOverlay/`
 - Public barrel: `packages/xc-antd/src/index.ts`
@@ -50,5 +52,6 @@ Choose one primary component family before coding.
 - AMap editor: `/amap-editor`
 - QR code: `/qr-code`
 - Video and music players: `/media-player`
+- Permissions: `/permission`
 - Sensitive data: `/sensitive-data`
 - Overlays: `/action-overlay`

@@ -19,6 +19,7 @@ const consumerSkills = [
   'xc-antd-amap-editor',
   'xc-antd-qr-code',
   'xc-antd-media-player',
+  'xc-antd-permission',
 ];
 const authoringSkill = 'xc-antd-component-authoring';
 
