@@ -1,5 +1,7 @@
 import { Button, Input, Select } from 'antd';
 import type { GroupedSelectGroup, GroupedSelectValue } from './utils';
+import { GroupedSelectColorPicker } from './ColorPickerSelect';
+import type { GroupedSelectColor } from './utils';
 
 interface AddEditorProps {
   mode: 'group' | 'option';
@@ -7,10 +9,13 @@ interface AddEditorProps {
   label: string;
   maxLength?: number;
   groupId?: GroupedSelectValue;
+  colorOptions?: GroupedSelectColor[];
+  color?: string;
   adding: boolean;
   error: string;
   onLabelChange: (label: string) => void;
   onGroupChange: (id: GroupedSelectValue) => void;
+  onColorChange?: (color: string | undefined) => void;
   onSubmit: () => void;
   onCancel: () => void;
 }
@@ -21,10 +26,13 @@ export function GroupedSelectAddEditor({
   label,
   maxLength,
   groupId,
+  colorOptions = [],
+  color,
   adding,
   error,
   onLabelChange,
   onGroupChange,
+  onColorChange,
   onSubmit,
   onCancel,
 }: AddEditorProps) {
@@ -39,6 +47,13 @@ export function GroupedSelectAddEditor({
           onChange={onGroupChange}
           getPopupContainer={(trigger) => trigger.parentElement ?? document.body}
           className="xc-grouped-select__group-picker"
+        />
+      )}
+      {mode === 'option' && colorOptions.length > 0 && (
+        <GroupedSelectColorPicker
+          colors={colorOptions}
+          value={color}
+          onChange={onColorChange ?? (() => undefined)}
         />
       )}
       <Input

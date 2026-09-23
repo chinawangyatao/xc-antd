@@ -3,5 +3,16 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 16px;
+  gap: 0;
+}
+
+.xc-action-overlay__footer > .ant-btn + .ant-btn {
+  margin-inline-start: 16px;
+}
+
+@media (max-width: 480px) {
+  .xc-action-overlay__footer {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
 }

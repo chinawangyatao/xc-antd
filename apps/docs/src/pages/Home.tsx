@@ -1,126 +1,19 @@
-import { Card, Typography, Space, Tag } from 'antd'
-import { useNavigate } from 'react-router-dom'
-
-const { Title, Paragraph } = Typography
-
+import React from 'react';
+import { AppstoreOutlined, ArrowRightOutlined, DatabaseOutlined, EnvironmentOutlined, FormOutlined, LayoutOutlined, LockOutlined, PictureOutlined, PlaySquareOutlined, QrcodeOutlined, SafetyCertificateOutlined, TableOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { Button, Typography } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import './Home.css';
+type Entry = { name: string; description: string; route: string; icon: React.ReactNode; tone: string };
+type Group = { title: string; description: string; icon: React.ReactNode; items: Entry[] };
+const groups: Group[] = [
+  { title: '展示类', description: '展示、脱敏和状态组件', icon: <AppstoreOutlined />, items: [{ name: 'TextField', description: '原子字段的只读与编辑模式', route: '/pro-field', icon: <FormOutlined />, tone: 'blue' }, { name: 'SensitiveData', description: '敏感文本和图片脱敏', route: '/sensitive-data', icon: <LockOutlined />, tone: 'gold' }, { name: 'QRCode', description: 'SVG / Canvas 二维码', route: '/qr-code', icon: <QrcodeOutlined />, tone: 'cyan' }] },
+  { title: '数据类', description: '表格、列表和层级数据', icon: <DatabaseOutlined />, items: [{ name: 'HocTable', description: '本地数据、筛选、行内编辑', route: '/table', icon: <TableOutlined />, tone: 'blue' }, { name: 'CrudTable', description: '请求查询、分页与列表操作', route: '/crud-table', icon: <ThunderboltOutlined />, tone: 'green' }, { name: 'List / ListTree', description: '搜索列表、树与拖拽', route: '/tree-select', icon: <AppstoreOutlined />, tone: 'purple' }] },
+  { title: '交互类', description: '弹层、上传、地图和媒体', icon: <ThunderboltOutlined />, items: [{ name: 'ActionOverlay', description: '异步确认与操作容器', route: '/action-overlay', icon: <ThunderboltOutlined />, tone: 'blue' }, { name: 'GroupedSelect', description: '分组搜索与标签编辑', route: '/grouped-select', icon: <AppstoreOutlined />, tone: 'purple' }, { name: 'ImageUpload', description: '上传、预览和图片裁剪', route: '/image-upload', icon: <PictureOutlined />, tone: 'green' }, { name: 'RichTextEditor', description: 'Quill 富文本编辑与预览', route: '/rich-text-editor', icon: <FormOutlined />, tone: 'cyan' }, { name: 'AmapEditor', description: '高德地图打点、划线与搜索', route: '/amap-editor', icon: <EnvironmentOutlined />, tone: 'gold' }, { name: 'Video / Music', description: 'XGPlayer 视频、音乐与流媒体', route: '/media-player', icon: <PlaySquareOutlined />, tone: 'red' }, { name: 'Permission', description: '权限码注入与界面控制', route: '/permission', icon: <SafetyCertificateOutlined />, tone: 'blue' }] },
+  { title: '布局类', description: '表单分组和配置驱动字段', icon: <LayoutOutlined />, items: [{ name: 'FormGroup', description: '标题与栅格容器', route: '/form-group', icon: <LayoutOutlined />, tone: 'cyan' }, { name: 'SchemaForm', description: '字段、校验、联动与提交', route: '/schema-form', icon: <FormOutlined />, tone: 'purple' }] },
+];
 function Home() {
-  const navigate = useNavigate()
-
-  return (
-    <Space orientation="vertical" size="large" style={{ width: '100%' }}>
-      <Card>
-        <Title level={3} style={{ margin: 0 }}>
-          xc-antd 组件库
-        </Title>
-        <Paragraph style={{ color: '#666', marginTop: 8 }}>
-          基于 Ant Design 6.x 的 TextField 原子字段组件库。
-        </Paragraph>
-      </Card>
-
-      <Title level={4}>组件列表</Title>
-      <Card hoverable onClick={() => navigate('/pro-field')} style={{ cursor: 'pointer' }}>
-        <Title level={5} style={{ margin: 0 }}>
-          TextField
-        </Title>
-        <Paragraph style={{ color: '#666', marginTop: 8, marginBottom: 8 }}>
-          通过 valueType 切换不同类型字段（文本/金额/日期/选择/进度/评分 ...）的展示和编辑形态。
-        </Paragraph>
-        <Space>
-          <Tag color="blue">原子字段</Tag>
-          <Tag>支持 read / edit 两种 mode</Tag>
-        </Space>
-      </Card>
-
-      <Card hoverable onClick={() => navigate('/crud-table')} style={{ cursor: 'pointer' }}>
-        <Title level={5} style={{ margin: 0 }}>
-          CrudTable
-        </Title>
-        <Paragraph style={{ color: '#666', marginTop: 8, marginBottom: 8 }}>
-          面向真实列表页的查询、请求、分页、选择、自定义列和操作扩展组件。
-        </Paragraph>
-        <Space>
-          <Tag color="green">业务表格</Tag>
-          <Tag>配置驱动</Tag>
-          <Tag>服务端请求</Tag>
-        </Space>
-      </Card>
-
-      <Card hoverable onClick={() => navigate('/action-overlay')} style={{ cursor: 'pointer' }}>
-        <Title level={5} style={{ margin: 0 }}>
-          ActionDrawer / ActionModal
-        </Title>
-        <Paragraph style={{ color: '#666', marginTop: 8, marginBottom: 8 }}>
-          统一确认与取消顺序、底部左对齐和异步提交状态的操作容器。
-        </Paragraph>
-        <Space>
-          <Tag color="blue">抽屉优先</Tag>
-          <Tag>统一 Footer</Tag>
-        </Space>
-      </Card>
-
-      <Card hoverable onClick={() => navigate('/form-group')} style={{ cursor: 'pointer' }}>
-        <Title level={5} style={{ margin: 0 }}>
-          FormGroup
-        </Title>
-        <Paragraph style={{ color: '#666', marginTop: 8, marginBottom: 8 }}>
-          使用标识标题和栅格内容区组织较长表单。
-        </Paragraph>
-        <Space>
-          <Tag color="cyan">表单分组</Tag>
-          <Tag>React Children</Tag>
-        </Space>
-      </Card>
-
-      <Card hoverable onClick={() => navigate('/schema-form')} style={{ cursor: 'pointer' }}>
-        <Title level={5} style={{ margin: 0 }}>
-          SchemaForm
-        </Title>
-        <Paragraph style={{ color: '#666', marginTop: 8, marginBottom: 8 }}>
-          由配置驱动分组、字段、校验、联动和提交转换的重型表单。
-        </Paragraph>
-        <Space>
-          <Tag color="purple">配置表单</Tag>
-          <Tag>类型安全</Tag>
-          <Tag>字段联动</Tag>
-        </Space>
-      </Card>
-
-      <Card>
-        <Title level={4}>快速开始</Title>
-        <pre
-          style={{
-            background: '#f6f8fa',
-            padding: 16,
-            borderRadius: 6,
-            fontSize: 13,
-            overflow: 'auto',
-          }}
-        >
-{`// 1. 安装依赖
-npm install xc-antd antd dayjs swr
-
-// 2. 引入并使用
-import { TextField } from 'xc-antd'
-
-// 只读
-<TextField valueType="money" text={9999.99} />
-
-// 编辑
-<TextField mode="edit" valueType="date" text="2026-06-02" />
-
-// 自定义枚举
-<TextField
-  valueType="select"
-  text="online"
-  valueEnum={{
-    online: { text: '在线', status: 'Success' },
-    offline: { text: '离线', status: 'Default' },
-  }}
-/>`}
-        </pre>
-      </Card>
-    </Space>
-  )
+  const navigate = useNavigate();
+  const count = groups.reduce((total, group) => total + group.items.length, 0);
+  return <main className="xc-home"><section className="xc-home__intro"><div className="xc-home__eyebrow">XC-ANTD / COMPONENT LIBRARY</div><div className="xc-home__intro-row"><div><Typography.Title level={1} className="xc-home__title">面向业务场景的 React 组件库</Typography.Title><Typography.Paragraph className="xc-home__summary">基于 React 19 与 Ant Design 6，覆盖字段、表格、交互、地图和权限控制。</Typography.Paragraph></div><div className="xc-home__actions"><Button type="primary" size="large" onClick={() => navigate('/pro-field')}>开始浏览 <ArrowRightOutlined /></Button><Button size="large" onClick={() => navigate('/permission')}>查看权限方案</Button></div></div></section><section className="xc-home__metrics"><div><strong>{count}</strong><span>业务组件</span></div><div><strong>{groups.length}</strong><span>组件分类</span></div><div><strong>React 19</strong><span>运行时</span></div><div><strong>Ant Design 6</strong><span>设计基座</span></div></section><section className="xc-home__directory"><div className="xc-home__heading"><div><Typography.Title level={2}>组件目录</Typography.Title><Typography.Text type="secondary">按业务场景快速进入对应示例。</Typography.Text></div><Button type="link" onClick={() => navigate('/pro-field')}>查看全部 <ArrowRightOutlined /></Button></div><div className="xc-home__groups">{groups.map((group) => <section className="xc-home__group" key={group.title}><div className="xc-home__group-title"><span>{group.icon}</span><div><Typography.Title level={3}>{group.title}</Typography.Title><Typography.Text type="secondary">{group.description}</Typography.Text></div><em>{group.items.length}</em></div><div className="xc-home__grid">{group.items.map((item) => <button className="xc-home__item" key={item.name} type="button" onClick={() => navigate(item.route)}><span className={`xc-home__item-icon xc-home__item-icon--${item.tone}`}>{item.icon}</span><span><b>{item.name}</b><small>{item.description}</small></span><ArrowRightOutlined /></button>)}</div></section>)}</div></section><section className="xc-home__quickstart"><div><div className="xc-home__eyebrow">QUICK START</div><Typography.Title level={2}>从一个字段开始</Typography.Title><Typography.Paragraph type="secondary">安装后引入样式，即可在现有 Ant Design 项目中使用。</Typography.Paragraph><Button onClick={() => navigate('/pro-field')}>查看 TextField <ArrowRightOutlined /></Button></div><pre>{`npm install xc-antd antd dayjs swr\n\nimport { TextField } from 'xc-antd'\nimport 'xc-antd/style'\n\n<TextField valueType="money" text={9999.99} />`}</pre></section></main>;
 }
-
-export default Home
+export default Home;

@@ -22,3 +22,11 @@
 .xc-grouped-select__group-picker { flex: 1 1 130px; min-width: 0; }
 .xc-grouped-select__editor-actions { display: flex; flex: 0 0 auto; gap: 8px; }
 .xc-grouped-select__error { width: 100%; color: #ff4d4f; font-size: 12px; }
+.xc-grouped-select__colored-label { display: inline-flex; min-width: 0; align-items: center; gap: 8px; }
+.xc-grouped-select__inline-color { display: inline-block; width: 14px; height: 14px; flex: 0 0 auto; border: 1px solid rgba(0,0,0,.12); border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.28); }
+.xc-grouped-select__color-picker { display: inline-flex; flex: 0 0 auto; }
+.ant-popover.xc-grouped-select__color-picker-root { z-index: 1060; }
+.xc-grouped-select__editor .ant-color-picker-trigger { flex: 0 0 auto; }
+.xc-grouped-select__inline-editor .xc-grouped-select__edit-group-picker,
+.xc-grouped-select__inline-editor .ant-input { flex: 1 1 0; min-width: 0; }
+.xc-grouped-select__inline-editor .ant-color-picker-trigger { flex: 0 0 auto; }
