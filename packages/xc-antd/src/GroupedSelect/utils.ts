@@ -1,8 +1,16 @@
 export type GroupedSelectValue = string | number;
 
+export interface GroupedSelectColorOption {
+  value: string;
+  label?: string;
+}
+
+export type GroupedSelectColor = string | GroupedSelectColorOption;
+
 export interface GroupedSelectOption {
   value: GroupedSelectValue;
   label: string;
+  color?: string;
   disabled?: boolean;
 }
 

@@ -84,12 +84,13 @@ Use `GroupedSelect` for multi-select from labeled groups, with a searchable Sele
 
 ```tsx
 <GroupedSelect
-  groups={[{ id: 'a', label: '分组A', options: [{ value: 'a1', label: '选项A-1' }] }]}
+  colorOptions={['#1677ff', '#52c41a', '#faad14', '#722ed1']}
+  groups={[{ id: 'a', label: '分组A', options: [{ value: 'a1', label: '选项A-1', color: '#1677ff' }] }]}
   value={selectedValues}
   onChange={setSelectedValues}
   onAddGroup={(label) => createGroup(label)}
-  onAddOption={(label, group) => createOption(label, group.id)}
-  onEditOption={(option, group, label, nextGroup) => updateOption(option.value, nextGroup.id, label)}
+  onAddOption={(label, group, color) => createOption(label, group.id, color)}
+  onEditOption={(option, group, label, nextGroup, color) => updateOption(option.value, nextGroup.id, label, color)}
 />
 ```
 
@@ -97,6 +98,7 @@ Use `GroupedSelect` for multi-select from labeled groups, with a searchable Sele
 - Search matches group or option labels. `onAddGroup(label)` and `onAddOption(label, group)` are called after in-popup input and confirmation.
 - Use `groupLabelMaxLength` and `optionLabelMaxLength` to set different limits for group and option name inputs during creation and editing. Omit either prop to leave that input unrestricted.
 - `onEditGroup(group, label)` and `onEditOption(option, group, label, nextGroup)` receive the inline editor result; async failures keep that row editable. The Select popup stays open during edits. `nextGroup` is the selected destination group, and equals `group` when only the label changes.
+- Pass `colorOptions` to show an Ant Design `ColorPicker` preset panel while creating or editing labels. Only `options[].color` is persisted and rendered; groups never have a color field. The optional color is appended to `onAddOption` and `onEditOption` callbacks.
 - Deletion uses Ant Design `Popconfirm` inside the Select popup by default; use `deleteConfirm={false}` only when the caller owns confirmation. Missing action callbacks hide their buttons.
 - The caller updates `groups` after CRUD; successful deletion removes affected selected values via `onChange`.
 - For remote search, pass `searchMode="remote"`, `onSearchChange={setKeyword}`, server response groups, and `searchLoading`. The component skips local filtering; the caller debounces requests and discards stale responses. On closing a nonempty search it emits `onSearchChange('')` to restore the list.

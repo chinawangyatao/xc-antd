@@ -5,6 +5,7 @@ import { GroupedSelect } from '../src/GroupedSelect';
 import { GroupedSelectAddEditor } from '../src/GroupedSelect/AddEditor';
 import { GroupedSelectDeleteButton } from '../src/GroupedSelect/DeleteButton';
 import { GroupedSelectEditEditor } from '../src/GroupedSelect/EditEditor';
+import { GroupedSelectColorPicker } from '../src/GroupedSelect/ColorPickerSelect';
 import {
   filterGroupedSelectGroups,
   getVisibleGroupedSelectGroups,
@@ -140,5 +141,40 @@ describe('GroupedSelect', () => {
     expect(confirmed.props.title).toBe('确认删除标签 A吗？');
     expect(confirmed.props.children.props['aria-label']).toBe('删除标签 A');
     expect(direct.props['aria-label']).toBe('删除标签 A');
+  });
+
+  test('renders the externally supplied color picker in add and edit flows', () => {
+    const colors = ['#1677ff', '#52c41a', '#faad14'];
+    const pickerHtml = renderToStaticMarkup(
+      <GroupedSelectColorPicker
+        colors={colors}
+        value="#52c41a"
+        onChange={() => undefined}
+      />,
+    );
+    expect(pickerHtml).toContain('选择颜色');
+    expect(pickerHtml).toContain('ant-color-picker-trigger');
+    expect(pickerHtml).toContain('rgb(82,196,26)');
+    expect(pickerHtml).toContain('xc-grouped-select__color-picker');
+    expect(pickerHtml).toContain('xc-grouped-select__color-picker-root');
+
+    const addHtml = renderToStaticMarkup(
+      <GroupedSelectAddEditor
+        mode="option"
+        groups={groups}
+        label="新标签"
+        colorOptions={colors}
+        color="#1677ff"
+        groupId="a"
+        adding={false}
+        error=""
+        onLabelChange={() => undefined}
+        onGroupChange={() => undefined}
+        onColorChange={() => undefined}
+        onSubmit={() => undefined}
+        onCancel={() => undefined}
+      />,
+    );
+    expect(addHtml).toContain('ant-color-picker-trigger');
   });
 });

@@ -13,12 +13,14 @@ import { useEffect, useState } from 'react';
 import { GroupedSelectAddEditor } from './AddEditor';
 import { GroupedSelectDeleteButton } from './DeleteButton';
 import { GroupedSelectEditEditor } from './EditEditor';
+import { GroupedSelectColorSwatch } from './ColorPickerSelect';
 import type { ListDeleteConfirmOptions } from '../shared/listDeleteConfirm';
 import {
   getVisibleGroupedSelectGroups,
   resolveGroupedSelectOptions,
   toggleGroupedSelectValue,
   type GroupedSelectGroup,
+  type GroupedSelectColor,
   type GroupedSelectOption,
   type GroupedSelectValue,
 } from './utils';
@@ -39,6 +41,8 @@ export interface GroupedSelectProps {
   groupLabelMaxLength?: number;
   /** 新增或编辑标签时允许输入的最大字符数；不传则不限制。 */
   optionLabelMaxLength?: number;
+  /** 新增或编辑分组/标签时可选的颜色。 */
+  colorOptions?: GroupedSelectColor[];
   /** remote 模式只展示传入的 groups，不再执行本地筛选。 */
   searchMode?: 'local' | 'remote';
   onSearchChange?: (keyword: string) => void;
@@ -46,7 +50,7 @@ export interface GroupedSelectProps {
   /** 在下拉框内输入分组名并确认后调用。 */
   onAddGroup?: (label: string) => void | Promise<void>;
   /** 在下拉框内输入标签名并选择所属分组后调用。 */
-  onAddOption?: (label: string, group: GroupedSelectGroup) => void | Promise<void>;
+  onAddOption?: (label: string, group: GroupedSelectGroup, color?: string) => void | Promise<void>;
   /** 编辑分组名称，保存时调用；返回 Promise 时等待完成。 */
   onEditGroup?: (group: GroupedSelectGroup, label: string) => void | Promise<void>;
   /** 远程模式下 groups 可能是部分结果，调用方还需清理该分组下的受控已选值。 */
@@ -57,6 +61,7 @@ export interface GroupedSelectProps {
     group: GroupedSelectGroup,
     label: string,
     nextGroup: GroupedSelectGroup,
+    color?: string,
   ) => void | Promise<void>;
   onDeleteOption?: (option: GroupedSelectOption, group: GroupedSelectGroup) => void | Promise<void>;
   deleteConfirm?: ListDeleteConfirmOptions;
@@ -78,6 +83,7 @@ export function GroupedSelect({
   searchPlaceholder = '请输入内容',
   groupLabelMaxLength,
   optionLabelMaxLength,
+  colorOptions = [],
   searchMode = 'local',
   onSearchChange,
   searchLoading = false,
@@ -98,6 +104,7 @@ export function GroupedSelect({
   const [addMode, setAddMode] = useState<'group' | 'option' | null>(null);
   const [draftLabel, setDraftLabel] = useState('');
   const [draftGroupId, setDraftGroupId] = useState<GroupedSelectValue | undefined>();
+  const [draftColor, setDraftColor] = useState<string>();
   const [adding, setAdding] = useState(false);
   const [addError, setAddError] = useState('');
   const [editing, setEditing] = useState<{
@@ -107,6 +114,7 @@ export function GroupedSelect({
   } | null>(null);
   const [editingGroupId, setEditingGroupId] = useState<GroupedSelectValue>();
   const [editLabel, setEditLabel] = useState('');
+  const [editColor, setEditColor] = useState<string>();
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState('');
   const [cachedOptions, setCachedOptions] = useState(
@@ -117,6 +125,10 @@ export function GroupedSelect({
   const options = resolveGroupedSelectOptions(
     groups, selected, selectedOptions, cachedOptions,
   );
+  const selectOptions = options.map((option) => ({
+    value: option.value,
+    label: <GroupedSelectColorSwatch color={option.color} label={option.label} />,
+  }));
 
   useEffect(() => {
     const selectedValues = new Set(selected);
@@ -154,6 +166,7 @@ export function GroupedSelect({
     setEditing({ kind: option ? 'option' : 'group', group, option });
     setEditingGroupId(group.id);
     setEditLabel(option?.label ?? group.label);
+    setEditColor(option?.color);
     setEditError('');
   };
   const submitEdit = async () => {
@@ -166,7 +179,7 @@ export function GroupedSelect({
       else if (editing.option) {
         const nextGroup = groups.find((group) => group.id === editingGroupId)
           ?? editing.group;
-        await onEditOption?.(editing.option, editing.group, label, nextGroup);
+        await onEditOption?.(editing.option, editing.group, label, nextGroup, editColor);
       }
       setEditing(null);
       setEditingGroupId(undefined);
@@ -183,6 +196,7 @@ export function GroupedSelect({
     setAddMode(mode);
     setDraftLabel('');
     setDraftGroupId(groups[0]?.id);
+    setDraftColor(undefined);
     setAddError('');
   };
   const submitAdd = async () => {
@@ -194,9 +208,10 @@ export function GroupedSelect({
     setAddError('');
     try {
       if (addMode === 'group') await onAddGroup?.(label);
-      else if (group) await onAddOption?.(label, group);
+      else if (group) await onAddOption?.(label, group, draftColor);
       setAddMode(null);
       setDraftLabel('');
+      setDraftColor(undefined);
       updateSearch('');
     } catch (error) {
       setAddError(error instanceof Error ? error.message : '新增失败，请重试');
@@ -236,7 +251,7 @@ export function GroupedSelect({
         mode="multiple"
         value={selected}
         onChange={commit}
-        options={options}
+        options={selectOptions}
         placeholder={placeholder}
         showSearch={false}
         open={open}
@@ -280,10 +295,13 @@ export function GroupedSelect({
                       <GroupedSelectEditEditor
                         kind="group"
                         label={editLabel}
+                        colorOptions={colorOptions}
+                        color={editColor}
                         maxLength={groupLabelMaxLength}
                         saving={editSaving}
                         error={editError}
                         onChange={setEditLabel}
+                        onColorChange={setEditColor}
                         onSave={() => void submitEdit()}
                         onCancel={() => {
                           setEditing(null);
@@ -292,7 +310,9 @@ export function GroupedSelect({
                       />
                     ) : (
                       <>
-                        <span className="xc-grouped-select__label">{group.label}</span>
+                        <span className="xc-grouped-select__label">
+                          {group.label}
+                        </span>
                         {onEditGroup && (
                           <Button type="text" size="small" aria-label={`编辑分组 ${group.label}`}
                             icon={<EditOutlined />} onClick={() => beginEdit(group)} />
@@ -314,10 +334,13 @@ export function GroupedSelect({
                           groups={groups}
                           groupId={editingGroupId}
                           label={editLabel}
+                          colorOptions={colorOptions}
+                          color={editColor}
                           maxLength={optionLabelMaxLength}
                           saving={editSaving}
                           error={editError}
                           onChange={setEditLabel}
+                          onColorChange={setEditColor}
                           onGroupChange={setEditingGroupId}
                           onSave={() => void submitEdit()}
                           onCancel={() => {
@@ -333,7 +356,7 @@ export function GroupedSelect({
                             checked={selected.includes(option.value)}
                             onChange={() => commit(toggleGroupedSelectValue(selected, option.value))}
                           >
-                            {option.label}
+                            <GroupedSelectColorSwatch color={option.color} label={option.label} />
                           </Checkbox>
                           {onEditOption && (
                             <Button type="text" size="small" aria-label={`编辑选项 ${option.label}`}
@@ -361,10 +384,13 @@ export function GroupedSelect({
                       ? groupLabelMaxLength
                       : optionLabelMaxLength}
                     groupId={draftGroupId}
+                    colorOptions={colorOptions}
+                    color={draftColor}
                     adding={adding}
                     error={addError}
                     onLabelChange={setDraftLabel}
                     onGroupChange={setDraftGroupId}
+                    onColorChange={setDraftColor}
                     onSubmit={() => void submitAdd()}
                     onCancel={() => setAddMode(null)}
                   />

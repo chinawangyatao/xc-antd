@@ -1,17 +1,22 @@
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { Button, Input, Select } from 'antd';
 import type { GroupedSelectGroup, GroupedSelectValue } from './utils';
+import { GroupedSelectColorPicker } from './ColorPickerSelect';
+import type { GroupedSelectColor } from './utils';
 
 interface EditEditorProps {
   kind: 'group' | 'option';
   groups?: GroupedSelectGroup[];
   groupId?: GroupedSelectValue;
+  colorOptions?: GroupedSelectColor[];
+  color?: string;
   label: string;
   maxLength?: number;
   saving: boolean;
   error: string;
   onChange: (label: string) => void;
   onGroupChange?: (id: GroupedSelectValue) => void;
+  onColorChange?: (color: string | undefined) => void;
   onSave: () => void;
   onCancel: () => void;
 }
@@ -20,12 +25,15 @@ export function GroupedSelectEditEditor({
   kind,
   groups = [],
   groupId,
+  colorOptions = [],
+  color,
   label,
   maxLength,
   saving,
   error,
   onChange,
   onGroupChange,
+  onColorChange,
   onSave,
   onCancel,
 }: EditEditorProps) {
@@ -41,6 +49,14 @@ export function GroupedSelectEditEditor({
           onChange={onGroupChange}
           getPopupContainer={(trigger) => trigger.parentElement ?? document.body}
           className="xc-grouped-select__edit-group-picker"
+        />
+      )}
+      {kind === 'option' && colorOptions.length > 0 && onColorChange && (
+        <GroupedSelectColorPicker
+          colors={colorOptions}
+          value={color}
+          size="small"
+          onChange={onColorChange}
         />
       )}
       <Input
