@@ -85,6 +85,7 @@ Use `GroupedSelect` for multi-select from labeled groups, with a searchable Sele
 ```tsx
 <GroupedSelect
   colorOptions={['#1677ff', '#52c41a', '#faad14', '#722ed1']}
+  defaultColor="#1677ff"
   groups={[{ id: 'a', label: '分组A', options: [{ value: 'a1', label: '选项A-1', color: '#1677ff' }] }]}
   value={selectedValues}
   onChange={setSelectedValues}
@@ -99,6 +100,7 @@ Use `GroupedSelect` for multi-select from labeled groups, with a searchable Sele
 - Use `groupLabelMaxLength` and `optionLabelMaxLength` to set different limits for group and option name inputs during creation and editing. Omit either prop to leave that input unrestricted.
 - `onEditGroup(group, label)` and `onEditOption(option, group, label, nextGroup)` receive the inline editor result; async failures keep that row editable. The Select popup stays open during edits. `nextGroup` is the selected destination group, and equals `group` when only the label changes.
 - Pass `colorOptions` to show a compact color-swatch trigger with an Ant Design `ColorPicker` preset panel while creating or editing labels. Creation controls use the standard control height; inline editing uses the small control size and keeps the group picker and label input at matching widths and heights. Only `options[].color` is persisted and rendered; groups never have a color field. The optional color is appended to `onAddOption` and `onEditOption` callbacks.
+- `defaultColor` preselects a color each time the new-label form opens and passes it to `onAddOption` unless the user changes or clears it. It does not override existing labels' colors. Omit it to leave new labels without a color by default.
 - Deletion uses Ant Design `Popconfirm` inside the Select popup by default; use `deleteConfirm={false}` only when the caller owns confirmation. Missing action callbacks hide their buttons.
 - The caller updates `groups` after CRUD; successful deletion removes affected selected values via `onChange`.
 - For remote search, pass `searchMode="remote"`, `onSearchChange={setKeyword}`, server response groups, and `searchLoading`. The component skips local filtering; the caller debounces requests and discards stale responses. On closing a nonempty search it emits `onSearchChange('')` to restore the list.

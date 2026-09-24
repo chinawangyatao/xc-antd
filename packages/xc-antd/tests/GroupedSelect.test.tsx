@@ -176,5 +176,6 @@ describe('GroupedSelect', () => {
       />,
     );
     expect(addHtml).toContain('ant-color-picker-trigger');
+    expect(addHtml).toContain('rgb(22,119,255)');
   });
 });
