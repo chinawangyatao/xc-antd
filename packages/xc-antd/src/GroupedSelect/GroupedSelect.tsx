@@ -43,6 +43,8 @@ export interface GroupedSelectProps {
   optionLabelMaxLength?: number;
   /** 新增或编辑分组/标签时可选的颜色。 */
   colorOptions?: GroupedSelectColor[];
+  /** 新增标签时默认选中的颜色；不影响已有标签。 */
+  defaultColor?: string;
   /** remote 模式只展示传入的 groups，不再执行本地筛选。 */
   searchMode?: 'local' | 'remote';
   onSearchChange?: (keyword: string) => void;
@@ -84,6 +86,7 @@ export function GroupedSelect({
   groupLabelMaxLength,
   optionLabelMaxLength,
   colorOptions = [],
+  defaultColor,
   searchMode = 'local',
   onSearchChange,
   searchLoading = false,
@@ -196,7 +199,7 @@ export function GroupedSelect({
     setAddMode(mode);
     setDraftLabel('');
     setDraftGroupId(groups[0]?.id);
-    setDraftColor(undefined);
+    setDraftColor(mode === 'option' ? defaultColor : undefined);
     setAddError('');
   };
   const submitAdd = async () => {

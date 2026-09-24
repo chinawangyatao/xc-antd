@@ -117,6 +117,7 @@ export default function GroupedSelectDemo() {
           groupLabelMaxLength={12}
           optionLabelMaxLength={20}
           colorOptions={colorOptions}
+          defaultColor="#1677ff"
           onAddGroup={(nextLabel) => {
             setGroups((current) => [...current, {
               id: `group-${crypto.randomUUID()}`,
@@ -176,7 +177,7 @@ export default function GroupedSelectDemo() {
           }}
         />
         <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-          点击“添加标签”或选项右侧的编辑按钮，再点击颜色按钮即可从预设色板选择颜色；选中的颜色会显示在标签名称旁。
+          新增标签时默认选中蓝色，也可点击颜色按钮从预设色板选择其他颜色；选中的颜色会显示在标签名称旁。
         </Typography.Paragraph>
         <Alert style={{ marginTop: 20 }} type="info"
           message={`当前选中：${value.length ? value.join('、') : '暂无'}`} />
