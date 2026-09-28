@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import { GroupedSelectAddEditor } from './AddEditor';
 import { GroupedSelectDeleteButton } from './DeleteButton';
 import { GroupedSelectEditEditor } from './EditEditor';
-import { GroupedSelectColorSwatch } from './ColorPickerSelect';
+import { GroupedSelectColorFilterControl, GroupedSelectColorSwatch } from './ColorPickerSelect';
 import type { ListDeleteConfirmOptions } from '../shared/listDeleteConfirm';
 import {
   getVisibleGroupedSelectGroups,
@@ -21,6 +21,7 @@ import {
   toggleGroupedSelectValue,
   type GroupedSelectGroup,
   type GroupedSelectColor,
+  type GroupedSelectColorFilter,
   type GroupedSelectOption,
   type GroupedSelectValue,
 } from './utils';
@@ -41,11 +42,13 @@ export interface GroupedSelectProps {
   groupLabelMaxLength?: number;
   /** 新增或编辑标签时允许输入的最大字符数；不传则不限制。 */
   optionLabelMaxLength?: number;
-  /** 新增或编辑分组/标签时可选的颜色。 */
+  /** 标签新增、编辑和颜色筛选使用的颜色选项；为空时不显示颜色筛选。 */
   colorOptions?: GroupedSelectColor[];
   /** 新增标签时默认选中的颜色；不影响已有标签。 */
   defaultColor?: string;
-  /** remote 模式只展示传入的 groups，不再执行本地筛选。 */
+  /** 颜色筛选规则；默认按标签颜色不区分大小写精确匹配。 */
+  colorFilter?: GroupedSelectColorFilter;
+  /** remote 模式跳过本地文字筛选，颜色筛选仍作用于传入的 groups。 */
   searchMode?: 'local' | 'remote';
   onSearchChange?: (keyword: string) => void;
   searchLoading?: boolean;
@@ -87,6 +90,7 @@ export function GroupedSelect({
   optionLabelMaxLength,
   colorOptions = [],
   defaultColor,
+  colorFilter,
   searchMode = 'local',
   onSearchChange,
   searchLoading = false,
@@ -103,6 +107,7 @@ export function GroupedSelect({
 }: GroupedSelectProps) {
   const [innerValue, setInnerValue] = useState(defaultValue);
   const [search, setSearch] = useState('');
+  const [filterColor, setFilterColor] = useState<string>();
   const [open, setOpen] = useState(false);
   const [addMode, setAddMode] = useState<'group' | 'option' | null>(null);
   const [draftLabel, setDraftLabel] = useState('');
@@ -124,7 +129,10 @@ export function GroupedSelect({
     () => new Map<GroupedSelectValue, GroupedSelectOption>(),
   );
   const selected = value === undefined ? innerValue : value;
-  const visibleGroups = getVisibleGroupedSelectGroups(groups, search, searchMode);
+  const activeFilterColor = colorOptions.length ? filterColor : undefined;
+  const visibleGroups = getVisibleGroupedSelectGroups(
+    groups, search, searchMode, activeFilterColor, colorFilter,
+  );
   const options = resolveGroupedSelectOptions(
     groups, selected, selectedOptions, cachedOptions,
   );
@@ -262,6 +270,7 @@ export function GroupedSelect({
           setOpen(nextOpen);
           if (!nextOpen) {
             if (search) updateSearch('');
+            setFilterColor(undefined);
             setAddMode(null);
             setAddError('');
             setEditing(null);
@@ -280,6 +289,11 @@ export function GroupedSelect({
                 suffix={<SearchOutlined />}
                 value={search}
                 onChange={(event) => updateSearch(event.target.value)}
+              />
+              <GroupedSelectColorFilterControl
+                colors={colorOptions}
+                value={activeFilterColor}
+                onChange={setFilterColor}
               />
             </div>
             <div className="xc-grouped-select__list">

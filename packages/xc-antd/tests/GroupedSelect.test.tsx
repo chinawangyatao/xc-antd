@@ -5,7 +5,10 @@ import { GroupedSelect } from '../src/GroupedSelect';
 import { GroupedSelectAddEditor } from '../src/GroupedSelect/AddEditor';
 import { GroupedSelectDeleteButton } from '../src/GroupedSelect/DeleteButton';
 import { GroupedSelectEditEditor } from '../src/GroupedSelect/EditEditor';
-import { GroupedSelectColorPicker } from '../src/GroupedSelect/ColorPickerSelect';
+import {
+  GroupedSelectColorFilterControl,
+  GroupedSelectColorPicker,
+} from '../src/GroupedSelect/ColorPickerSelect';
 import {
   filterGroupedSelectGroups,
   getVisibleGroupedSelectGroups,
@@ -48,6 +51,35 @@ describe('GroupedSelect', () => {
     expect(resolveGroupedSelectOptions(
       [], ['a-1'], [groups[0].options[0]], new Map([['a-1', renamed]]),
     )).toEqual([renamed]);
+  });
+
+  test('combines local search with color filtering and accepts a custom matching rule', () => {
+    const coloredGroups: GroupedSelectGroup[] = [
+      { ...groups[0], options: [
+        { ...groups[0].options[0], color: '#1677ff' },
+        { ...groups[0].options[1], color: '#91caff' },
+      ] },
+      { ...groups[1], options: [{ ...groups[1].options[0], color: '#52c41a' }] },
+    ];
+    expect(getVisibleGroupedSelectGroups(coloredGroups, '', 'local', '#1677FF')).toEqual([
+      { ...coloredGroups[0], options: [coloredGroups[0].options[0]] },
+    ]);
+    expect(getVisibleGroupedSelectGroups(coloredGroups, 'a-2', 'local', '#1677ff')).toEqual([]);
+    expect(getVisibleGroupedSelectGroups(coloredGroups, 'a-2', 'remote', '#1677ff'))
+      .toEqual([{ ...coloredGroups[0], options: [coloredGroups[0].options[0]] }]);
+    const matched: string[] = [];
+    const customFilter = (
+      option: GroupedSelectGroup['options'][number],
+      color: string,
+      group: GroupedSelectGroup,
+    ) => {
+      matched.push(`${group.id}:${option.value}:${color}`);
+      return option.color === '#91caff';
+    };
+    expect(getVisibleGroupedSelectGroups(coloredGroups, '', 'local', '#1677ff', customFilter))
+      .toEqual([{ ...coloredGroups[0], options: [coloredGroups[0].options[1]] }]);
+    expect(matched).toContain('a:a-2:#1677ff');
+    expect(coloredGroups[0].options).toHaveLength(2);
   });
 
   test('toggles checkbox selection without changing its source array', () => {
@@ -177,5 +209,24 @@ describe('GroupedSelect', () => {
     );
     expect(addHtml).toContain('ant-color-picker-trigger');
     expect(addHtml).toContain('rgb(22,119,255)');
+  });
+
+  test('reuses the color picker for filtering only when colors are configured', () => {
+    const onChange = () => undefined;
+    expect(renderToStaticMarkup(
+      <GroupedSelectColorFilterControl colors={[]} onChange={onChange} />,
+    )).toBe('');
+    const html = renderToStaticMarkup(
+      <GroupedSelectColorFilterControl
+        colors={[{ value: '#1677ff', label: '蓝色' }, '#52c41a']}
+        value="#1677ff"
+        onChange={onChange}
+      />,
+    );
+    expect(html).toContain('按颜色筛选');
+    expect(html).toContain('xc-grouped-select__color-filter');
+    expect(html).toContain('xc-grouped-select__color-picker');
+    expect(html).toContain('ant-color-picker-trigger');
+    expect(html).toContain('rgb(22,119,255)');
   });
 });

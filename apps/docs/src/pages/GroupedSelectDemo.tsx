@@ -13,6 +13,7 @@ const initialGroups: GroupedSelectGroup[] = [
       { value: 'a-1', label: '选项A-1', color: '#1677ff' },
       { value: 'a-2', label: '选项A-2', color: '#52c41a' },
       { value: 'a-3', label: '选项A-3', color: '#faad14' },
+      { value: 'a-4', label: '选项A-4', color: '#91caff' },
     ],
   },
   { id: 'group-b', label: '分组B', options: [{ value: 'b-1', label: '选项B-1', color: '#722ed1' }] },
@@ -60,11 +61,12 @@ function mockCreateGroup(label: string) {
   });
 }
 
-function mockCreateOption(label: string) {
+function mockCreateOption(label: string, color?: string) {
   return new Promise<GroupedSelectOption>((resolve) => {
     window.setTimeout(() => resolve({
       value: `option-${crypto.randomUUID()}`,
       label,
+      color,
     }), 320);
   });
 }
@@ -177,14 +179,14 @@ export default function GroupedSelectDemo() {
           }}
         />
         <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-          新增标签时默认选中蓝色，也可点击颜色按钮从预设色板选择其他颜色；选中的颜色会显示在标签名称旁。
+          新增标签默认选中蓝色；下拉框中的颜色按钮使用同一预设色板筛选标签，并与文字搜索叠加。清除颜色可恢复全部标签。
         </Typography.Paragraph>
         <Alert style={{ marginTop: 20 }} type="info"
           message={`当前选中：${value.length ? value.join('、') : '暂无'}`} />
       </Card>
-      <Card title="非编辑模式（不启用颜色选择）" style={{ maxWidth: 600 }}>
+      <Card title="非编辑模式（不启用颜色筛选）" style={{ maxWidth: 600 }}>
         <Typography.Paragraph type="secondary">
-          不传 colorOptions 时不会显示颜色选择器；本示例只保留搜索和多选能力，也不传新增、编辑、删除回调。
+          不传 colorOptions 时不会显示颜色筛选；本示例只保留搜索和多选能力，也不传新增、编辑、删除回调。
         </Typography.Paragraph>
         <GroupedSelect
           groups={initialGroups}
@@ -200,13 +202,19 @@ export default function GroupedSelectDemo() {
       </Card>
       <Card title="远程搜索（模拟接口）" style={{ maxWidth: 600 }}>
         <Typography.Paragraph type="secondary">
-          搜索请求延迟 320ms，输入防抖 250ms；连续输入会取消过期请求。可以在下拉框中异步添加分组、标签，然后再次搜索新内容；已选的 A-1 跨搜索结果仍会显示名称。
+          搜索请求延迟 320ms，输入防抖 250ms；蓝色筛选通过自定义规则同时包含浅蓝标签。已选的 A-1 跨搜索结果仍会显示名称。
         </Typography.Paragraph>
         <GroupedSelect
           groups={remoteGroups}
           value={remoteValue}
           onChange={setRemoteValue}
           selectedOptions={initialSelectedOptions}
+          colorOptions={['#1677ff', '#52c41a', '#722ed1']}
+          colorFilter={(option, selectedColor) => {
+            const optionColor = option.color?.toLowerCase();
+            const color = selectedColor.toLowerCase();
+            return optionColor === color || (color === '#1677ff' && optionColor === '#91caff');
+          }}
           searchMode="remote"
           searchLoading={remoteLoading}
           onSearchChange={(keyword) => {
@@ -217,8 +225,8 @@ export default function GroupedSelectDemo() {
             const saved = await mockCreateGroup(label);
             setRemoteCatalog((current) => [...current, saved]);
           }}
-          onAddOption={async (label, group) => {
-            const saved = await mockCreateOption(label);
+          onAddOption={async (label, group, color) => {
+            const saved = await mockCreateOption(label, color);
             setRemoteCatalog((current) => current.map((item) => item.id === group.id
               ? { ...item, options: [...item.options, saved] }
               : item));

@@ -1,4 +1,4 @@
-import { ColorPicker, type ColorPickerProps } from 'antd';
+import { Button, ColorPicker, type ColorPickerProps } from 'antd';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import type { GroupedSelectColor } from './utils';
@@ -37,6 +37,14 @@ export function GroupedSelectColorPicker({
       onClick={(event) => event.stopPropagation()}
     >
       <components.Presets />
+      {value && (
+        <div className="xc-grouped-select__color-picker-actions">
+          <Button type="text" size="small" onClick={() => {
+            onChange(undefined);
+            setOpen(false);
+          }}>清除颜色</Button>
+        </div>
+      )}
     </div>
   );
 
@@ -54,7 +62,6 @@ export function GroupedSelectColorPicker({
         open={open}
         onOpenChange={setOpen}
         presets={[{ label: '可选颜色', colors: presetColors }]}
-        allowClear
         size={size}
         showText={false}
         panelRender={panelRender}
@@ -62,7 +69,6 @@ export function GroupedSelectColorPicker({
         aria-label={ariaLabel}
         getPopupContainer={(trigger) => trigger.ownerDocument.body}
         onChange={(color) => onChange(color.toHexString())}
-        onClear={() => onChange(undefined)}
       />
     </span>
   );
@@ -85,6 +91,28 @@ export function GroupedSelectColorSwatch({
         />
       )}
       <span>{label}</span>
+    </span>
+  );
+}
+
+export function GroupedSelectColorFilterControl({
+  colors,
+  value,
+  onChange,
+}: {
+  colors: GroupedSelectColor[];
+  value?: string;
+  onChange: (color: string | undefined) => void;
+}) {
+  if (!colors.length) return null;
+  return (
+    <span className="xc-grouped-select__color-filter" title="按颜色筛选">
+      <GroupedSelectColorPicker
+        colors={colors}
+        value={value}
+        onChange={onChange}
+        ariaLabel="按颜色筛选"
+      />
     </span>
   );
 }
