@@ -20,12 +20,28 @@ export interface GroupedSelectGroup {
   options: GroupedSelectOption[];
 }
 
+export type GroupedSelectColorFilter = (
+  option: GroupedSelectOption,
+  selectedColor: string,
+  group: GroupedSelectGroup,
+) => boolean;
+
+const defaultColorFilter: GroupedSelectColorFilter = (option, selectedColor) =>
+  option.color?.toLowerCase() === selectedColor.toLowerCase();
+
 export function getVisibleGroupedSelectGroups(
   groups: GroupedSelectGroup[],
   search: string,
   mode: 'local' | 'remote',
+  selectedColor?: string,
+  colorFilter: GroupedSelectColorFilter = defaultColorFilter,
 ) {
-  return mode === 'remote' ? groups : filterGroupedSelectGroups(groups, search);
+  const searchedGroups = mode === 'remote' ? groups : filterGroupedSelectGroups(groups, search);
+  if (!selectedColor) return searchedGroups;
+  return searchedGroups.flatMap((group) => {
+    const options = group.options.filter((option) => colorFilter(option, selectedColor, group));
+    return options.length ? [{ ...group, options }] : [];
+  });
 }
 
 /** 保留远程结果之外的已选项标签；当前结果中的标签始终优先。 */
