@@ -89,6 +89,9 @@ const specificPropsData: Record<string, { prop: string; desc: string; type: stri
   time: [
     { prop: 'format', desc: '时间格式', type: 'string', default: "'HH:mm:ss'" },
   ],
+  timeRange: [
+    { prop: 'format', desc: '起止时间的展示与解析格式', type: 'string', default: "'HH:mm:ss'" },
+  ],
   checkbox: [
     { prop: 'layout', desc: '布局方向', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
   ],
@@ -108,7 +111,7 @@ const specificPropsData: Record<string, { prop: string; desc: string; type: stri
 const allValueTypes = [
   'text', 'password', 'textarea', 'digit', 'digitRange', 'money', 'percent',
   'progress', 'rate', 'slider', 'switch', 'color', 'second',
-  'date', 'dateTime', 'time', 'dateRange', 'fromNow',
+  'date', 'dateTime', 'time', 'timeRange', 'dateRange', 'fromNow',
   'select', 'radio', 'radioButton', 'checkbox', 'segmented',
   'cascader', 'treeSelect', 'tag', 'image', 'code', 'jsonCode',
 ]
@@ -141,7 +144,12 @@ const demos: DemoItem[] = [
   { label: '密码', valueType: 'password', defaultText: 'p@ssw0rd123' },
   { label: '文本域', valueType: 'textarea', defaultText: '这是一段较长的文本内容，可以折行展示。' },
   { label: '数字', valueType: 'digit', defaultText: 12345 },
-  { label: '数字范围', valueType: 'digitRange', defaultText: [10, 99] },
+  {
+    label: '最小值 - 最大值',
+    valueType: 'digitRange',
+    defaultText: [10, 99],
+    fieldProps: { placeholder: ['最小值', '最大值'] },
+  },
   { label: '金额（CNY）', valueType: 'money', defaultText: 88888.88 },
   { label: '百分比', valueType: 'percent', defaultText: 23.45, fieldProps: { precision: 2 } },
   { label: '进度', valueType: 'progress', defaultText: 65 },
@@ -168,6 +176,7 @@ const demos: DemoItem[] = [
 function ProFieldDemo() {
   const [editMode, setEditMode] = useState(false)
   const mode = editMode ? 'edit' : 'read'
+  const [timeRange, setTimeRange] = useState<[string, string] | null>(['09:00', '18:00'])
 
   // 保存每个字段的当前值，编辑后可回显
   const [values, setValues] = useState<Record<string, any>>(() => {
@@ -237,7 +246,7 @@ function ProFieldDemo() {
       <Card title="字段总览">
         <Row gutter={[16, 16]}>
           {demos.map((item) => (
-            <Col span={8} key={item.valueType}>
+            <Col xs={24} md={12} xl={8} key={item.valueType}>
               <div
                 style={{
                   border: '1px solid #f0f0f0',
@@ -269,6 +278,79 @@ function ProFieldDemo() {
             </Col>
           ))}
         </Row>
+        <Card type="inner" title="最小值 - 最大值输入框（digitRange）" style={{ marginTop: 16 }}>
+          <Paragraph type="secondary">
+            两个 <Text code>InputNumber</Text> 分别输入最小值和最大值，通过 <Text code>value</Text> 与
+            <Text code>onChange</Text> 控制范围；失焦后会按从小到大排列。
+          </Paragraph>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={12}>
+              <Text strong>编辑</Text>
+              <div style={{ marginTop: 8 }}>
+                <TextField
+                  mode="edit"
+                  valueType="digitRange"
+                  value={values.digitRange}
+                  onChange={handleChange('digitRange')}
+                  fieldProps={{ placeholder: ['最小值', '最大值'] }}
+                />
+              </div>
+            </Col>
+            <Col xs={24} md={12}>
+              <Text strong>只读回显</Text>
+              <div style={{ marginTop: 8 }}>
+                <TextField mode="read" valueType="digitRange" text={values.digitRange} />
+              </div>
+            </Col>
+          </Row>
+          <Space style={{ marginTop: 16 }} wrap>
+            <Button
+              size="small"
+              onClick={() => setValues((previous) => ({ ...previous, digitRange: [10, 99] }))}
+            >
+              恢复示例值
+            </Button>
+            <Text type="secondary">
+              当前值：{Array.isArray(values.digitRange)
+                ? `[${values.digitRange.map((value: number | null | undefined) => value ?? '空').join(', ')}]`
+                : '空'}
+            </Text>
+          </Space>
+        </Card>
+        {/* 时间范围的受控编辑与只读回显 */}
+        <Card type="inner" title="时间范围选择器（timeRange）" style={{ marginTop: 16 }}>
+          <Paragraph type="secondary">
+            基于 <Text code>TimePicker.RangePicker</Text>。通过 <Text code>value</Text> 传入起止时间字符串，
+            选择时 <Text code>onChange</Text> 的第二个参数返回格式化后的时间数组；清空时可能为 null，只读视图显示空值。
+          </Paragraph>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={12}>
+              <Text strong>编辑</Text>
+              <div style={{ marginTop: 8 }}>
+                <TextField
+                  mode="edit"
+                  valueType="timeRange"
+                  format="HH:mm"
+                  value={timeRange}
+                  onChange={(_times: unknown, formatted?: [string, string] | null) => {
+                    setTimeRange(formatted?.[0] && formatted?.[1] ? formatted : null)
+                  }}
+                  fieldProps={{ placeholder: ['开始时间', '结束时间'], minuteStep: 15 }}
+                />
+              </div>
+            </Col>
+            <Col xs={24} md={12}>
+              <Text strong>只读回显</Text>
+              <div style={{ marginTop: 8 }}>
+                <TextField mode="read" valueType="timeRange" format="HH:mm" text={timeRange} />
+              </div>
+            </Col>
+          </Row>
+          <Space style={{ marginTop: 16 }} wrap>
+            <Button size="small" onClick={() => setTimeRange(['09:00', '18:00'])}>恢复示例值</Button>
+            <Text type="secondary">当前值：{timeRange ? JSON.stringify(timeRange) : '空'}</Text>
+          </Space>
+        </Card>
       </Card>
 
       {/* 公共 Props 配置表 */}

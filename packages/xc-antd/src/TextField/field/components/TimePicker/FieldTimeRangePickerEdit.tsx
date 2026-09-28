@@ -28,19 +28,30 @@ export function FieldTimeRangePickerEdit(
     variant,
     finalFormat,
   } = props;
-
-  const dayValue = parseValueToDay(
-    fieldProps.value,
-    finalFormat,
-  ) as dayjs.Dayjs[];
+  const { value, defaultValue, ...pickerProps } = fieldProps;
+  const dayValue =
+    value === undefined
+      ? undefined
+      : (parseValueToDay(value, finalFormat) as dayjs.Dayjs[] | null);
+  const initialValue = defaultValue === undefined ? text : defaultValue;
+  const defaultDayValue =
+    value === undefined && Array.isArray(initialValue) && initialValue.length
+      ? (parseValueToDay(initialValue, finalFormat) as dayjs.Dayjs[])
+      : undefined;
+  const rangeValueProps =
+    value === undefined
+      ? defaultDayValue === undefined
+        ? {}
+        : { defaultValue: defaultDayValue }
+      : { value: dayValue };
 
   const dom = (
     <TimePicker.RangePicker
       ref={ref as React.Ref<any>}
       format={format}
-      {...fieldProps}
+      {...pickerProps}
       variant={variant ?? fieldProps?.variant}
-      value={dayValue}
+      {...rangeValueProps}
     />
   );
 

@@ -1,6 +1,6 @@
 import { useControlledState } from '@rc-component/util';
 import { theme } from 'antd';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback } from 'react';
 import {
   isProFieldEditOrUpdateMode,
   isProFieldReadMode,
@@ -11,6 +11,9 @@ import { FieldDigitRangeRead } from './FieldDigitRangeRead';
 import type { FieldDigitRangeProps, ValuePair } from './types';
 
 export type { FieldDigitRangeProps, Value, ValuePair } from './types';
+
+const DigitRangeEdit = React.forwardRef(FieldDigitRangeEdit);
+const DigitRangeRead = React.forwardRef(FieldDigitRangeRead);
 
 /**
  * 数字范围组件
@@ -29,48 +32,40 @@ const FieldDigitRange: ProFieldFC<FieldDigitRangeProps> = (
   ref,
 ) => {
   const { value, defaultValue, onChange } = fieldProps;
-  
-
+  const initialValue =
+    defaultValue === undefined
+      ? Array.isArray(text)
+        ? text
+        : undefined
+      : defaultValue;
   const { token } = theme.useToken();
-  const [valuePair, setValuePairInner] = useControlledState(
-    () => defaultValue,
+  const [valuePair, setValuePairInner] = useControlledState<
+    ValuePair | null | undefined
+  >(
+    () => initialValue,
     value,
   );
   const setValuePair = useCallback(
-    (
-      updater:
-        | ValuePair
-        | undefined
-        | ((prev: ValuePair | undefined) => ValuePair | undefined),
-    ) => {
-      setValuePairInner((prev: ValuePair | undefined) => {
-        const next =
-          typeof updater === 'function'
-            ? (updater as (p: ValuePair | undefined) => ValuePair | undefined)(
-                prev,
-              )
-            : updater;
-        onChange?.(next);
-        return next;
-      });
+    (next: ValuePair | undefined) => {
+      setValuePairInner(next);
+      onChange?.(next);
     },
-    [onChange],
+    [onChange, setValuePairInner],
   );
-  const valuePairRef = useRef(valuePair);
 
   if (isProFieldReadMode(type)) {
-    return FieldDigitRangeRead(
-      {
-        text,
-        mode: type,
-        render,
-        placeholder,
-        formItemRender,
-        fieldProps,
-        separator,
-        separatorWidth,
-      },
-      ref,
+    return (
+      <DigitRangeRead
+        text={text}
+        mode={type}
+        render={render}
+        placeholder={placeholder}
+        formItemRender={formItemRender}
+        fieldProps={fieldProps}
+        separator={separator}
+        separatorWidth={separatorWidth}
+        ref={ref}
+      />
     );
   }
 
@@ -81,23 +76,22 @@ const FieldDigitRange: ProFieldFC<FieldDigitRangeProps> = (
         '请输入',
       ];
 
-    return FieldDigitRangeEdit(
-      {
-        text,
-        mode: type,
-        render,
-        placeholder,
-        formItemRender,
-        fieldProps,
-        separator,
-        separatorWidth,
-        valuePair,
-        valuePairRef,
-        setValuePair,
-        token,
-        placeholderValue,
-      },
-      ref,
+    return (
+      <DigitRangeEdit
+        text={text}
+        mode={type}
+        render={render}
+        placeholder={placeholder}
+        formItemRender={formItemRender}
+        fieldProps={fieldProps}
+        separator={separator}
+        separatorWidth={separatorWidth}
+        valuePair={valuePair}
+        setValuePair={setValuePair}
+        token={token}
+        placeholderValue={placeholderValue}
+        ref={ref}
+      />
     );
   }
   return null;
