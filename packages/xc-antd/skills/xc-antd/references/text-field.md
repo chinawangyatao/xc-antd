@@ -6,7 +6,7 @@ Use `TextField` when one value needs consistent read/edit rendering selected by 
 
 - Public types: `packages/xc-antd/src/TextField/field/types.ts`
 - Value-type union: `packages/xc-antd/src/TextField/utils/typing.ts`
-- Live example: `apps/docs/src/pages/ProFieldDemo.tsx`
+- Live examples: `apps/docs/src/pages/ProFieldDemo.tsx` (type catalog) and `apps/docs/src/pages/TextFieldUsageDemo.tsx` (controlled usage)
 
 ## Core pattern
 

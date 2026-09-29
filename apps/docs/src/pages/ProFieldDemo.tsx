@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { Button, Card, Space, Switch, Typography, Row, Col, Divider, Table, Tag } from 'antd'
 import { TextField } from 'xc-antd'
+import { useNavigate } from 'react-router-dom'
 
 const { Title, Paragraph, Text } = Typography
 
@@ -174,6 +175,7 @@ const demos: DemoItem[] = [
 
 /* ==================== 组件 ==================== */
 function ProFieldDemo() {
+  const navigate = useNavigate()
   const [editMode, setEditMode] = useState(false)
   const mode = editMode ? 'edit' : 'read'
   const [timeRange, setTimeRange] = useState<[string, string] | null>(['09:00', '18:00'])
@@ -239,6 +241,7 @@ function ProFieldDemo() {
           <Switch checked={editMode} onChange={setEditMode} />
           <Text type="secondary">当前模式：{mode}</Text>
           <Button size="small" onClick={handleReset}>重置数据</Button>
+          <Button size="small" onClick={() => navigate('/text-field-usage')}>查看使用示例</Button>
         </Space>
       </Card>
 
