@@ -38,10 +38,23 @@ export function FieldTimeRangePickerLightEdit(
     setOpen,
   } = props;
 
-  const dayValue = parseValueToDay(
-    fieldProps.value,
-    finalFormat,
-  ) as dayjs.Dayjs[];
+  const { value, defaultValue, ...pickerProps } = fieldProps;
+  const dayValue =
+    value === undefined
+      ? undefined
+      : (parseValueToDay(value, finalFormat) as dayjs.Dayjs[] | null);
+  const initialValue = defaultValue === undefined ? text : defaultValue;
+  const defaultDayValue =
+    value === undefined && Array.isArray(initialValue) && initialValue.length
+      ? (parseValueToDay(initialValue, finalFormat) as dayjs.Dayjs[])
+      : undefined;
+  const shownValue = value === undefined ? defaultDayValue : dayValue;
+  const rangeValueProps =
+    value === undefined
+      ? defaultDayValue === undefined
+        ? {}
+        : { defaultValue: defaultDayValue }
+      : { value: dayValue };
 
   const {
     disabled,
@@ -61,7 +74,7 @@ export function FieldTimeRangePickerLightEdit(
     <FieldLabel
       onClick={handleLabelClick}
       style={
-        dayValue
+        shownValue
           ? {
               paddingInlineEnd: 0,
             }
@@ -72,14 +85,14 @@ export function FieldTimeRangePickerLightEdit(
       variant={variant}
       placeholder={placeholder}
       value={
-        dayValue || open ? (
+        shownValue || open ? (
           <TimePicker.RangePicker
             format={format}
             ref={ref as React.Ref<any>}
-            {...fieldProps}
+            {...pickerProps}
             variant={variant ?? fieldProps?.variant}
             placeholder={placeholder}
-            value={dayValue}
+            {...rangeValueProps}
             onOpenChange={(isOpen) => {
               setOpen(isOpen);
               fieldProps?.onOpenChange?.(isOpen);
@@ -88,7 +101,7 @@ export function FieldTimeRangePickerLightEdit(
           />
         ) : null
       }
-      downIcon={dayValue || open ? false : undefined}
+      downIcon={shownValue || open ? false : undefined}
       allowClear={false}
       ref={lightLabel}
     />

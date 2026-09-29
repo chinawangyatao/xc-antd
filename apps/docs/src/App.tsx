@@ -3,6 +3,7 @@ import { Button, Drawer, Grid, Layout, Menu, type MenuProps } from 'antd'
 import { HomeOutlined, AppstoreOutlined, EnvironmentOutlined, ExportOutlined, FormOutlined, MenuOutlined, PictureOutlined, PlaySquareOutlined, ProfileOutlined, QrcodeOutlined, SafetyCertificateOutlined, TableOutlined } from '@ant-design/icons'
 import Home from './pages/Home'
 import ProFieldDemo from './pages/ProFieldDemo'
+import TextFieldUsageDemo from './pages/TextFieldUsageDemo'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Table from "./pages/Table.tsx";
 import CrudTableDemo from './pages/CrudTableDemo'
@@ -30,6 +31,7 @@ const menuItems: MenuProps['items'] = [
     label: '展示类',
     children: [
       { key: '/pro-field', icon: <AppstoreOutlined />, label: 'TextField' },
+      { key: '/text-field-usage', icon: <FormOutlined />, label: 'TextField 使用示例' },
       { key: '/sensitive-data', icon: <SafetyCertificateOutlined />, label: 'SensitiveData' },
       { key: '/qr-code', icon: <QrcodeOutlined />, label: 'QRCode' },
     ],
@@ -71,6 +73,7 @@ const menuItems: MenuProps['items'] = [
 
 const menuCategoryByPath: Record<string, string> = {
   '/pro-field': 'display',
+  '/text-field-usage': 'display',
   '/sensitive-data': 'display',
   '/qr-code': 'display',
   '/table': 'data',
@@ -105,9 +108,10 @@ function App() {
   const selectedKeys = [location.pathname]
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ height: '100%', minHeight: 0, overflow: 'hidden' }}>
       <Header
         style={{
+          flex: '0 0 64px',
           display: 'flex',
           alignItems: 'center',
           background: '#fff',
@@ -137,10 +141,10 @@ function App() {
           基于 Ant Design 的二次封装组件库
         </span>}
       </Header>
-      <Layout>
+      <Layout style={{ flex: '1 1 0', minHeight: 0, overflow: 'hidden' }}>
         {!isMobile && <Sider
           width={220}
-          style={{ background: '#fff', borderRight: '1px solid #f0f0f0' }}
+          style={{ background: '#fff', borderRight: '1px solid #f0f0f0', overflowY: 'auto' }}
         >
           <Menu
             mode="inline"
@@ -170,15 +174,20 @@ function App() {
           />
         </Drawer>
         <Content
+          key={location.pathname}
           style={{
             padding: isMobile ? 12 : 24,
             background: '#f5f5f5',
-            overflow: 'auto',
+            minWidth: 0,
+            minHeight: 0,
+            overflowX: 'hidden',
+            overflowY: 'auto',
           }}
         >
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/pro-field" element={<ProFieldDemo />} />
+            <Route path="/text-field-usage" element={<TextFieldUsageDemo />} />
             <Route path="/table" element={<Table />} />
             <Route path="/crud-table" element={<CrudTableDemo />} />
             <Route path="/action-overlay" element={<ActionOverlayDemo />} />

@@ -1,18 +1,11 @@
 ﻿import { Input, InputNumber, Space } from 'antd';
 import React from 'react';
-import type { MutableRefObject } from 'react';
 import type { ProFieldFC } from '../../types';
 import type { FieldDigitRangeProps, Value, ValuePair } from './types';
 
 type Props = Parameters<ProFieldFC<FieldDigitRangeProps>>[0] & {
-  valuePair: ValuePair | undefined;
-  valuePairRef: MutableRefObject<ValuePair | undefined>;
-  setValuePair: (
-    updater:
-      | ValuePair
-      | undefined
-      | ((prev: ValuePair | undefined) => ValuePair | undefined),
-  ) => void;
+  valuePair: ValuePair | null | undefined;
+  setValuePair: (next: ValuePair | undefined) => void;
   token: { colorBgContainer?: string };
   placeholderValue: string | string[];
 };
@@ -26,16 +19,25 @@ export function FieldDigitRangeEdit(props: Props, _ref: React.Ref<unknown>) {
     separator = '~',
     separatorWidth = 30,
     valuePair,
-    valuePairRef,
     setValuePair,
     token,
     placeholderValue,
   } = props;
-  const { defaultValue, id } = fieldProps;
+  const {
+    id,
+    value: _rangeValue,
+    defaultValue: _rangeDefaultValue,
+    onChange: _rangeOnChange,
+    placeholder: _rangePlaceholder,
+    ...inputProps
+  } = fieldProps;
 
-  const handleGroupBlur = () => {
-    if (Array.isArray(valuePairRef.current)) {
-      const [value0, value1] = valuePairRef.current;
+  const handleGroupBlur = (event: React.FocusEvent<HTMLElement>) => {
+    if (event.relatedTarget && event.currentTarget.contains(event.relatedTarget)) {
+      return;
+    }
+    if (Array.isArray(valuePair)) {
+      const [value0, value1] = valuePair;
       if (
         typeof value0 === 'number' &&
         typeof value1 === 'number' &&
@@ -54,7 +56,6 @@ export function FieldDigitRangeEdit(props: Props, _ref: React.Ref<unknown>) {
   const handleChange = (index: number, changedValue: Value) => {
     const newValuePair = [...(valuePair || [])];
     newValuePair[index] = changedValue === null ? undefined : changedValue;
-    valuePairRef.current = newValuePair;
     setValuePair(newValuePair);
   };
 
@@ -64,18 +65,18 @@ export function FieldDigitRangeEdit(props: Props, _ref: React.Ref<unknown>) {
       : placeholderValue;
 
   const dom = (
-    <Space.Compact block onBlur={handleGroupBlur}>
+    <Space.Compact block style={{ minWidth: 0 }} onBlur={handleGroupBlur}>
       <InputNumber<number>
-        {...fieldProps}
+        {...inputProps}
         placeholder={getInputNumberPlaceholder(0)}
-        id={id ?? `${id}-0`}
-        style={{ width: `calc((100% - ${separatorWidth}px) / 2)` }}
-        value={valuePair?.[0]}
-        defaultValue={defaultValue?.[0]}
+        id={id ? `${id}-min` : undefined}
+        style={{ flex: '1 1 0', minWidth: 0 }}
+        value={valuePair === null ? null : valuePair?.[0]}
         onChange={(changedValue) => handleChange(0, changedValue)}
       />
       <Input
         style={{
+          flex: `0 0 ${separatorWidth}px`,
           width: separatorWidth,
           textAlign: 'center',
           borderInlineStart: 0,
@@ -87,15 +88,15 @@ export function FieldDigitRangeEdit(props: Props, _ref: React.Ref<unknown>) {
         disabled
       />
       <InputNumber<number>
-        {...fieldProps}
+        {...inputProps}
         placeholder={getInputNumberPlaceholder(1)}
-        id={id ?? `${id}-1`}
+        id={id ? `${id}-max` : undefined}
         style={{
-          width: `calc((100% - ${separatorWidth}px) / 2)`,
-          borderInlineStart: 0,
+          flex: '1 1 0',
+          minWidth: 0,
+          // borderInlineStart: 0,
         }}
-        value={valuePair?.[1]}
-        defaultValue={defaultValue?.[1]}
+        value={valuePair === null ? null : valuePair?.[1]}
         onChange={(changedValue) => handleChange(1, changedValue)}
       />
     </Space.Compact>

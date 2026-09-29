@@ -8,16 +8,29 @@ export function FieldDigitRangeRead(
 ) {
   const { text, mode: type, render, fieldProps, separator = '~' } = props;
   const getContent = (number: Value) => {
+    if (number === null || number === undefined || number === '') {
+      return '-';
+    }
+    const numericValue = Number(number);
+    if (!Number.isFinite(numericValue)) {
+      return '-';
+    }
     const digit = new Intl.NumberFormat(undefined, {
-      minimumSignificantDigits: 2,
       ...(fieldProps?.intlProps || {}),
-    }).format(Number(number) as number);
+    }).format(numericValue);
 
     return fieldProps?.formatter?.(digit) || digit;
   };
+  const [start, end] = Array.isArray(text) ? text : [];
+  const startContent = getContent(start);
+  const endContent = getContent(end);
+  const content =
+    startContent === '-' && endContent === '-'
+      ? '-'
+      : `${startContent} ${separator} ${endContent}`;
   const dom = (
     <span ref={ref as React.Ref<HTMLSpanElement>}>
-      {getContent(text[0])} {separator} {getContent(text[1])}
+      {content}
     </span>
   );
   if (render) {
