@@ -1,5 +1,5 @@
 import {useState, type CSSProperties, type Dispatch, type ReactNode, type SetStateAction} from 'react'
-import {Alert, Button, Card, Modal, Popconfirm, Tag, Tooltip, Typography} from 'antd'
+import {Alert, Button, Card, Form, Modal, Popconfirm, Tag, Tooltip, Typography} from 'antd'
 import {DeleteOutlined, EditOutlined, PlusOutlined, SettingOutlined} from '@ant-design/icons'
 import {TextField} from 'xc-antd'
 import {getBatchDates, getOtherTimeRanges, pricePeriods} from './ticketRuleUtils'
@@ -18,10 +18,10 @@ const priceRowClass = `${priceGridClass} border border-[#e5e5e5] p-2 [&_.ant-rad
 const dayGridCheckboxClass = [
     'grid! w-full grid-cols-7 gap-0 border-l border-t border-[#d9d9d9]',
     '[&_.ant-checkbox-wrapper]:m-0 [&_.ant-checkbox-wrapper]:flex [&_.ant-checkbox-wrapper]:min-h-[46px]',
-    '[&_.ant-checkbox-wrapper]:items-center [&_.ant-checkbox-wrapper]:justify-center',
+    '[&_.ant-checkbox-wrapper]:items-center! [&_.ant-checkbox-wrapper]:justify-center!',
     '[&_.ant-checkbox-wrapper]:border-r [&_.ant-checkbox-wrapper]:border-b [&_.ant-checkbox-wrapper]:border-[#d9d9d9]',
     '[&_.ant-checkbox]:absolute [&_.ant-checkbox]:size-px [&_.ant-checkbox]:opacity-0',
-    '[&_.ant-checkbox-wrapper>span:last-child]:p-0 [&_.ant-checkbox-wrapper>span:last-child]:whitespace-nowrap',
+    '[&_.ant-checkbox-wrapper>span:last-child]:p-0! [&_.ant-checkbox-wrapper>span:last-child]:whitespace-nowrap',
     '[&_.ant-checkbox-wrapper-checked]:bg-[#1677ff] [&_.ant-checkbox-wrapper-checked]:text-white!',
     '[&_.ant-checkbox-wrapper:focus-within]:outline-2 [&_.ant-checkbox-wrapper:focus-within]:outline-offset-[-2px]',
     '[&_.ant-checkbox-wrapper:focus-within]:outline-[#0958d9]',
@@ -120,7 +120,7 @@ function AddedTags({values, options, onRemove, invalidValues = []}: {
     invalidValues?: string[]
 }) {
     const labels = new Map(options)
-    return <div className="grid w-full gap-2">
+    return <div className="grid w-full min-w-0 grid-cols-1 gap-2">
         <Typography.Text type="secondary">已添加：</Typography.Text>
         <div className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-2">{values.length ? values.map((value) =>
             <Tag key={value} className="m-0 max-w-full break-all whitespace-normal px-2 py-1" color={invalidValues.includes(value) ? 'orange' : undefined}
@@ -517,21 +517,32 @@ interface RuleTemplate {
     content: string
 }
 
-function TemplatePicker({label, initialContent}: { label: string; initialContent: string }) {
+function TemplatePicker({label, initialContent, value, onChange, showLabel = true}: {
+    label: string
+    initialContent: string
+    value?: string | null
+    onChange?: (value: string | null) => void
+    showLabel?: boolean
+}) {
     const [templates, setTemplates] = useState<RuleTemplate[]>([
         {id: 'template1', label: '模板A-1', content: initialContent},
         {id: 'template2', label: '模板A-2', content: initialContent},
     ])
     const [selected, setSelected] = useState<string | null>('template1')
+    const selectedId = value === undefined ? selected : value
+    const selectTemplate = (id: string | null) => {
+        setSelected(id)
+        onChange?.(id)
+    }
     const [editing, setEditing] = useState<{ id: string | null; label: string; content: string } | null>(null)
     const canSave = Boolean(editing?.label.trim() && editing.content.trim()) &&
         !templates.some((template) => template.id !== editing?.id && template.label === editing?.label.trim())
     return <div className="grid w-full grid-cols-1 gap-3">
-        <FieldRow><Typography.Text strong>{label}</Typography.Text>
+        <FieldRow>{showLabel && <Typography.Text strong>{label}</Typography.Text>}
             <Button type="link" icon={<PlusOutlined/>}
                     onClick={() => setEditing({id: null, label: '', content: initialContent})}>新增模板</Button>
         </FieldRow>
-        <TextField mode="edit" valueType="select" value={selected} onChange={setSelected}
+        <TextField mode="edit" valueType="select" value={selectedId} onChange={selectTemplate}
                    fieldProps={{
                        options: templates.map((template) => ({value: template.id, label: template.label})),
                        showSearch: true, optionFilterProp: 'label', allowClear: true, style: {width: '100%'},
@@ -548,14 +559,14 @@ function TemplatePicker({label, initialContent}: { label: string; initialContent
                                               }}/></Tooltip>
             <Popconfirm title="删除此模板？" okText="删除" cancelText="取消" onConfirm={() => {
                 setTemplates((current) => current.filter((item) => item.id !== option.value))
-                if (selected === option.value) setSelected(null)
+                if (selectedId === option.value) selectTemplate(null)
             }}><Tooltip title="删除模板"><Button type="text" danger size="small" aria-label={`删除${option.label}`}
                                                  icon={<DeleteOutlined/>}/></Tooltip></Popconfirm>
           </span>
                        </div>,
                    }}/>
-        {selected && <TextField mode="read" valueType="textarea"
-                                text={templates.find((item) => item.id === selected)?.content}/>}
+        {selectedId && <TextField mode="read" valueType="textarea"
+                                text={templates.find((item) => item.id === selectedId)?.content}/>}
         <Modal open={Boolean(editing)} title={`${editing?.id ? '编辑' : '新增'}${label}`}
                onCancel={() => setEditing(null)}
                footer={<FieldRow><Button type="primary" disabled={!canSave} onClick={() => {
@@ -566,7 +577,7 @@ function TemplatePicker({label, initialContent}: { label: string; initialContent
                        content: editing.content.trim()
                    }
                    setTemplates((current) => editing.id ? current.map((item) => item.id === editing.id ? next : item) : [...current, next])
-                   setSelected(next.id)
+                   selectTemplate(next.id)
                    setEditing(null)
                }}>保存</Button><Button onClick={() => setEditing(null)}>取消</Button></FieldRow>}>
             <div className="grid w-full grid-cols-1 gap-3 [&>label]:grid [&>label]:gap-1.5">
@@ -588,9 +599,33 @@ function TemplatePicker({label, initialContent}: { label: string; initialContent
     </div>
 }
 
+function RefundConditionEditor({value, onChange, options, days, times, onDaysChange, onTimeChange}: {
+    value?: string
+    onChange?: (value: string) => void
+    options: Choices
+    days: Record<string, number | null>
+    times: Record<string, string>
+    onDaysChange: (key: string, value: number | null) => void
+    onTimeChange: (key: string, value: string) => void
+}) {
+    return <div className="grid gap-3">
+        {options.map(([key, label]) => <FieldRow key={key}>
+            <TextField mode="edit" valueType="checkbox" value={value === key ? [key] : []}
+                       onChange={(next: string[]) => onChange?.(next.length ? key : '')}
+                       valueEnum={{[key]: {text: label}}}/>
+            <DigitField value={days[key]} onChange={(next) => onDaysChange(key, next)} min={0}
+                        width={86} disabled={value !== key}/>
+            <span>天的</span>
+            <TimeOfDayField value={times[key]} onChange={(next) => onTimeChange(key, next)} disabled={value !== key}/>
+            <span>前可退</span>
+        </FieldRow>)}
+    </div>
+}
+
 function RefundLimitCard() {
+    const [form] = Form.useForm<{condition: string}>()
     const [mode, setMode] = useState('conditional')
-    const [condition, setCondition] = useState('beforeStart')
+    const [validated, setValidated] = useState(false)
     const [values, setValues] = useState<Record<string, number | null>>({beforeStart: 1, beforeUse: 1, afterEnd: 1})
     const [times, setTimes] = useState<Record<string, string>>({
         beforeStart: '23:59',
@@ -604,26 +639,27 @@ function RefundLimitCard() {
     ] as const
     return <RuleCard id="refund-limit" title="退订限制"
                      hint="不可退、随时退、有条件退三种模式；有条件退只允许选择一个时间条件。">
-        <Choice value={mode} onChange={setMode} options={[
-            ['never', '不可退'], ['anytime', '随时退'], ['conditional', '有条件退'],
-        ]}/>
-        {mode === 'conditional' && <div className={subpanelClass}>
-            <Typography.Text strong>* 退订条件（单选）</Typography.Text>
-            {conditionOptions.map(([value, label]) => <FieldRow key={value}>
-                <TextField mode="edit" valueType="checkbox" value={condition === value ? [value] : []}
-                           onChange={(next: string[]) => {
-                               if (next.length) setCondition(value)
-                           }}
-                           valueEnum={{[value]: {text: label}}}/>
-                <DigitField value={values[value]}
-                            onChange={(next) => setValues((current) => ({...current, [value]: next}))} min={0}
-                            width={86} disabled={condition !== value}/>
-                <span>天的</span><TimeOfDayField value={times[value]} onChange={(next) => setTimes((current) => ({
-                ...current,
-                [value]: next
-            }))} disabled={condition !== value}/><span>前可退</span>
-            </FieldRow>)}
-        </div>}
+        <Form form={form} layout="vertical" initialValues={{condition: 'beforeStart'}}
+              onFinish={() => setValidated(true)} onValuesChange={() => setValidated(false)}
+              className="grid w-full min-w-0 grid-cols-1 gap-3">
+            <Choice value={mode} onChange={(next) => {setMode(next); setValidated(false)}} options={[
+                ['never', '不可退'], ['anytime', '随时退'], ['conditional', '有条件退'],
+            ]}/>
+            {mode === 'conditional' && <div className={subpanelClass}>
+                <Form.Item name="condition" label="退订条件（单选）" required className="mb-0!"
+                           rules={[{validator: async (_, condition: string) => {
+                               if (!condition) throw new Error('请选择退订条件')
+                               if (values[condition] === null) throw new Error('请填写退订提前天数')
+                               if (!times[condition]) throw new Error('请选择退订截止时间')
+                           }}]}>
+                    <RefundConditionEditor options={conditionOptions} days={values} times={times}
+                                           onDaysChange={(key, next) => {setValues((current) => ({...current, [key]: next})); setValidated(false)}}
+                                           onTimeChange={(key, next) => {setTimes((current) => ({...current, [key]: next})); setValidated(false)}}/>
+                </Form.Item>
+            </div>}
+            <Button className="justify-self-start" type="primary" htmlType="submit">校验设置</Button>
+            {validated && <Alert type="success" title="退订限制已校验"/>}
+        </Form>
     </RuleCard>
 }
 
@@ -713,6 +749,8 @@ function RefundFeeCard() {
 }
 
 function TicketCodeCard({ticketType, setTicketType}: { ticketType: string; setTicketType: (value: string) => void }) {
+    const [printForm] = Form.useForm<{template: string | null}>()
+    const [printValidated, setPrintValidated] = useState(false)
     const [paperMode, setPaperMode] = useState('precode')
     const [electronicMode, setElectronicMode] = useState('custom')
     const [generate, setGenerate] = useState('yes')
@@ -728,9 +766,15 @@ function TicketCodeCard({ticketType, setTicketType}: { ticketType: string; setTi
         <Choice value={ticketType} onChange={setTicketType} options={[
             ['electronic', '电子票'], ['paper', '纸质预制票'], ['print', '纸质机打票'],
         ]}/>
-        <div className={subpanelClass} hidden={ticketType !== 'print'}>
-            <TemplatePicker label="机打票模板" initialContent={'门票：{票名称}\n票号：{票号}'}/>
-        </div>
+        {ticketType === 'print' && <Form form={printForm} layout="vertical" initialValues={{template: 'template1'}}
+                                                onFinish={() => setPrintValidated(true)} onValuesChange={() => setPrintValidated(false)}
+                                                className={subpanelClass}>
+            <Form.Item name="template" label="机打票模板" rules={[{required: true, message: '请选择机打票模板'}]} className="mb-0!">
+                <TemplatePicker label="机打票模板" initialContent={'门票：{票名称}\n票号：{票号}'} showLabel={false}/>
+            </Form.Item>
+            <Button className="justify-self-start" type="primary" htmlType="submit">校验设置</Button>
+            {printValidated && <Alert type="success" title="机打票模板已校验"/>}
+        </Form>}
         {ticketType === 'paper' && <div className={subpanelClass}>
             <Typography.Text strong>预制票模式</Typography.Text><Choice value={paperMode} onChange={setPaperMode}
                                                                         options={[["precode", '预制码'], ['random', '任意码']]}/>
@@ -845,7 +889,12 @@ function ProductTimeCard() {
     </RuleCard>
 }
 
+const initialUsageValues = {
+    maxMode: 'limited', maxCount: 10, period: 1, periodUnit: 'day', periodQuantity: 365, perPeriod: 1,
+}
+
 function UsageCountCard() {
+    const [form] = Form.useForm()
     const [mode, setMode] = useState('many')
     const [maxMode, setMaxMode] = useState('limited')
     const [maxCount, setMaxCount] = useState<number | null>(10)
@@ -853,21 +902,52 @@ function UsageCountCard() {
     const [periodUnit, setPeriodUnit] = useState('day')
     const [periodQuantity, setPeriodQuantity] = useState<number | null>(365)
     const [perPeriod, setPerPeriod] = useState<number | null>(1)
+    const [validated, setValidated] = useState(false)
     return <RuleCard id="usage-count" title="产品使用次数" hint="可设置仅使用一次，或按周期允许多次使用。">
-        <Choice value={mode} onChange={setMode} options={[["once", '仅限使用1次'], ['many', '可使用多次']]}/>
-        {mode === 'many' && <>
-            <FieldRow><span>* 最大通行次数</span><Choice value={maxMode} onChange={setMaxMode}
-                                                         options={[["unlimited", '无限'], ['limited', '有限']]}/>
-                {maxMode === 'limited' && <DigitField value={maxCount} onChange={setMaxCount} min={1} width={180}
-                                                      placeholder="请设置最大通行次数"/>}</FieldRow>
-            <FieldRow><span>* 周期</span><DigitField value={period} onChange={setPeriod} min={1} width={180}/>
-                <SelectField value={periodUnit} onChange={(next) => setPeriodUnit(next as string)}
-                             options={[["day", '天'], ['hour', '时'], ['minute', '分']]} width={100}/></FieldRow>
-            <FieldRow><span>* 周期的数量</span><DigitField value={periodQuantity} onChange={setPeriodQuantity} min={1}
-                                                           width={180}/></FieldRow>
-            <FieldRow><span>* 单周期内最大使用次数</span><DigitField value={perPeriod} onChange={setPerPeriod} min={1}
-                                                                     width={180}/></FieldRow>
-        </>}
+        <Form form={form} layout="vertical" initialValues={initialUsageValues}
+              onValuesChange={(changed: Partial<typeof initialUsageValues>) => {
+                  setValidated(false)
+                  if (changed.maxMode) setMaxMode(changed.maxMode)
+                  if (changed.maxCount !== undefined) setMaxCount(changed.maxCount)
+                  if (changed.period !== undefined) setPeriod(changed.period)
+                  if (changed.periodUnit) setPeriodUnit(changed.periodUnit)
+                  if (changed.periodQuantity !== undefined) setPeriodQuantity(changed.periodQuantity)
+                  if (changed.perPeriod !== undefined) setPerPeriod(changed.perPeriod)
+              }} onFinish={() => setValidated(true)} className="grid w-full min-w-0 grid-cols-1 gap-3">
+            <Choice value={mode} onChange={(next) => {setMode(next); setValidated(false)}}
+                    options={[["once", '仅限使用1次'], ['many', '可使用多次']]}/>
+            {mode === 'many' && <>
+                <Form.Item label="最大通行次数" required className="mb-0!">
+                    <FieldRow>
+                        <Form.Item name="maxMode" noStyle rules={[{required: true, message: '请选择通行次数限制'}]}>
+                            <Choice value={maxMode} onChange={setMaxMode} options={[["unlimited", '无限'], ['limited', '有限']]}/>
+                        </Form.Item>
+                        {maxMode === 'limited' && <Form.Item name="maxCount" noStyle rules={[{required: true, message: '请输入最大通行次数'}]}>
+                            <DigitField value={maxCount} onChange={setMaxCount} min={1} width={180} placeholder="请设置最大通行次数"/>
+                        </Form.Item>}
+                    </FieldRow>
+                </Form.Item>
+                <Form.Item label="周期" required className="mb-0!">
+                    <FieldRow>
+                        <Form.Item name="period" noStyle rules={[{required: true, message: '请设置周期'}]}>
+                            <DigitField value={period} onChange={setPeriod} min={1} width={180}/>
+                        </Form.Item>
+                        <Form.Item name="periodUnit" noStyle rules={[{required: true, message: '请选择周期单位'}]}>
+                            <SelectField value={periodUnit} onChange={(next) => setPeriodUnit(next as string)}
+                                         options={[["day", '天'], ['hour', '时'], ['minute', '分']]} width={100}/>
+                        </Form.Item>
+                    </FieldRow>
+                </Form.Item>
+                <Form.Item name="periodQuantity" label="周期的数量" rules={[{required: true, message: '请设置周期的数量'}]} className="mb-0!">
+                    <DigitField value={periodQuantity} onChange={setPeriodQuantity} min={1} width={180}/>
+                </Form.Item>
+                <Form.Item name="perPeriod" label="单周期内最大使用次数" rules={[{required: true, message: '请设置单周期内最大使用次数'}]} className="mb-0!">
+                    <DigitField value={perPeriod} onChange={setPerPeriod} min={1} width={180}/>
+                </Form.Item>
+            </>}
+            <Button className="justify-self-start" type="primary" htmlType="submit">校验设置</Button>
+            {validated && <Alert type="success" title="产品使用次数已校验"/>}
+        </Form>
     </RuleCard>
 }
 
@@ -942,6 +1022,21 @@ interface BatchRange {
     range: [string, string] | null
 }
 
+function DateRangesField({value = [], onChange}: {
+    value?: BatchRange[]
+    onChange?: (value: BatchRange[]) => void
+}) {
+    return <div className="grid w-full min-w-0 grid-cols-1 gap-2">
+        {value.map((item) => <div key={item.id} className="inline-flex min-w-0 max-w-full items-center gap-1.5 [&_.ant-picker]:min-w-0 [&_.ant-picker]:flex-1">
+            <DateRangeField value={item.range} onChange={(range) => onChange?.(value.map((entry) => entry.id === item.id ? {...entry, range} : entry))}/>
+            {value.length > 1 && <Button type="text" danger icon={<DeleteOutlined/>} aria-label="删除日期段"
+                                         onClick={() => onChange?.(value.filter((entry) => entry.id !== item.id))}/>}
+        </div>)}
+        <Button className="justify-self-start" type="link" icon={<PlusOutlined/>}
+                onClick={() => onChange?.([...value, {id: Date.now(), range: null}])}>添加日期段</Button>
+    </div>
+}
+
 interface PriceRow {
     id: number;
     period: string;
@@ -974,15 +1069,42 @@ interface BatchSnapshot {
     otherPrice: PriceRow | null
 }
 
+interface BatchFormValues {
+    dateRanges: BatchRange[]
+    operation: string
+    selectedDates: string[]
+    selectedWeekdays: string[]
+    saleType: string
+    priceType: string
+    stockMode: string
+    stock: number | null
+    settlement: number | null
+}
+
+const initialBatchRanges: BatchRange[] = [
+    {id: 1, range: ['2024-11-26', '2024-12-31']},
+    {id: 2, range: ['2025-01-01', '2025-04-30']},
+]
+const initialBatchDays = ['3', '5', '10', '12', '17', '19', '24', '26', '31']
+const initialBatchValues: BatchFormValues = {
+    dateRanges: initialBatchRanges,
+    operation: 'number',
+    selectedDates: initialBatchDays,
+    selectedWeekdays: [],
+    saleType: 'sell',
+    priceType: 'fixed',
+    stockMode: 'limited',
+    stock: 2000,
+    settlement: 80,
+}
+
 function BatchSettingsCard() {
-    const [ranges, setRanges] = useState<BatchRange[]>([{id: 1, range: ['2024-11-26', '2024-12-31']}, {
-        id: 2,
-        range: ['2025-01-01', '2025-04-30']
-    }])
+    const [form] = Form.useForm<BatchFormValues>()
+    const [ranges, setRanges] = useState<BatchRange[]>(initialBatchRanges)
     const [operation, setOperation] = useState('number')
     const [saleType, setSaleType] = useState('sell')
     const [priceType, setPriceType] = useState('fixed')
-    const [selectedDates, setSelectedDates] = useState<string[]>(['3', '5', '10', '12', '17', '19', '24', '26', '31'])
+    const [selectedDates, setSelectedDates] = useState<string[]>(initialBatchDays)
     const [selectedWeekdays, setSelectedWeekdays] = useState<string[]>([])
     const [stockMode, setStockMode] = useState('limited')
     const [stock, setStock] = useState<number | null>(2000)
@@ -994,101 +1116,128 @@ function BatchSettingsCard() {
     const [otherPrice, setOtherPrice] = useState<PriceRow>(createOtherPrice)
     const [saved, setSaved] = useState<BatchSnapshot | null>(null)
     const days = Array.from({length: 31}, (_, index) => String(index + 1))
+    const weekdays = [
+        ['mon', '星期一'], ['tue', '星期二'], ['wed', '星期三'], ['thu', '星期四'],
+        ['fri', '星期五'], ['sat', '星期六'], ['sun', '星期日'],
+    ] as const
     const dates = getBatchDates(ranges.map((item) => item.range), operation, selectedDates, selectedWeekdays)
+    const periodPriceValid = prices.every((row) => Boolean(row.period) && row.settlement !== null && (row.stockMode !== 'limited' || row.stock !== null)) &&
+        (!sellOtherTimes || otherPrice.settlement !== null && (otherPrice.stockMode !== 'limited' || otherPrice.stock !== null))
     const canSave = ranges.every((item) => item.range) && dates.length > 0 && (saleType === 'stop' ||
-        (priceType === 'fixed' ? settlement !== null && (stockMode !== 'limited' || stock !== null) :
-            prices.every((row) => row.settlement !== null && (row.stockMode !== 'limited' || row.stock !== null)) &&
-            (!sellOtherTimes || otherPrice.settlement !== null && (otherPrice.stockMode !== 'limited' || otherPrice.stock !== null))))
+        (priceType === 'fixed' ? settlement !== null && (stockMode !== 'limited' || stock !== null) : periodPriceValid))
     const reset = () => {
-        setRanges([{id: 1, range: ['2024-11-26', '2024-12-31']}, {id: 2, range: ['2025-01-01', '2025-04-30']}])
-        setOperation('number');
-        setSelectedDates(['3', '5', '10', '12', '17', '19', '24', '26', '31']);
-        setSelectedWeekdays([])
-        setSaleType('sell');
-        setPriceType('fixed');
-        setStockMode('limited');
-        setStock(2000)
-        setCost(60);
-        setLinePrice(100);
-        setSettlement(80);
-        setPrices(createPriceRows());
-        setOtherPrice(createOtherPrice())
-        setSellOtherTimes(true);
-        setSaved(null)
+        setRanges(initialBatchRanges)
+        setOperation('number'); setSelectedDates(initialBatchDays); setSelectedWeekdays([])
+        setSaleType('sell'); setPriceType('fixed'); setStockMode('limited'); setStock(2000)
+        setCost(60); setLinePrice(100); setSettlement(80); setPrices(createPriceRows())
+        setOtherPrice(createOtherPrice()); setSellOtherTimes(true); setSaved(null)
+        form.resetFields()
     }
-    return <RuleCard id="batch-settings" title="批量设置"
-                     hint="按日期范围批量修改售卖类型、价格库存和结算价格。长图中的按号数、所有日期、按星期为同一页面的不同修改操作状态。">
-        <FieldRow><span>*日期范围</span>{ranges.map((item) => <div key={item.id} className="inline-flex min-w-0 max-w-full items-center gap-1.5 [&_.ant-picker]:min-w-0 [&_.ant-picker]:flex-1">
-            <DateRangeField value={item.range}
-                            onChange={(range) => setRanges((current) => current.map((entry) => entry.id === item.id ? {
-                                ...entry,
-                                range
-                            } : entry))}/>{ranges.length > 1 && <Button type="text" danger icon={<DeleteOutlined/>}
-                                                                        onClick={() => setRanges((current) => current.filter((entry) => entry.id !== item.id))}/>}
-        </div>)}<Button type="link" icon={<PlusOutlined/>} onClick={() => setRanges((current) => [...current, {
-            id: Date.now(),
-            range: null
-        }])}>添加日期段</Button></FieldRow>
-        <FieldRow><span>*修改操作</span><SelectField value={operation}
-                                                     onChange={(value) => setOperation(value as string)}
-                                                     options={[["number", '按号数'], ['all', '所有日期'], ['weekday', '按星期']]}
-                                                     width={460}/></FieldRow>
-        {operation === 'number' && <>
-            <div className="w-full max-w-[700px]"><CheckField value={selectedDates} onChange={setSelectedDates} dayGrid
-                                                         options={days.map((day) => [day, `${day}号`])}/></div>
-            <FieldRow><Button type="link" onClick={() => setSelectedDates(days)}>全选</Button><Button type="link"
-                                                                                                      onClick={() => setSelectedDates([])}>取消全选</Button><Typography.Text>保存时仅对选择的号数日期进行修改</Typography.Text></FieldRow></>}
-        {operation === 'weekday' && <><CheckField value={selectedWeekdays} onChange={setSelectedWeekdays}
-                                                  options={[["mon", '星期一'], ['tue', '星期二'], ['wed', '星期三'], ['thu', '星期四'], ['fri', '星期五'], ['sat', '星期六'], ['sun', '星期日']]}/><FieldRow><Button
-            type="link"
-            onClick={() => setSelectedWeekdays(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'])}>全选</Button><Button
-            type="link"
-            onClick={() => setSelectedWeekdays([])}>取消全选</Button><Typography.Text>保存时仅对选择星期的日期进行修改</Typography.Text></FieldRow></>}
-        <FieldRow><span>*售卖类型</span><Choice value={saleType} onChange={setSaleType}
-                                                options={[["sell", '可售'], ['stop', '禁止销售']]}/></FieldRow>
-        <FieldRow><span>*价格库存类型</span><Choice value={priceType} onChange={setPriceType}
-                                                    options={[["fixed", '全天固定价格和库存'], ['period', '多时段价格和库存']]}/></FieldRow>
-        {priceType === 'fixed' ? <div className="grid w-full gap-3">
-            <FieldRow><span>*日库存</span><Choice value={stockMode} onChange={setStockMode}
-                                                  options={[["unlimited", '无限'], ['limited', '有限']]}/>{stockMode === 'limited' &&
-                <DigitField value={stock} onChange={setStock} width={180}/>}</FieldRow>
-            <FieldRow><span>成本价格</span><DigitField value={cost} onChange={setCost} width={180}
-                                                       precision={2}/></FieldRow>
-            <FieldRow><span>划线价格</span><DigitField value={linePrice} onChange={setLinePrice} width={180}
-                                                       precision={2}/></FieldRow>
-            <FieldRow><span>*结算价格</span><DigitField value={settlement} onChange={setSettlement} width={180}
-                                                        precision={2}/></FieldRow>
-        </div> : <PeriodPriceRows rows={prices} setRows={setPrices} sellOtherTimes={sellOtherTimes}
-                                  setSellOtherTimes={setSellOtherTimes}
-                                  otherPrice={otherPrice} setOtherPrice={setOtherPrice}/>}
-        <FieldRow><Button type="primary" disabled={!canSave} onClick={() => setSaved({
-            dates,
-            saleType,
-            priceType,
+    const save = () => {
+        if (!canSave) return
+        setSaved({
+            dates, saleType, priceType,
             prices: priceType === 'fixed' ? [{
-                id: 0,
-                period: 'allDay',
-                stockMode,
-                stock,
-                cost,
-                line: linePrice,
-                settlement
+                id: 0, period: 'allDay', stockMode, stock, cost, line: linePrice, settlement,
             }] : prices.map((row) => ({...row})),
             otherPrice: priceType === 'period' && sellOtherTimes ? {...otherPrice} : null,
-        })}>确认</Button><Button onClick={reset}>取消</Button><Typography.Text
-            type="secondary">{dates.length} 个匹配日期</Typography.Text></FieldRow>
-        {saved && <><Alert type="success" title={`已保存本页设置，共 ${saved.dates.length} 个日期。`}/>
-            <details className="w-full">
-                <summary>保存结果</summary>
-                <pre className="max-h-[300px] overflow-auto bg-[#f5f5f5] p-3">{JSON.stringify(saved, null, 2)}</pre>
-            </details>
-        </>}
+        })
+    }
+    return <RuleCard id="batch-settings" title="批量设置"
+                     hint="按日期范围批量修改售卖类型、价格库存和结算价格。">
+        <Form<BatchFormValues> form={form} layout="vertical"
+                               className="grid w-full min-w-0 grid-cols-1 gap-4 [&_.ant-form-item]:min-w-0 [&_.ant-form-item-control-input-content]:min-w-0"
+                               initialValues={initialBatchValues}
+                               onValuesChange={(changed: Partial<BatchFormValues>) => {
+                                   setSaved(null)
+                                   if (changed.dateRanges) setRanges(changed.dateRanges)
+                                   if (changed.operation) setOperation(changed.operation)
+                                   if (changed.selectedDates) setSelectedDates(changed.selectedDates)
+                                   if (changed.selectedWeekdays) setSelectedWeekdays(changed.selectedWeekdays)
+                                   if (changed.saleType) setSaleType(changed.saleType)
+                                   if (changed.priceType) setPriceType(changed.priceType)
+                                   if (changed.stockMode) setStockMode(changed.stockMode)
+                                   if (changed.stock !== undefined) setStock(changed.stock)
+                                   if (changed.settlement !== undefined) setSettlement(changed.settlement)
+                                   if (changed.saleType === 'stop') form.setFields([{name: 'stock', errors: []}, {name: 'settlement', errors: []}])
+                                   if (changed.stockMode === 'unlimited') form.setFields([{name: 'stock', errors: []}])
+                               }}
+                               onFinish={save}>
+            <Form.Item name="dateRanges" label="日期范围" required className="mb-0!"
+                       rules={[{validator: async (_, value: BatchRange[]) => {
+                           if (!value?.length || value.some((item) => !item.range?.[0] || !item.range?.[1] || item.range[0] > item.range[1])) {
+                               throw new Error('请填写有效的日期范围')
+                           }
+                       }}]}>
+                <DateRangesField onChange={setRanges}/>
+            </Form.Item>
+            <Form.Item name="operation" label="修改操作" rules={[{required: true, message: '请选择修改操作'}]} className="mb-0!">
+                <SelectField value={operation} onChange={(value) => setOperation(value as string)}
+                             options={[["number", '按号数'], ['all', '所有日期'], ['weekday', '按星期']]} width={460}/>
+            </Form.Item>
+            {operation === 'number' && <>
+                <div className="w-full max-w-[700px]">
+                    <Form.Item name="selectedDates" label="选择号数" required className="mb-0!"
+                               rules={[{type: 'array', min: 1, message: '请至少选择一个号数'}]}>
+                        <CheckField value={selectedDates} onChange={setSelectedDates} dayGrid
+                                    options={days.map((day) => [day, `${day}号`])}/>
+                    </Form.Item>
+                </div>
+                <FieldRow><Button type="link" onClick={() => { setSelectedDates(days); form.setFieldValue('selectedDates', days) }}>全选</Button>
+                    <Button type="link" onClick={() => { setSelectedDates([]); form.setFieldValue('selectedDates', []) }}>取消全选</Button>
+                    <Typography.Text>保存时仅对选择的号数日期进行修改</Typography.Text></FieldRow>
+            </>}
+            {operation === 'weekday' && <>
+                <Form.Item name="selectedWeekdays" label="选择星期" required className="mb-0!"
+                           rules={[{type: 'array', min: 1, message: '请至少选择一个星期'}]}>
+                    <CheckField value={selectedWeekdays} onChange={setSelectedWeekdays} options={weekdays}/>
+                </Form.Item>
+                <FieldRow><Button type="link" onClick={() => { const all = weekdays.map(([value]) => value); setSelectedWeekdays(all); form.setFieldValue('selectedWeekdays', all) }}>全选</Button>
+                    <Button type="link" onClick={() => { setSelectedWeekdays([]); form.setFieldValue('selectedWeekdays', []) }}>取消全选</Button>
+                    <Typography.Text>保存时仅对选择星期的日期进行修改</Typography.Text></FieldRow>
+            </>}
+            <Form.Item name="saleType" label="售卖类型" rules={[{required: true, message: '请选择售卖类型'}]} className="mb-0!">
+                <Choice value={saleType} onChange={setSaleType} options={[["sell", '可售'], ['stop', '禁止销售']]}/>
+            </Form.Item>
+            <Form.Item name="priceType" label="价格库存类型" rules={[{required: true, message: '请选择价格库存类型'}]} className="mb-0!">
+                <Choice value={priceType} onChange={setPriceType} options={[["fixed", '全天固定价格和库存'], ['period', '多时段价格和库存']]}/>
+            </Form.Item>
+            {priceType === 'fixed' ? <div className="grid w-full gap-3">
+                <Form.Item name="stockMode" label="日库存方式" rules={[{required: true, message: '请选择库存方式'}]} className="mb-0!">
+                    <Choice value={stockMode} onChange={setStockMode} options={[["unlimited", '无限'], ['limited', '有限']]}/>
+                </Form.Item>
+                {stockMode === 'limited' && <Form.Item name="stock" label="日库存" required={saleType === 'sell'}
+                                                       rules={saleType === 'sell' ? [{required: true, message: '请输入日库存'}] : []} className="mb-0!">
+                    <DigitField value={stock} onChange={setStock} width={180}/>
+                </Form.Item>}
+                <Form.Item label="成本价格" className="mb-0!"><DigitField value={cost} onChange={setCost} width={180} precision={2}/></Form.Item>
+                <Form.Item label="划线价格" className="mb-0!"><DigitField value={linePrice} onChange={setLinePrice} width={180} precision={2}/></Form.Item>
+                <Form.Item name="settlement" label="结算价格" required={saleType === 'sell'}
+                           rules={saleType === 'sell' ? [{required: true, message: '请输入结算价格'}] : []} className="mb-0!">
+                    <DigitField value={settlement} onChange={setSettlement} width={180} precision={2}/>
+                </Form.Item>
+            </div> : <Form.Item name="periodPrices" label="时段库存与价格" required={saleType === 'sell'} className="mb-0!"
+                                 rules={[{validator: async () => {
+                                     if (saleType === 'sell' && !periodPriceValid) throw new Error('请填写所有必填的时段库存和结算价格')
+                                 }}]}>
+                <PeriodPriceRows rows={prices} setRows={setPrices} required={saleType === 'sell'} sellOtherTimes={sellOtherTimes}
+                                 setSellOtherTimes={setSellOtherTimes} otherPrice={otherPrice} setOtherPrice={setOtherPrice}/>
+            </Form.Item>}
+            <FieldRow><Button type="primary" htmlType="submit">确认</Button><Button onClick={reset}>取消</Button>
+                <Typography.Text type="secondary">{dates.length} 个匹配日期</Typography.Text></FieldRow>
+            {saved && <><Alert type="success" title={`已保存本页设置，共 ${saved.dates.length} 个日期。`}/>
+                <details className="w-full"><summary>保存结果</summary>
+                    <pre className="max-h-[300px] overflow-auto bg-[#f5f5f5] p-3">{JSON.stringify(saved, null, 2)}</pre>
+                </details>
+            </>}
+        </Form>
     </RuleCard>
 }
 
-function PeriodPriceRows({rows, setRows, sellOtherTimes, setSellOtherTimes, otherPrice, setOtherPrice}: {
+function PeriodPriceRows({rows, setRows, required, sellOtherTimes, setSellOtherTimes, otherPrice, setOtherPrice}: {
     rows: PriceRow[]
     setRows: Dispatch<SetStateAction<PriceRow[]>>
+    required: boolean
     sellOtherTimes: boolean
     setSellOtherTimes: (value: boolean) => void
     otherPrice: PriceRow
@@ -1099,7 +1248,10 @@ function PeriodPriceRows({rows, setRows, sellOtherTimes, setSellOtherTimes, othe
     const otherRanges = getOtherTimeRanges(rows.map((row) => row.period))
     return <div className="grid w-full grid-cols-1 gap-2 overflow-x-auto">
         <div className={`${priceGridClass} bg-[#f0f0f0] p-2 font-semibold`}>
-            <span>* 时间范围信息</span><span>* 时段库存</span><span>成本价格</span><span>划线价格</span><span>* 结算价格</span><span>操作</span>
+            <span>{required && <span className="text-[#ff4d4f]">*</span>} 时间范围信息</span>
+            <span>{required && <span className="text-[#ff4d4f]">*</span>} 时段库存</span>
+            <span>成本价格</span><span>划线价格</span>
+            <span>{required && <span className="text-[#ff4d4f]">*</span>} 结算价格</span><span>操作</span>
         </div>
         {rows.map((row) => <div className={priceRowClass} key={row.id}>
             <SelectField value={row.period}
