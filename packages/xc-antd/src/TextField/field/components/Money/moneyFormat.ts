@@ -64,7 +64,7 @@ export const getTextByLocale = (
 ) => {
   let moneyText: number | string | undefined = paramsText
     ?.toString()
-    .replaceAll(',', '');
+    .replace(/,/g, '');
   if (typeof moneyText === 'string') {
     const parsedNum = Number(moneyText);
     // 转换数字为NaN时，返回原始值展示
@@ -73,7 +73,7 @@ export const getTextByLocale = (
   }
   if (!moneyText && moneyText !== 0) return '';
 
-  let supportFormat = false;
+  let supportFormat: boolean;
 
   try {
     supportFormat =
@@ -81,7 +81,9 @@ export const getTextByLocale = (
       Intl.NumberFormat.supportedLocalesOf([locale.replace('_', '-')], {
         localeMatcher: 'lookup',
       }).length > 0;
-  } catch (error) {}
+  } catch {
+    supportFormat = false;
+  }
 
   try {
     // Formatting the number, when readonly moneySymbol = false, unused currency.
@@ -122,7 +124,7 @@ export const getTextByLocale = (
       return `${moneySymbol || ''}${operatorSymbol}${pureMoneyText}`;
     }
     return `${moneySymbol || ''}${pureMoneyText}`;
-  } catch (error) {
+  } catch {
     return moneyText;
   }
 };

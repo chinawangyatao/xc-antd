@@ -9,6 +9,7 @@ describe('ImageUpload', () => {
       <ImageUpload
         maxCount={3}
         maxSizeMB={2}
+        accept="image/png,image/jpeg,image/webp"
         autoUpload={false}
         trigger={<span>上传图片</span>}
       />,
@@ -17,6 +18,7 @@ describe('ImageUpload', () => {
     expect(html).toContain('xc-image-upload');
     expect(html).toContain('上传图片');
     expect(html).toContain('<strong>2 MB</strong>');
+    expect(html).toContain('支持 png / jpeg / webp');
     expect(html).toContain('3');
   });
 

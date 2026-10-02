@@ -49,7 +49,10 @@ const FieldTreeSelect: ProFieldFC<{} & FieldSelectProps> = (
 ) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const layoutClassName = getPrefixCls('pro-field-tree-select');
-  const treeSelectRef = useRef<GetRef<typeof TreeSelect>>(null);
+  const treeSelectRef = useRef<GetRef<typeof TreeSelect> | null>(null);
+  const setTreeSelectRef = useCallback((instance: GetRef<typeof TreeSelect> | null) => {
+    treeSelectRef.current = instance;
+  }, []);
   const [open, setOpen] = useState(false);
 
   const {
@@ -108,7 +111,7 @@ const FieldTreeSelect: ProFieldFC<{} & FieldSelectProps> = (
         return next;
       });
     },
-    [onSearch],
+    [onSearch, setSearchValueInner],
   );
 
   useImperativeHandle(ref, () => ({
@@ -187,7 +190,7 @@ const FieldTreeSelect: ProFieldFC<{} & FieldSelectProps> = (
       fieldProps,
       open,
       setOpen,
-      treeSelectRef,
+      treeSelectRef: setTreeSelectRef,
       loading,
       options: options as NonNullable<TreeSelectProps['treeData']>,
       fetchData,

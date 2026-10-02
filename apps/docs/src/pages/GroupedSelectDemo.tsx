@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, Card, Space, Typography } from 'antd';
 import {
   GroupedSelect,
@@ -25,6 +25,7 @@ const colorOptions = [
   '#ffccc7', '#ffd591', '#fff1b8', '#d3adf7', '#ff7875', '#ffc069', '#ffe58f', '#b37feb',
   '#ff4d4f', '#ffa940', '#fadb14', '#9254de', '#cf1322', '#d46b08', '#d48806', '#531dab',
 ];
+const rotatingDefaultColors = ['#1677ff', '#52c41a', '#faad14'];
 
 const initialSelectedOption = initialGroups[0].options[0];
 const initialSelectedOptions = [initialSelectedOption];
@@ -72,6 +73,7 @@ function mockCreateOption(label: string, color?: string) {
 }
 
 export default function GroupedSelectDemo() {
+  const defaultColorIndex = useRef(0);
   const [groups, setGroups] = useState(initialGroups);
   const [value, setValue] = useState<GroupedSelectValue[]>([]);
   const [readOnlyValue, setReadOnlyValue] = useState<GroupedSelectValue[]>(['a-1']);
@@ -82,6 +84,11 @@ export default function GroupedSelectDemo() {
   ]);
   const [remoteQuery, setRemoteQuery] = useState('');
   const [remoteLoading, setRemoteLoading] = useState(false);
+  const nextDefaultColor = () => {
+    const color = rotatingDefaultColors[defaultColorIndex.current % rotatingDefaultColors.length];
+    defaultColorIndex.current += 1;
+    return color;
+  };
 
   useEffect(() => {
     const controller = new AbortController();
@@ -119,7 +126,7 @@ export default function GroupedSelectDemo() {
           groupLabelMaxLength={12}
           optionLabelMaxLength={20}
           colorOptions={colorOptions}
-          defaultColor="#1677ff"
+          defaultColor={nextDefaultColor}
           onAddGroup={(nextLabel) => {
             setGroups((current) => [...current, {
               id: `group-${crypto.randomUUID()}`,
@@ -179,7 +186,7 @@ export default function GroupedSelectDemo() {
           }}
         />
         <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-          新增标签默认选中蓝色；下拉框中的颜色按钮使用同一预设色板筛选标签，并与文字搜索叠加。清除颜色可恢复全部标签。
+          每次打开新增标签时默认颜色依次为蓝、绿、橙；下拉框中的颜色按钮使用同一预设色板筛选标签，并与文字搜索叠加。清除颜色可恢复全部标签。
         </Typography.Paragraph>
         <Alert style={{ marginTop: 20 }} type="info"
           message={`当前选中：${value.length ? value.join('、') : '暂无'}`} />

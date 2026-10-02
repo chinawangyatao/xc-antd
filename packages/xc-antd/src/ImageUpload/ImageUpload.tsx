@@ -441,7 +441,7 @@ function ImageUploadInner<ResponseType = unknown>(
         <div className="xc-image-upload__tip">
           {tip ?? (
             <>
-              支持 {accept.replaceAll('image/', '').replaceAll(',', ' / ')}，
+              支持 {accept.replace(/image\//g, '').replace(/,/g, ' / ')}，
               单张不超过 <strong>{maxSizeMB} MB</strong>，
               最多 <strong>{maxCount}</strong> 张
             </>

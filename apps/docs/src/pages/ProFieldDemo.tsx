@@ -165,6 +165,18 @@ const demos: DemoItem[] = [
   { label: '日期范围', valueType: 'dateRange', defaultText: ['2026-01-01', '2026-12-31'] },
   { label: '相对时间', valueType: 'fromNow', defaultText: '2026-05-01 12:00:00' },
   { label: '下拉选择', valueType: 'select', defaultText: 'online', valueEnum: statusEnum },
+  {
+    label: '树形选择', valueType: 'treeSelect', defaultText: 'taiqing',
+    fieldProps: {
+      showSearch: true,
+      treeData: [
+        { title: '崂山风景区', value: 'laoshan', children: [
+          { title: '太清游览区', value: 'taiqing' },
+          { title: '巨峰游览区', value: 'jufeng' },
+        ] },
+      ],
+    },
+  },
   { label: '单选', valueType: 'radio', defaultText: 'online', valueEnum: statusEnum },
   { label: '单选按钮', valueType: 'radioButton', defaultText: 'busy', valueEnum: statusEnum },
   { label: '多选', valueType: 'checkbox', defaultText: ['online', 'busy'], valueEnum: statusEnum },
@@ -403,6 +415,7 @@ function ProFieldDemo() {
       {/* 自定义 render */}
       <Card title="自定义 render（只读时高亮金额）">
         <Space direction="vertical" style={{ width: '100%' }}>
+          <TextField mode="read" valueType="money" text="1,234,567.89" />
           <TextField
             mode={mode}
             valueType="money"

@@ -108,6 +108,23 @@ describe('GroupedSelect', () => {
     expect(remoteSelected).toContain('选项A-1');
   });
 
+  test('does not resolve the default color before the add-option form opens', () => {
+    let calls = 0;
+    const html = renderToStaticMarkup(
+      <GroupedSelect
+        groups={groups}
+        colorOptions={['#1677ff']}
+        defaultColor={() => {
+          calls += 1;
+          return '#1677ff';
+        }}
+        onAddOption={() => undefined}
+      />,
+    );
+    expect(html).toContain('xc-grouped-select__trigger');
+    expect(calls).toBe(0);
+  });
+
   test('renders both addition forms inside the Select popup', () => {
     const props = {
       groups,
