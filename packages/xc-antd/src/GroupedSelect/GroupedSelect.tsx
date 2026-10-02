@@ -44,8 +44,8 @@ export interface GroupedSelectProps {
   optionLabelMaxLength?: number;
   /** 标签新增、编辑和颜色筛选使用的颜色选项；为空时不显示颜色筛选。 */
   colorOptions?: GroupedSelectColor[];
-  /** 新增标签时默认选中的颜色；不影响已有标签。 */
-  defaultColor?: string;
+  /** 新增标签时默认选中的颜色；传函数时每次打开新增表单重新取值。 */
+  defaultColor?: string | (() => string);
   /** 颜色筛选规则；默认按标签颜色不区分大小写精确匹配。 */
   colorFilter?: GroupedSelectColorFilter;
   /** remote 模式跳过本地文字筛选，颜色筛选仍作用于传入的 groups。 */
@@ -207,7 +207,9 @@ export function GroupedSelect({
     setAddMode(mode);
     setDraftLabel('');
     setDraftGroupId(groups[0]?.id);
-    setDraftColor(mode === 'option' ? defaultColor : undefined);
+    setDraftColor(mode === 'option'
+      ? (typeof defaultColor === 'function' ? defaultColor() : defaultColor)
+      : undefined);
     setAddError('');
   };
   const submitAdd = async () => {

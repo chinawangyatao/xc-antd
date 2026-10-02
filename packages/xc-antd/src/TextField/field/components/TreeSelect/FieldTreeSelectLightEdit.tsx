@@ -24,7 +24,7 @@ export interface FieldTreeSelectLightEditProps {
   fieldProps: TreeSelectFieldProps;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  treeSelectRef: React.RefObject<GetRef<typeof TreeSelect> | null>;
+  treeSelectRef: (instance: GetRef<typeof TreeSelect> | null) => void;
   intl?: any;
   loading: boolean;
   options: NonNullable<TreeSelectProps['treeData']>;

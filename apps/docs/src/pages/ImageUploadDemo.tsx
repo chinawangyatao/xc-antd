@@ -111,6 +111,7 @@ export default function ImageUploadDemo() {
               onChange={setAvatarFiles}
               maxCount={1}
               maxSizeMB={5}
+              accept="image/png,image/jpeg"
               listType="picture-circle"
               customUpload={mockUpload}
               crop={{
