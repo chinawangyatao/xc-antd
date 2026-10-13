@@ -34,6 +34,9 @@ In a consuming project, inspect the installed
 - Pass record-specific data through `resource` for ownership or state rules.
 - `PermissionGuard` adds no DOM wrapper. Use `fallback` for denied content and
   `loadingFallback` while permissions load.
+- Optional `action` and `label` strings declare operation metadata for business
+  source scanners. They do not affect matching or DOM output; prefer static
+  literals. The consuming application owns route association and CSV generation.
 - Frontend checks control UI and interaction only. APIs must authorize every
   protected operation independently.
 

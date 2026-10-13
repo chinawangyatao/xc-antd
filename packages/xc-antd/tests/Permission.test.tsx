@@ -46,6 +46,40 @@ describe('Permission checks', () => {
 });
 
 describe('Permission React API', () => {
+  test('accepts action metadata without changing matching or rendered markup', () => {
+    const matchedParams: unknown[] = [];
+    const html = renderToStaticMarkup(
+      <PermissionProvider permissions={['order:create']}>
+        <PermissionGuard
+          permission="order:create"
+          action="create"
+          label="新建订单"
+          matcher={(params) => {
+            matchedParams.push(params);
+            return params.granted.includes(params.required[0]);
+          }}
+        >
+          <button type="button">新建订单</button>
+        </PermissionGuard>
+        <PermissionGuard
+          permission="order:delete"
+          action="delete"
+          label="删除订单"
+          fallback={<span>Denied</span>}
+        >
+          <button type="button">删除订单</button>
+        </PermissionGuard>
+      </PermissionProvider>,
+    );
+    expect(html).toBe('<button type="button">新建订单</button><span>Denied</span>');
+    expect(matchedParams).toEqual([{
+      granted: ['order:create'],
+      required: ['order:create'],
+      mode: 'all',
+      resource: undefined,
+    }]);
+  });
+
   test('renders allowed children and denied fallbacks without a wrapper element', () => {
     const html = renderToStaticMarkup(
       <PermissionProvider permissions={['user:create']}>
