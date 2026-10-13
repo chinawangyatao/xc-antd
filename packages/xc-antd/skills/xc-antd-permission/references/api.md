@@ -30,6 +30,26 @@ The nearest provider replaces an outer provider.
 Use `resource={record}` when a provider or local matcher needs record data.
 `fallback` and `loadingFallback` default to `null`.
 
+### Action metadata
+
+```tsx
+<PermissionGuard
+  permission="order:create"
+  action="create"
+  label="新建订单"
+>
+  <Button>新建订单</Button>
+</PermissionGuard>
+```
+
+`action?: string` is the operation identifier and `label?: string` is its
+human-readable name. Both are optional declaration metadata for business-side
+source scanning (for example, a Vite plugin generating a permission CSV).
+Use static string literals when a scanner needs to extract them reliably.
+They do not change permission decisions, enter matcher parameters, add DOM
+attributes or wrappers, or replace child text. Route association and CSV
+generation remain the consuming application's responsibility.
+
 ## Hook and pure function
 
 ```tsx

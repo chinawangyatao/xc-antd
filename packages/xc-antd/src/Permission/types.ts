@@ -45,6 +45,8 @@ export interface PermissionProviderProps {
 export interface PermissionGuardProps<TResource = unknown>
   extends PermissionCheckOptions<TResource> {
   permission: PermissionRequirement;
+  action?: string;
+  label?: string;
   fallback?: ReactNode;
   loadingFallback?: ReactNode;
   children?: ReactNode;

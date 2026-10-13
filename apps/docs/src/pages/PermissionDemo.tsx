@@ -46,6 +46,8 @@ const providerCode = `<PermissionProvider permissions={permissionCodes}>
 
 const guardCode = `<PermissionGuard
   permission="article:create"
+  action="create"
+  label="新建文章"
   fallback={<Button disabled>新建文章</Button>}
 >
   <Button type="primary">新建文章</Button>
@@ -169,9 +171,14 @@ export default function PermissionDemo() {
 
       <PermissionProvider permissions={permissions} matcher={matcher}>
         <Card title="PermissionGuard 组件包裹">
+          <Typography.Paragraph type="secondary">
+            action 为操作标识，label 为操作名称；两者均为可选元数据，供业务构建插件扫描生成权限清单，不参与权限判断或 DOM 渲染。
+          </Typography.Paragraph>
           <Space wrap size="middle">
             <PermissionGuard
               permission="article:create"
+              action="create"
+              label="新建文章"
               fallback={<Button disabled>新建文章</Button>}
             >
               <Button
@@ -232,6 +239,8 @@ export default function PermissionDemo() {
                 <div style={{ flex: '0 0 auto' }}>
                   <PermissionGuard
                     permission="article:update"
+                    action="update"
+                    label="编辑文章"
                     resource={article}
                     fallback={<Button disabled>编辑</Button>}
                   >
