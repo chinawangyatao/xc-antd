@@ -3,6 +3,7 @@ import { ReloadOutlined, SaveOutlined } from '@ant-design/icons';
 import React from 'react';
 import { FormGroup } from '../FormGroup';
 import { TextField } from '../TextField';
+import { mergeFormControlProps } from '../shared/formControlProps';
 import type {
   SchemaFormAction,
   SchemaFormField,
@@ -28,9 +29,15 @@ interface SchemaFieldControlProps<
   mode: NonNullable<SchemaFormProps<Values>['mode']>;
   value?: unknown;
   onChange?: (...args: any[]) => void;
+  id?: string;
+  onBlur?: React.FocusEventHandler<HTMLElement>;
+  onFocus?: React.FocusEventHandler<HTMLElement>;
+  'aria-describedby'?: string;
+  'aria-invalid'?: React.AriaAttributes['aria-invalid'];
+  'aria-required'?: React.AriaAttributes['aria-required'];
 }
 
-function SchemaFieldControl<
+function SchemaFieldControlImpl<
   Values extends SchemaFormValues,
   SubmitValues extends SchemaFormValues = Values,
 >({
@@ -40,13 +47,16 @@ function SchemaFieldControl<
   mode,
   value,
   onChange = () => undefined,
-}: SchemaFieldControlProps<Values, SubmitValues>) {
+  ...injectedProps
+}: SchemaFieldControlProps<Values, SubmitValues>, ref: React.ForwardedRef<unknown>) {
   const fieldMode = field.mode ?? mode;
   const disabled = resolveSchemaFieldState(field.disabled, values);
   const readonly = resolveSchemaFieldState(field.readonly, values);
   const resolvedFieldProps = typeof field.fieldProps === 'function'
     ? field.fieldProps(values, form)
     : field.fieldProps;
+  // 在表单边界统一合并事件，TextField 只接收一条事件链，避免业务与校验重复触发。
+  const controlProps = mergeFormControlProps(resolvedFieldProps, { ...injectedProps, value, onChange });
   const context: SchemaFormFieldContext<Values, SubmitValues> = {
     value,
     onChange,
@@ -54,21 +64,25 @@ function SchemaFieldControl<
     form,
     mode: fieldMode,
     field,
+    controlProps,
+    ref,
   };
 
+  // eslint-disable-next-line react-hooks/refs -- render prop 仅传递 ref，实际控件在挂载时连接，不在此读取 current。
   const control = field.renderFormItem ? field.renderFormItem(context) : (
     <TextField
+      ref={ref}
       mode={fieldMode}
       text={value as React.ReactNode}
       value={value}
-      onChange={onChange}
       valueType={field.valueType ?? 'text'}
       valueEnum={field.valueEnum as never}
       request={field.request}
       params={field.params}
       readonly={readonly}
       fieldProps={{
-        ...resolvedFieldProps,
+        ...controlProps,
+        value,
         disabled: disabled || resolvedFieldProps?.disabled,
         style: {
           width: '100%',
@@ -85,6 +99,11 @@ function SchemaFieldControl<
   return control;
 }
 
+const SchemaFieldControl = React.forwardRef(SchemaFieldControlImpl) as <
+  Values extends SchemaFormValues,
+  SubmitValues extends SchemaFormValues = Values,
+>(props: SchemaFieldControlProps<Values, SubmitValues> & React.RefAttributes<unknown>) => React.ReactNode;
+
 export function SchemaForm<
   Values extends SchemaFormValues,
   SubmitValues extends SchemaFormValues = Values,
@@ -95,6 +114,7 @@ export function SchemaForm<
   mode = 'edit',
   initialValues,
   formProps,
+  groupProps,
   submitter = {},
   onFinish,
   onReset,
@@ -185,10 +205,13 @@ export function SchemaForm<
         if (resolveSchemaFieldState(group.hidden, values)) return null;
         return (
           <FormGroup
+            {...groupProps}
+            {...group.groupProps}
             key={group.key}
             title={group.title}
             extra={group.extra}
-            gutter={group.gutter}
+            gutter={group.gutter ?? group.groupProps?.gutter ?? groupProps?.gutter}
+            style={{ ...groupProps?.style, ...group.groupProps?.style }}
           >
             {group.fields.map((field, index) => {
               if (resolveSchemaFieldState(field.hidden, values)) return null;

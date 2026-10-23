@@ -25,6 +25,8 @@ import type {
   TableRowSelection,
 } from 'antd/es/table/interface';
 import { TextField } from '../TextField';
+import { useComponentTheme } from '../theme/useComponentTheme';
+import { TableCellText } from '../shared/TableCellText';
 import { CrudTableColumnSettings } from './ColumnSettings';
 import { CrudTableSearchForm } from './SearchForm';
 import type {
@@ -47,10 +49,10 @@ import './style.css';
 
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_OPTIONS = {
-  reload: true,
-  density: true,
+  reload: false,
+  density: false,
   setting: true,
-  fullScreen: true,
+  fullScreen: false,
 };
 
 function readPersistedColumnState(
@@ -171,15 +173,18 @@ export function CrudTable<
     pagination = {},
     columnsState,
     options = {},
-    defaultSize = 'middle',
+    defaultSize = 'small',
     adaptiveHeight,
     dateFormatter = 'string',
     postData,
     onLoad,
     onRequestError,
     tableProps,
+    className,
+    style,
   } = props;
 
+  const themeStyle = useComponentTheme();
   const rootRef = React.useRef<HTMLDivElement>(null);
   const tableAreaRef = React.useRef<HTMLDivElement>(null);
   const [form] = Form.useForm<Query>();
@@ -438,14 +443,15 @@ export function CrudTable<
   ]);
 
   const antdColumns = React.useMemo<ColumnType<RecordType>[]>(() => {
+    const visibleSettings = columnSettings.filter((setting) => setting.visible);
+    const isSingleColumn = visibleSettings.length === 1;
     const columnMap = new Map(
       columnsWithActions.map((column, index) => [
         getCrudColumnKey(column, index),
         column,
       ]),
     );
-    return columnSettings
-      .filter((setting) => setting.visible)
+    return visibleSettings
       .map((setting) => {
         const column = columnMap.get(setting.key)!;
         const {
@@ -461,6 +467,8 @@ export function CrudTable<
         const columnProps = getAntColumnProps(column);
         const result: ColumnType<RecordType> = {
           ...columnProps,
+          // 只保留操作列等单列场景不需要固定，避免 sticky 与 max-content 布局相互挤压。
+          fixed: isSingleColumn ? undefined : columnProps.fixed,
           key: key ?? setting.key,
           title,
           dataIndex,
@@ -489,9 +497,12 @@ export function CrudTable<
                 fieldProps={fieldProps}
               />
             );
-            const node = render
+            const renderedNode = render
               ? render(value, record, index, action)
               : defaultNode;
+            const node = result.ellipsis && !render
+              ? <TableCellText title={defaultNode}>{renderedNode}</TableCellText>
+              : renderedNode;
             if (!copyable) return node;
             return (
               <Typography.Text copyable={{ text: String(value ?? '') }}>
@@ -591,7 +602,7 @@ export function CrudTable<
   };
 
   return (
-    <div ref={rootRef} className="xc-crud-table">
+    <div ref={rootRef} className={['xc-crud-table', className].filter(Boolean).join(' ')} style={{ ...themeStyle, ...style }}>
       {searchConfig && (
         <CrudTableSearchForm
           columns={columns}
@@ -696,7 +707,7 @@ export function CrudTable<
           onChange={handleTableChange}
           onRow={mergedOnRow}
           scroll={{
-            x: 'max-content',
+            x: antdColumns.length > 1 ? 'max-content' : undefined,
             ...tableProps?.scroll,
             y: tableProps?.scroll?.y ?? adaptiveScrollY,
           }}

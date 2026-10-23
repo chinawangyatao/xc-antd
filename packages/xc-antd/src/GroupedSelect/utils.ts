@@ -1,5 +1,22 @@
 export type GroupedSelectValue = string | number;
 
+/** 由选择器统一管理正在确认删除的目标，气泡生命周期跟随下拉框。 */
+export interface GroupedSelectDeleteTarget {
+  kind: 'group' | 'option';
+  value: GroupedSelectValue;
+}
+
+/** 旧删除请求完成时，仅关闭自己的气泡，保留后来打开的其他目标。 */
+export function updateGroupedSelectDeleteTarget(
+  current: GroupedSelectDeleteTarget | undefined,
+  target: GroupedSelectDeleteTarget,
+  open: boolean,
+): GroupedSelectDeleteTarget | undefined {
+  if (open) return target;
+  if (current?.kind === target.kind && current.value === target.value) return undefined;
+  return current;
+}
+
 export interface GroupedSelectColorOption {
   value: string;
   label?: string;

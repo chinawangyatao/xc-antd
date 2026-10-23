@@ -1,5 +1,6 @@
 import { Drawer } from 'antd';
 import type { DrawerProps } from 'antd';
+import { useDrawerClosable } from '../shared/useDrawerClosable';
 import {
   ActionOverlayFooter,
   type ActionOverlayCommonProps,
@@ -20,6 +21,7 @@ export function ActionDrawer({
   confirmButtonProps,
   cancelButtonProps,
   footer,
+  footerLayout = 'drawer',
   onConfirm,
   onCancel,
   onOpenChange,
@@ -27,10 +29,11 @@ export function ActionDrawer({
   hasUnsavedChanges,
   unsavedChangesPrompt,
   destroyOnHidden = true,
-  mask,
+  closable,
   size = 720,
   ...drawerProps
 }: ActionDrawerProps) {
+  const mergedClosable = useDrawerClosable(closable);
   const action = useActionOverlay({
     confirmLoading,
     onConfirm,
@@ -42,6 +45,7 @@ export function ActionDrawer({
   });
   const footerNode = footer === false ? null : footer ?? (
     <ActionOverlayFooter
+      layout={footerLayout}
       confirmText={confirmText}
       cancelText={cancelText}
       showConfirm={showConfirm}
@@ -59,7 +63,7 @@ export function ActionDrawer({
       <Drawer
         {...drawerProps}
         size={size}
-        mask={mask ?? { closable: true }}
+        closable={mergedClosable}
         destroyOnHidden={destroyOnHidden}
         footer={footerNode}
         onClose={action.requestClose}
@@ -67,6 +71,7 @@ export function ActionDrawer({
       <UnsavedChangesPrompt
         open={action.unsavedPromptOpen}
         config={unsavedChangesPrompt || undefined}
+        getContainer={drawerProps.getContainer}
         zIndex={(drawerProps.zIndex ?? 1000) + 10}
         onDiscard={action.discardChanges}
         onContinue={action.continueEditing}

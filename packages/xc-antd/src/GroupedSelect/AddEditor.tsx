@@ -2,6 +2,7 @@ import { Button, Input, Select } from 'antd';
 import type { GroupedSelectGroup, GroupedSelectValue } from './utils';
 import { GroupedSelectColorPicker } from './ColorPickerSelect';
 import type { GroupedSelectColor } from './utils';
+import { getMaskLayerPopupProps } from '../shared/popupContainer';
 
 interface AddEditorProps {
   mode: 'group' | 'option';
@@ -40,12 +41,12 @@ export function GroupedSelectAddEditor({
     <div className="xc-grouped-select__editor">
       {mode === 'option' && (
         <Select<GroupedSelectValue>
+          {...getMaskLayerPopupProps()}
           aria-label="所属分组"
           placeholder="请选择分组"
           value={groups.some((group) => group.id === groupId) ? groupId : undefined}
           options={groups.map((group) => ({ value: group.id, label: group.label }))}
           onChange={onGroupChange}
-          getPopupContainer={(trigger) => trigger.parentElement ?? document.body}
           className="xc-grouped-select__group-picker"
         />
       )}

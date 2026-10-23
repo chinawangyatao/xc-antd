@@ -20,6 +20,7 @@ export function ActionModal({
   confirmButtonProps,
   cancelButtonProps,
   footer,
+  footerLayout = 'modal',
   onConfirm,
   onCancel,
   onOpenChange,
@@ -27,7 +28,6 @@ export function ActionModal({
   hasUnsavedChanges,
   unsavedChangesPrompt,
   destroyOnHidden = true,
-  mask,
   width = 520,
   ...modalProps
 }: ActionModalProps) {
@@ -42,6 +42,7 @@ export function ActionModal({
   });
   const footerNode = footer === false ? null : footer ?? (
     <ActionOverlayFooter
+      layout={footerLayout}
       confirmText={confirmText}
       cancelText={cancelText}
       showConfirm={showConfirm}
@@ -59,7 +60,6 @@ export function ActionModal({
       <Modal
         {...modalProps}
         width={width}
-        mask={mask ?? { closable: true }}
         destroyOnHidden={destroyOnHidden}
         footer={footerNode}
         onCancel={action.requestClose}
@@ -67,6 +67,7 @@ export function ActionModal({
       <UnsavedChangesPrompt
         open={action.unsavedPromptOpen}
         config={unsavedChangesPrompt || undefined}
+        getContainer={modalProps.getContainer}
         zIndex={(modalProps.zIndex ?? 1000) + 10}
         onDiscard={action.discardChanges}
         onContinue={action.continueEditing}

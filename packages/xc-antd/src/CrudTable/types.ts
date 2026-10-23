@@ -1,5 +1,5 @@
 import type React from 'react';
-import type { FormInstance } from 'antd';
+import type { ColProps, FormInstance, FormProps, RowProps } from 'antd';
 import type { FormItemProps } from 'antd/es/form/FormItem';
 import type {
   ColumnType,
@@ -67,6 +67,9 @@ export interface CrudTableColumn<
     value?: unknown;
     onChange?: (...args: unknown[]) => void;
     column: CrudTableColumn<RecordType, Query>;
+    /** 自定义查询控件应展开此属性并连接 ref，保留标签、值与校验事件。 */
+    controlProps: Record<string, unknown>;
+    ref: React.ForwardedRef<unknown>;
   }) => React.ReactNode;
 }
 
@@ -116,6 +119,12 @@ export interface CrudTableSearchConfig<Query extends CrudTableQuery> {
   collapsed?: boolean;
   onCollapse?: (collapsed: boolean) => void;
   defaultColsNumber?: number;
+  /** 原生栅格配置；响应式断点按查询区实际宽度计算。 */
+  colProps?: ColProps;
+  rowProps?: Omit<RowProps, 'children'>;
+  formProps?: Omit<FormProps<Query>, 'children' | 'form' | 'initialValues' | 'onFinish'>;
+  /** 默认顺序为展开 / 收起、查询、重置；可按旧项目需要显式指定。 */
+  actionOrder?: Array<'collapse' | 'submit' | 'reset'>;
   submitText?: React.ReactNode;
   resetText?: React.ReactNode;
   extraActions?:
@@ -124,8 +133,10 @@ export interface CrudTableSearchConfig<Query extends CrudTableQuery> {
 }
 
 export interface CrudTableOptions {
+  /** 刷新、密度、全屏默认隐藏，可显式启用。 */
   reload?: boolean;
   density?: boolean;
+  /** 自定义列入口默认显示。 */
   setting?: boolean;
   fullScreen?: boolean;
 }
@@ -174,6 +185,7 @@ export interface CrudTableProps<
   pagination?: false | TablePaginationConfig;
   columnsState?: CrudTableColumnsStateConfig;
   options?: false | CrudTableOptions;
+  /** 默认 small（紧凑），可使用 middle / large 调整密度。 */
   defaultSize?: 'large' | 'middle' | 'small';
   adaptiveHeight?: boolean | CrudTableAdaptiveHeightConfig;
   dateFormatter?: 'string' | 'number' | false;
@@ -190,4 +202,6 @@ export interface CrudTableProps<
     | 'rowSelection'
     | 'size'
   >;
+  className?: string;
+  style?: React.CSSProperties;
 }

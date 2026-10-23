@@ -1,4 +1,5 @@
 import type React from 'react';
+import type { FormGroupProps } from '../FormGroup';
 import type {
   ButtonProps,
   ColProps,
@@ -30,6 +31,10 @@ export interface SchemaFormFieldContext<
   form: FormInstance<Values>;
   mode: ProFieldFCMode;
   field: SchemaFormField<Values, SubmitValues>;
+  /** 自定义控件应展开此属性，保留 Form.Item 的 id、ARIA、校验事件及字段值。 */
+  controlProps: Record<string, unknown>;
+  /** 连接到可聚焦控件，供 Form 的聚焦与滚动使用。 */
+  ref: React.ForwardedRef<unknown>;
 }
 
 export interface SchemaFormField<
@@ -72,6 +77,8 @@ export interface SchemaFormGroup<
   extra?: React.ReactNode;
   fields: SchemaFormField<Values, SubmitValues>[];
   gutter?: number;
+  /** 分组容器的原生样式与 Row 布局；优先于 SchemaForm.groupProps。 */
+  groupProps?: Omit<FormGroupProps, 'children' | 'title' | 'extra'>;
   hidden?: SchemaFieldState<Values>;
 }
 
@@ -116,6 +123,8 @@ export interface SchemaFormProps<
     FormProps<Values>,
     'children' | 'form' | 'initialValues' | 'onFinish' | 'onValuesChange'
   >;
+  /** 所有分组的容器配置；默认不增加 padding，独立分组可设 style.padding 为 24。 */
+  groupProps?: Omit<FormGroupProps, 'children' | 'title' | 'extra'>;
   submitter?: false | SchemaFormSubmitterConfig<Values, SubmitValues>;
   onFinish?: (values: SubmitValues) => boolean | void | Promise<boolean | void>;
   onReset?: () => void;

@@ -1,0 +1,57 @@
+/* 固定槽位，仅改变 thumb 的透明边框，悬停与拖动不会挤压内容。 */
+:where(.xc-scrollbar, .xc-list-panel__body, .xc-list-tree__tree .ant-tree-list-holder,
+  .xc-crud-table__table .ant-table-body, .xc-crud-table__table .ant-table-content,
+  .xc-hoc-table__table .ant-table-body, .xc-hoc-table__table .ant-table-content,
+  .xc-crud-table__column-settings-list, .xc-hoc-table__column-settings-list) {
+  scrollbar-color: var(--xc-scrollbar-thumb, #c9cdd4) transparent;
+  scrollbar-width: thin;
+}
+
+.xc-scrollbar--small {
+  --xc-scrollbar-size: 6px;
+  --xc-scrollbar-inset: 1px;
+}
+
+:where(.xc-scrollbar, .xc-list-panel__body, .xc-list-tree__tree .ant-tree-list-holder,
+  .xc-crud-table__table .ant-table-body, .xc-crud-table__table .ant-table-content,
+  .xc-hoc-table__table .ant-table-body, .xc-hoc-table__table .ant-table-content,
+  .xc-crud-table__column-settings-list, .xc-hoc-table__column-settings-list)::-webkit-scrollbar {
+  width: var(--xc-scrollbar-size, 10px);
+  height: var(--xc-scrollbar-size, 10px);
+}
+
+:where(.xc-scrollbar, .xc-list-panel__body, .xc-list-tree__tree .ant-tree-list-holder,
+  .xc-crud-table__table .ant-table-body, .xc-crud-table__table .ant-table-content,
+  .xc-hoc-table__table .ant-table-body, .xc-hoc-table__table .ant-table-content,
+  .xc-crud-table__column-settings-list, .xc-hoc-table__column-settings-list)::-webkit-scrollbar-thumb {
+  border: var(--xc-scrollbar-inset, 2px) solid transparent;
+  border-radius: 8px;
+  background: var(--xc-scrollbar-thumb, #c9cdd4);
+  background-clip: content-box;
+}
+
+:where(.xc-scrollbar, .xc-list-panel__body, .xc-list-tree__tree .ant-tree-list-holder,
+  .xc-crud-table__table .ant-table-body, .xc-crud-table__table .ant-table-content,
+  .xc-hoc-table__table .ant-table-body, .xc-hoc-table__table .ant-table-content,
+  .xc-crud-table__column-settings-list, .xc-hoc-table__column-settings-list)::-webkit-scrollbar-thumb:is(:hover, :active) {
+  border-width: 0;
+  background-color: var(--xc-scrollbar-thumb-hover, #86909c);
+}
+
+:where(.xc-scrollbar, .xc-list-panel__body, .xc-list-tree__tree .ant-tree-list-holder,
+  .xc-crud-table__table .ant-table-body, .xc-crud-table__table .ant-table-content,
+  .xc-hoc-table__table .ant-table-body, .xc-hoc-table__table .ant-table-content,
+  .xc-crud-table__column-settings-list, .xc-hoc-table__column-settings-list)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Chromium / Safari 使用可精确控制的伪元素；Firefox 保留原生可用性。 */
+@supports selector(::-webkit-scrollbar) {
+  :where(.xc-scrollbar, .xc-list-panel__body, .xc-list-tree__tree .ant-tree-list-holder,
+    .xc-crud-table__table .ant-table-body, .xc-crud-table__table .ant-table-content,
+    .xc-hoc-table__table .ant-table-body, .xc-hoc-table__table .ant-table-content,
+    .xc-crud-table__column-settings-list, .xc-hoc-table__column-settings-list) {
+    scrollbar-color: auto;
+    scrollbar-width: auto;
+  }
+}

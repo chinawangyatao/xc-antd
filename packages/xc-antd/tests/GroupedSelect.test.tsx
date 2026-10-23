@@ -5,6 +5,7 @@ import { GroupedSelect } from '../src/GroupedSelect';
 import { GroupedSelectAddEditor } from '../src/GroupedSelect/AddEditor';
 import { GroupedSelectDeleteButton } from '../src/GroupedSelect/DeleteButton';
 import { GroupedSelectEditEditor } from '../src/GroupedSelect/EditEditor';
+import { getMaskLayerPopupProps } from '../src/shared/popupContainer';
 import {
   GroupedSelectColorFilterControl,
   GroupedSelectColorPicker,
@@ -14,6 +15,7 @@ import {
   getVisibleGroupedSelectGroups,
   resolveGroupedSelectOptions,
   toggleGroupedSelectValue,
+  updateGroupedSelectDeleteTarget,
   type GroupedSelectGroup,
 } from '../src/GroupedSelect/utils';
 
@@ -190,6 +192,47 @@ describe('GroupedSelect', () => {
     expect(confirmed.props.title).toBe('确认删除标签 A吗？');
     expect(confirmed.props.children.props['aria-label']).toBe('删除标签 A');
     expect(direct.props['aria-label']).toBe('删除标签 A');
+  });
+
+  test('mounts delete confirmation outside the clipped Select dropdown', () => {
+    const maskLayer = {} as HTMLElement;
+    const clippedPopup = {} as HTMLElement;
+    const popupProps = getMaskLayerPopupProps({
+      getElementById: (id) => id === 'mask-layer' ? maskLayer : null,
+    });
+    const trigger = {
+      closest: () => clippedPopup,
+    } as unknown as HTMLElement;
+    expect(popupProps.getPopupContainer?.(trigger)).toBe(maskLayer);
+  });
+
+  test('leaves the native popup container unset when the host has no mask layer', () => {
+    expect(getMaskLayerPopupProps({ getElementById: () => null }))
+      .not.toHaveProperty('getPopupContainer');
+    const confirmed = GroupedSelectDeleteButton({ label: '分组 A', onDelete: () => undefined });
+    expect(confirmed.props).not.toHaveProperty('getPopupContainer');
+  });
+
+  test('passes controlled visibility through to native Popconfirm', () => {
+    const changes: boolean[] = [];
+    const confirmed = GroupedSelectDeleteButton({
+      label: '分组 A',
+      open: true,
+      onOpenChange: (open) => changes.push(open),
+      onDelete: () => undefined,
+    });
+    expect(confirmed.props.open).toBe(true);
+    confirmed.props.onOpenChange(false);
+    expect(changes).toEqual([false]);
+  });
+
+  test('keeps a newer confirmation open when an older deletion finishes', () => {
+    const groupTarget = { kind: 'group' as const, value: 'a' };
+    const optionTarget = { kind: 'option' as const, value: 'a' };
+    const active = updateGroupedSelectDeleteTarget(groupTarget, optionTarget, true);
+    expect(active).toBe(optionTarget);
+    expect(updateGroupedSelectDeleteTarget(active, groupTarget, false)).toBe(optionTarget);
+    expect(updateGroupedSelectDeleteTarget(active, optionTarget, false)).toBeUndefined();
   });
 
   test('renders the externally supplied color picker in add and edit flows', () => {

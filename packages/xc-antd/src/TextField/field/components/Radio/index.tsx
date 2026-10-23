@@ -23,13 +23,17 @@ const FieldRadio: ProFieldFC<GroupProps> = (
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const layoutClassName = getPrefixCls('pro-field-radio');
   const [loading, options, fetchData] = useFieldFetchData(rest);
-  const radioRef = useRef<unknown>(null);
+  const radioRef = useRef<HTMLDivElement>(null);
   const status = Form.Item?.useStatus?.();
 
   useImperativeHandle(
     ref,
     () => ({
       ...(radioRef.current as any || {}),
+      nativeElement: radioRef.current,
+      // 原生 Group 的 ref 是容器，表单聚焦需要定位到实际可用的单选输入。
+      focus: () => radioRef.current?.querySelector<HTMLInputElement>('input:not(:disabled)')?.focus(),
+      blur: () => radioRef.current?.querySelector<HTMLInputElement>('input:focus')?.blur(),
       fetchData: (keyWord: string) => fetchData(keyWord),
     }),
     [fetchData],

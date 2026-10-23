@@ -4,6 +4,7 @@ import { DragDropProvider } from '@dnd-kit/react';
 import { isSortableOperation, useSortable } from '@dnd-kit/react/sortable';
 import type { ColumnSettingItem } from './utils';
 import { moveColumnSetting } from './utils';
+import { useComponentTheme } from '../theme/useComponentTheme';
 
 export interface CrudTableColumnSettingsProps {
   columns: ColumnSettingItem[];
@@ -16,6 +17,7 @@ export function CrudTableColumnSettings({
   onChange,
   onReset,
 }: CrudTableColumnSettingsProps) {
+  const themeStyle = useComponentTheme();
   const configurableColumns = columns.filter((column) => !column.disabled);
   const allVisible = configurableColumns.every((column) => column.visible);
   const partiallyVisible =
@@ -30,7 +32,7 @@ export function CrudTableColumnSettings({
   };
 
   return (
-    <div className="xc-crud-table__column-settings">
+    <div className="xc-crud-table__column-settings" style={themeStyle}>
       <div className="xc-crud-table__column-settings-header">
         <Checkbox
           checked={allVisible}

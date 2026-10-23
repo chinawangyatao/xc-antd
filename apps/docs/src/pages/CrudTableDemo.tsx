@@ -22,6 +22,7 @@ import {
   ActionDrawer,
   CrudTable,
   FormGroup,
+  xcTablePagination,
   type CrudTableAction,
   type CrudTableColumn,
   type CrudTableRequest,
@@ -180,7 +181,6 @@ const CrudTableDemo = () => {
         width: 72,
         fixed: 'left',
         hideInSearch: true,
-        disableColumnSetting: true,
       },
       {
         title: '姓名',
@@ -254,7 +254,7 @@ const CrudTableDemo = () => {
         CrudTable
       </Typography.Title>
       <Typography.Paragraph type="secondary">
-        配置列同时驱动查询和展示，并完整演示请求分页、选择、自定义列、列拖拽、密度和全屏。
+        默认紧凑模式，工具栏仅显示自定义列。可隐藏到仅剩操作列，恢复其他列后自动恢复固定列与横向滚动。
       </Typography.Paragraph>
 
       <CrudTable<UserRecord, UserQuery>
@@ -264,7 +264,9 @@ const CrudTableDemo = () => {
         request={queryUsers}
         search={{
           defaultCollapsed: true,
-          defaultColsNumber: 3,
+          defaultColsNumber: 4,
+          colProps: { xs: 24, sm: 12, lg: 6 },
+          rowProps: { gutter: 16 },
           extraActions: ({ form }) => (
             <>
               <Upload
@@ -342,7 +344,7 @@ const CrudTableDemo = () => {
           persistenceKey: 'xc-crud-table-user-demo',
           persistenceType: 'localStorage',
         }}
-        pagination={{ defaultPageSize: 10 }}
+        pagination={{ ...xcTablePagination, defaultPageSize: 10 }}
         adaptiveHeight={{ minHeight: 360, offsetBottom: 24 }}
       />
 
