@@ -31,6 +31,7 @@ import type {
   ImageCropResult,
 } from './types';
 import { createCroppedImageFile } from './utils';
+import { useDrawerClosable } from '../shared/useDrawerClosable';
 
 interface CropSource {
   file: File;
@@ -117,6 +118,7 @@ export function ImageCropDrawer({
   onCancel,
   onComplete,
 }: ImageCropDrawerProps) {
+  const closable = useDrawerClosable();
   const [messageApi, messageContextHolder] = message.useMessage();
   const [sources, setSources] = React.useState<CropSource[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(0);
@@ -213,6 +215,7 @@ export function ImageCropDrawer({
       title={title}
       open={open}
       size={width}
+      closable={closable}
       destroyOnHidden
       keyboard={false}
       mask={{ closable: false }}

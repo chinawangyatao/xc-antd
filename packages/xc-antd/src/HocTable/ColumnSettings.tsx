@@ -4,6 +4,7 @@ import { DragDropProvider } from '@dnd-kit/react';
 import { isSortableOperation, useSortable } from '@dnd-kit/react/sortable';
 import type { HocTableColumnSetting } from './utils';
 import { moveHocTableColumnSetting } from './utils';
+import { useComponentTheme } from '../theme/useComponentTheme';
 
 export interface HocTableColumnSettingsProps {
   columns: HocTableColumnSetting[];
@@ -16,12 +17,13 @@ export function HocTableColumnSettings({
   onChange,
   onReset,
 }: HocTableColumnSettingsProps) {
+  const themeStyle = useComponentTheme();
   const configurable = columns.filter((column) => !column.disabled);
   const allVisible = configurable.every((column) => column.visible);
   const partiallyVisible = configurable.some((column) => column.visible) && !allVisible;
 
   return (
-    <div className="xc-hoc-table__column-settings">
+    <div className="xc-hoc-table__column-settings" style={themeStyle}>
       <div className="xc-hoc-table__column-settings-header">
         <Checkbox
           checked={allVisible}

@@ -54,11 +54,15 @@ const FieldCheckbox: ProFieldFC<GroupProps> = (
     };
   });
 
-  const checkBoxRef = useRef<unknown>(null);
+  const checkBoxRef = useRef<HTMLDivElement>(null);
   useImperativeHandle(
     ref,
     () => ({
       ...(checkBoxRef.current || {}),
+      nativeElement: checkBoxRef.current,
+      // Group 容器不直接接受输入焦点，供 Form.scrollToField 的 focus 选项使用。
+      focus: () => checkBoxRef.current?.querySelector<HTMLInputElement>('input:not(:disabled)')?.focus(),
+      blur: () => checkBoxRef.current?.querySelector<HTMLInputElement>('input:focus')?.blur(),
       fetchData: (keyWord: string) => fetchData(keyWord),
     }),
     [fetchData],
@@ -96,6 +100,7 @@ const FieldCheckbox: ProFieldFC<GroupProps> = (
         render={render}
         options={options}
         loading={loading}
+        checkboxRef={checkBoxRef}
         layoutClassName={layoutClassName}
         wrapSSR={wrapSSR}
         hashId={hashId}

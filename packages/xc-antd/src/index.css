@@ -15,5 +15,14 @@
 @import "./AmapEditor/style.css";
 @import "./QRCode/style.css";
 @import "./MediaPlayer/style.css";
+@import "./theme/scrollbar.css";
 
 @source "./";
+
+.xc-table-cell-text {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

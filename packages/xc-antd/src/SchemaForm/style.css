@@ -4,7 +4,9 @@
 
 .xc-schema-form__read-value {
   min-width: 0;
-  padding-inline: 8px;
+  min-height: var(--xc-control-height);
+  display: flex;
+  align-items: center;
 }
 
 .xc-schema-form__submitter {

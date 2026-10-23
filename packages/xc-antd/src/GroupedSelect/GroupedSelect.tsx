@@ -9,16 +9,19 @@ import {
   type SelectProps,
 } from 'antd';
 import type { CSSProperties } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { GroupedSelectAddEditor } from './AddEditor';
 import { GroupedSelectDeleteButton } from './DeleteButton';
 import { GroupedSelectEditEditor } from './EditEditor';
 import { GroupedSelectColorFilterControl, GroupedSelectColorSwatch } from './ColorPickerSelect';
 import type { ListDeleteConfirmOptions } from '../shared/listDeleteConfirm';
+import { getMaskLayerPopupProps } from '../shared/popupContainer';
 import {
   getVisibleGroupedSelectGroups,
   resolveGroupedSelectOptions,
   toggleGroupedSelectValue,
+  updateGroupedSelectDeleteTarget,
+  type GroupedSelectDeleteTarget,
   type GroupedSelectGroup,
   type GroupedSelectColor,
   type GroupedSelectColorFilter,
@@ -105,10 +108,12 @@ export function GroupedSelect({
   className,
   style,
 }: GroupedSelectProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const [innerValue, setInnerValue] = useState(defaultValue);
   const [search, setSearch] = useState('');
   const [filterColor, setFilterColor] = useState<string>();
   const [open, setOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<GroupedSelectDeleteTarget>();
   const [addMode, setAddMode] = useState<'group' | 'option' | null>(null);
   const [draftLabel, setDraftLabel] = useState('');
   const [draftGroupId, setDraftGroupId] = useState<GroupedSelectValue | undefined>();
@@ -142,6 +147,16 @@ export function GroupedSelect({
   }));
 
   useEffect(() => {
+    if (!deleteTarget) return;
+    const ownerDocument = rootRef.current?.ownerDocument;
+    if (!ownerDocument) return;
+    // 气泡移出下拉层后，列表或页面滚动时主动关闭，避免脱离触发项后仍悬浮。
+    const closeDeleteConfirm = () => setDeleteTarget(undefined);
+    ownerDocument.addEventListener('scroll', closeDeleteConfirm, true);
+    return () => ownerDocument.removeEventListener('scroll', closeDeleteConfirm, true);
+  }, [deleteTarget]);
+
+  useEffect(() => {
     const selectedValues = new Set(selected);
     // The cache is only for labels of selected values that may disappear from remote results.
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -164,6 +179,7 @@ export function GroupedSelect({
   }, [groups, selected, selectedOptions]);
 
   const updateSearch = (keyword: string) => {
+    setDeleteTarget(undefined);
     setSearch(keyword);
     onSearchChange?.(keyword);
   };
@@ -173,6 +189,7 @@ export function GroupedSelect({
     onChange?.(next);
   };
   const beginEdit = (group: GroupedSelectGroup, option?: GroupedSelectOption) => {
+    setDeleteTarget(undefined);
     setAddMode(null);
     setEditing({ kind: option ? 'option' : 'group', group, option });
     setEditingGroupId(group.id);
@@ -202,6 +219,7 @@ export function GroupedSelect({
     }
   };
   const beginAdd = (mode: 'group' | 'option') => {
+    setDeleteTarget(undefined);
     setEditing(null);
     setEditingGroupId(undefined);
     setAddMode(mode);
@@ -255,10 +273,14 @@ export function GroupedSelect({
     if (next.length !== selected.length) commit(next);
     if (searchMode === 'remote' && search) onSearchChange?.(search);
   };
+  const onDeleteOpenChange = (target: GroupedSelectDeleteTarget, nextOpen: boolean) => {
+    setDeleteTarget((current) => updateGroupedSelectDeleteTarget(current, target, nextOpen));
+  };
 
   return (
-    <div className={`xc-grouped-select${className ? ` ${className}` : ''}`} style={style}>
+    <div ref={rootRef} className={`xc-grouped-select${className ? ` ${className}` : ''}`} style={style}>
       <Select<GroupedSelectValue[]>
+        {...getMaskLayerPopupProps()}
         {...selectProps}
         className={`xc-grouped-select__trigger${selectProps?.className ? ` ${selectProps.className}` : ''}`}
         mode="multiple"
@@ -271,6 +293,7 @@ export function GroupedSelect({
         onOpenChange={(nextOpen) => {
           setOpen(nextOpen);
           if (!nextOpen) {
+            setDeleteTarget(undefined);
             if (search) updateSearch('');
             setFilterColor(undefined);
             setAddMode(null);
@@ -338,6 +361,8 @@ export function GroupedSelect({
                         )}
                         {onDeleteGroup && (
                           <GroupedSelectDeleteButton label={`分组 ${group.label}`}
+                            open={open && deleteTarget?.kind === 'group' && deleteTarget.value === group.id}
+                            onOpenChange={(nextOpen) => onDeleteOpenChange({ kind: 'group', value: group.id }, nextOpen)}
                             confirm={deleteConfirm} onDelete={() => deleteGroup(group)} />
                         )}
                       </>
@@ -383,6 +408,8 @@ export function GroupedSelect({
                           )}
                           {onDeleteOption && (
                             <GroupedSelectDeleteButton label={`标签 ${option.label}`}
+                              open={open && deleteTarget?.kind === 'option' && deleteTarget.value === option.value}
+                              onOpenChange={(nextOpen) => onDeleteOpenChange({ kind: 'option', value: option.value }, nextOpen)}
                               confirm={deleteConfirm} onDelete={() => deleteOption(option, group)} />
                           )}
                         </>

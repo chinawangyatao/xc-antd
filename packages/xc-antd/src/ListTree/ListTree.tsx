@@ -1,3 +1,4 @@
+import { useComponentTheme } from '../theme/useComponentTheme';
 import {
   Button,
   Dropdown,
@@ -264,6 +265,7 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
   virtual,
   ...treeProps
 }: ListTreeProps<TreeDataType>) {
+  const themeStyle = useComponentTheme();
   const [innerSearchValue, setInnerSearchValue] = useState(defaultSearchValue);
   const { confirmDelete, contextHolder } = useListDeleteConfirm({
     title: '确认删除该节点吗？',
@@ -405,7 +407,7 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
         horizontalScroll ? 'xc-list-tree--horizontal-scroll' : undefined,
         className,
       )}
-      style={style}
+      style={{ ...themeStyle, ...style }}
     >
       {contextHolder}
       {toolbarVisibility.toolbar && (

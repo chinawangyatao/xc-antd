@@ -174,7 +174,7 @@ const SchemaFormDemo = () => {
         SchemaForm
       </Typography.Title>
       <Typography.Paragraph type="secondary">
-        通过类型安全配置组合 TextField、FormGroup、栅格、校验和字段联动。
+        标签关联及失焦校验自动贯通。此例由外层 Card 提供留白，groupProps 设置为零，避免重复 padding。
       </Typography.Paragraph>
 
       <Space wrap style={{ marginBottom: 20 }}>
@@ -193,6 +193,8 @@ const SchemaFormDemo = () => {
             schema={schema}
             mode={readMode ? 'read' : 'edit'}
             initialValues={initialValues}
+            groupProps={{ style: { padding: 0 } }}
+            formProps={{ validateTrigger: 'onBlur' }}
             submitter={{ submitText: '保存配置', resetText: '恢复默认值' }}
             onFinish={async (values) => {
               setSubmittedValues(values);

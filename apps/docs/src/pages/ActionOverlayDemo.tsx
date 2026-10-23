@@ -25,7 +25,8 @@ const ActionOverlayDemo = () => {
           抽屉与弹窗
         </Typography.Title>
         <Typography.Paragraph type="secondary">
-          统一采用左对齐 footer，并在存在未保存内容时拦截蒙版、关闭和取消操作。
+          弹窗底栏右对齐，取消在前；抽屉底栏左对齐，确认在前，顶部关闭按钮位于右侧。
+          通过原生 ConfigProvider 配置禁止遮罩关闭，关闭和取消操作会检查未保存内容。
         </Typography.Paragraph>
       </div>
 
@@ -45,6 +46,7 @@ const ActionOverlayDemo = () => {
       <ActionDrawer
         title="新增数据"
         open={drawerOpen}
+        resizable
         onOpenChange={(open) => {
           setDrawerOpen(open);
           if (!open) setDrawerValue('');
@@ -55,7 +57,7 @@ const ActionOverlayDemo = () => {
         <Typography.Paragraph>业务表单内容放在这里。</Typography.Paragraph>
         <Input
           value={drawerValue}
-          placeholder="输入内容后点击蒙版"
+          placeholder="输入内容后点击右侧关闭按钮或取消"
           onChange={(event) => setDrawerValue(event.target.value)}
         />
       </ActionDrawer>
@@ -72,7 +74,7 @@ const ActionOverlayDemo = () => {
       >
         <Input
           value={modalValue}
-          placeholder="输入内容后点击蒙版"
+          placeholder="输入内容后点击关闭或取消"
           onChange={(event) => setModalValue(event.target.value)}
         />
       </ActionModal>

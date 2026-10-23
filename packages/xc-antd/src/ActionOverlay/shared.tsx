@@ -1,5 +1,5 @@
-import { Button, Modal } from 'antd';
-import type { ButtonProps, FormInstance } from 'antd';
+import { Button, Flex, Modal, theme } from 'antd';
+import type { ButtonProps, DrawerProps, FormInstance, ModalProps } from 'antd';
 import React from 'react';
 
 export type ActionConfirmResult = boolean | void | Promise<boolean | void>;
@@ -20,6 +20,8 @@ export interface ActionOverlayCommonProps {
   confirmButtonProps?: ButtonProps;
   cancelButtonProps?: ButtonProps;
   footer?: React.ReactNode | false;
+  /** 默认按浮层类型排布；modal 为右对齐取消在前，drawer 为左对齐确认在前。 */
+  footerLayout?: 'modal' | 'drawer';
   onConfirm?: () => ActionConfirmResult;
   onCancel?: () => void;
   onOpenChange?: (open: boolean) => void;
@@ -104,12 +106,14 @@ export function UnsavedChangesPrompt({
   open,
   config,
   zIndex,
+  getContainer,
   onDiscard,
   onContinue,
 }: {
   open: boolean;
   config?: UnsavedChangesPromptConfig;
   zIndex?: number;
+  getContainer?: DrawerProps['getContainer'] | ModalProps['getContainer'];
   onDiscard: () => void;
   onContinue: () => void;
 }) {
@@ -117,8 +121,10 @@ export function UnsavedChangesPrompt({
     <Modal
       title={config?.title ?? '未保存提示'}
       open={open}
-      width={420}
+      width={480}
       zIndex={zIndex}
+      // 两者底层均为 Portal；Drawer 的容器类型比 Modal 多允许普通 Element。
+      getContainer={getContainer as ModalProps['getContainer']}
       closable={false}
       keyboard={false}
       mask={{ closable: false }}
@@ -126,6 +132,7 @@ export function UnsavedChangesPrompt({
       onCancel={onContinue}
       footer={(
         <ActionOverlayFooter
+          layout="modal"
           confirmText={config?.confirmText ?? '退出'}
           cancelText={config?.cancelText ?? '继续编辑'}
           confirmButtonProps={{ danger: true }}
@@ -140,6 +147,7 @@ export function UnsavedChangesPrompt({
 }
 
 export function ActionOverlayFooter({
+  layout = 'drawer',
   confirmText = '确定',
   cancelText = '取消',
   showConfirm = true,
@@ -149,25 +157,35 @@ export function ActionOverlayFooter({
   cancelButtonProps,
   onConfirm,
   onCancel,
-}: Omit<ActionOverlayCommonProps, 'footer' | 'onOpenChange'>) {
+}: Omit<ActionOverlayCommonProps, 'footer' | 'onOpenChange'> & {
+  layout?: 'modal' | 'drawer';
+}) {
+  const { token } = theme.useToken();
+  const confirmButton = showConfirm && (
+    <Button
+      key="confirm"
+      {...confirmButtonProps}
+      type="primary"
+      loading={confirmLoading}
+      onClick={() => void onConfirm?.()}
+    >
+      {confirmText}
+    </Button>
+  );
+  const cancelButton = showCancel && (
+    <Button key="cancel" {...cancelButtonProps} onClick={onCancel}>
+      {cancelText}
+    </Button>
+  );
   return (
-    <div className="xc-action-overlay__footer">
-      {showConfirm && (
-        <Button
-          {...confirmButtonProps}
-          type="primary"
-          loading={confirmLoading}
-          onClick={() => void onConfirm?.()}
-          style={{ minWidth: 88, ...confirmButtonProps?.style }}
-        >
-          {confirmText}
-        </Button>
-      )}
-      {showCancel && (
-        <Button {...cancelButtonProps} onClick={onCancel}>
-          {cancelText}
-        </Button>
-      )}
-    </div>
+    <Flex
+      className="xc-action-overlay__footer"
+      justify={layout === 'modal' ? 'flex-end' : 'flex-start'}
+      align="center"
+      gap={token.marginXS}
+      wrap
+    >
+      {layout === 'modal' ? [cancelButton, confirmButton] : [confirmButton, cancelButton]}
+    </Flex>
   );
 }

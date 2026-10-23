@@ -1,6 +1,7 @@
 import { Row } from 'antd';
 import type { RowProps } from 'antd';
 import React from 'react';
+import { useComponentTheme } from '../theme/useComponentTheme';
 import './style.css';
 
 export interface FormGroupProps
@@ -19,13 +20,15 @@ export function FormGroup({
   justify = 'start',
   align,
   className,
+  style,
   children,
   ...sectionProps
 }: FormGroupProps) {
+  const themeStyle = useComponentTheme();
   const rootClassName = ['xc-form-group', className].filter(Boolean).join(' ');
 
   return (
-    <section {...sectionProps} className={rootClassName}>
+    <section {...sectionProps} className={rootClassName} style={{ ...themeStyle, ...style }}>
       {(title !== undefined || extra !== undefined) && (
         <header className="xc-form-group__header">
           {title !== undefined && (

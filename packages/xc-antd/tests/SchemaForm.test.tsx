@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { SchemaForm, type SchemaFormGroup } from '../src/SchemaForm';
+import { mergeFormControlProps } from '../src/shared/formControlProps';
 import {
   applySchemaTransforms,
   getSchemaColProps,
@@ -85,7 +86,7 @@ describe('SchemaForm', () => {
     });
   });
 
-  test('wraps read-only field content with horizontal spacing', () => {
+  test('wraps read-only field content without changing column alignment', () => {
     const html = renderToStaticMarkup(
       <SchemaForm<FormValues, SubmitValues>
         schema={schema}
@@ -100,5 +101,70 @@ describe('SchemaForm', () => {
     );
     expect(html).toContain('xc-schema-form__read-value');
     expect(html).toContain('ant-form-item-required');
+  });
+
+  test('passes label ids and required semantics to native controls', () => {
+    const html = renderToStaticMarkup(
+      <SchemaForm
+        schema={[{ key: 'fields', fields: [
+          { name: 'text', label: '文本', required: true, fieldProps: { id: 'unrelated-id' } },
+          { name: 'number', label: '数值', valueType: 'digit', required: true },
+          { name: 'select', label: '选择', valueType: 'select', required: true, valueEnum: { a: '选项' } },
+          { name: 'date', label: '日期', valueType: 'date', required: true },
+          { name: 'radio', label: '单选', valueType: 'radio', required: true, valueEnum: { a: '选项' } },
+          { name: 'checkbox', label: '多选', valueType: 'checkbox', required: true, valueEnum: { a: '选项' } },
+        ] }]}
+        formProps={{ name: 'association' }}
+        submitter={false}
+      />,
+    );
+    for (const name of ['text', 'number', 'select', 'date', 'radio', 'checkbox']) {
+      expect(html).toContain(`for="association_${name}"`);
+      expect(html).toContain(`id="association_${name}"`);
+    }
+    expect(html).not.toContain('id="unrelated-id"');
+    expect(html.match(/aria-required="true"/g)?.length).toBeGreaterThanOrEqual(6);
+  });
+
+  test('exposes Form.Item blur validation and ref to custom controls', () => {
+    let captured: Record<string, unknown> | undefined;
+    let blurCount = 0;
+    const html = renderToStaticMarkup(
+      <SchemaForm
+        schema={[{ key: 'custom', fields: [{
+          name: 'name',
+          label: '名称',
+          fieldProps: { onBlur: () => { blurCount += 1; } },
+          renderFormItem: ({ controlProps, ref }) => {
+            captured = controlProps;
+            expect(ref).toBeDefined();
+            return <input {...controlProps} />;
+          },
+        }] }]}
+        formProps={{ name: 'blur', validateTrigger: 'onBlur' }}
+        submitter={false}
+      />,
+    );
+    expect(html).toContain('id="blur_name"');
+    expect(typeof captured?.onBlur).toBe('function');
+    (captured?.onBlur as () => void)();
+    expect(blurCount).toBe(1);
+  });
+
+  test('merges event handlers once and retains accessible descriptions', () => {
+    const calls: string[] = [];
+    const formHandler = () => calls.push('form');
+    const merged = mergeFormControlProps(
+      { onBlur: () => calls.push('business'), 'aria-describedby': 'hint' },
+      { onBlur: formHandler, 'aria-describedby': 'hint error', id: 'form-field' },
+    );
+    (merged.onBlur as () => void)();
+    expect(calls).toEqual(['business', 'form']);
+    expect(merged['aria-describedby']).toBe('hint error');
+    expect(merged.id).toBe('form-field');
+    calls.length = 0;
+    const sameHandler = mergeFormControlProps({ onBlur: formHandler }, { onBlur: formHandler });
+    (sameHandler.onBlur as () => void)();
+    expect(calls).toEqual(['form']);
   });
 });

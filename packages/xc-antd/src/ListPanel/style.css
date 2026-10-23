@@ -32,8 +32,8 @@
   display: block;
   overflow: hidden;
   padding: 0 8px;
-  color: #1d2129;
-  font-size: 14px;
+  color: var(--xc-color-text);
+  font-size: var(--xc-font-size);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -60,8 +60,8 @@
   overflow: hidden;
   padding: 5px 8px;
   border: 0;
-  border-radius: 4px;
-  color: #1d2129;
+  border-radius: var(--xc-radius);
+  color: var(--xc-color-text);
   background: transparent;
   font: inherit;
   line-height: 22px;
@@ -71,27 +71,27 @@
 }
 
 .xc-list-panel__item:hover {
-  background: #f7f8fa;
+  background: var(--xc-color-hover);
 }
 
 .xc-list-panel__item:active {
-  background: #e7e7e7;
+  background: var(--xc-color-fill);
 }
 
 .xc-list-panel__item:focus-visible {
-  outline: 2px solid #1677ff;
+  outline: 2px solid var(--xc-color-primary);
   outline-offset: -2px;
 }
 
 .xc-list-panel__item--selected,
 .xc-list-panel__item--selected:hover {
-  color: #1677ff;
-  background: #e6f4ff;
+  color: var(--xc-color-primary);
+  background: var(--xc-color-primary-bg);
 }
 
 .xc-list-panel__item--disabled,
 .xc-list-panel__item--disabled:hover {
-  color: #c9cdd4;
+  color: var(--xc-color-text-disabled);
   background: transparent;
   cursor: not-allowed;
 }
@@ -106,8 +106,8 @@
 
 .xc-list-panel__item-description {
   margin-top: 2px;
-  color: #86909c;
-  font-size: 12px;
+  color: var(--xc-color-text-tertiary);
+  font-size: var(--xc-font-size-sm);
 }
 
 .xc-list-panel__item--selected .xc-list-panel__item-description {
@@ -115,5 +115,5 @@
 }
 
 .xc-list-panel__item--disabled .xc-list-panel__item-description {
-  color: #c9cdd4;
+  color: var(--xc-color-text-disabled);
 }

@@ -11,6 +11,7 @@ type Props = Omit<Parameters<ProFieldFC<GroupProps>>[0], 'options'> & {
   layoutClassName: string;
   wrapSSR: (node: React.ReactElement) => React.ReactElement;
   hashId: string;
+  checkboxRef: React.RefObject<HTMLDivElement | null>;
   status: { status?: string } | undefined;
 };
 
@@ -24,6 +25,7 @@ export function FieldCheckboxEdit(props: Props) {
     layoutClassName,
     wrapSSR,
     hashId,
+    checkboxRef,
     status,
     ...rest
   } = props;
@@ -36,6 +38,7 @@ export function FieldCheckboxEdit(props: Props) {
 
   const dom = wrapSSR(
     <Checkbox.Group
+      ref={checkboxRef}
       {...restFieldProps}
       variant={variant}
       className={clsx(

@@ -1,3 +1,4 @@
+import { useComponentTheme } from '../theme/useComponentTheme';
 import {
   Button,
   Divider,
@@ -155,6 +156,7 @@ export function ListPanel<ItemType extends object = ListPanelDataItem>({
   className,
   style,
 }: ListPanelProps<ItemType>) {
+  const themeStyle = useComponentTheme();
   const [innerSelectedKey, setInnerSelectedKey] = useState<Key | null>(defaultSelectedKey);
   const [innerSearchValue, setInnerSearchValue] = useState(defaultSearchValue);
   const { confirmDelete, contextHolder } = useListDeleteConfirm({
@@ -219,7 +221,7 @@ export function ListPanel<ItemType extends object = ListPanelDataItem>({
   };
 
   return (
-    <div className={joinClassNames('xc-list-panel', className)} style={style}>
+    <div className={joinClassNames('xc-list-panel', className)} style={{ ...themeStyle, ...style }}>
       {contextHolder}
       {toolbarVisibility.toolbar && (
         <div className="xc-list-panel__toolbar">

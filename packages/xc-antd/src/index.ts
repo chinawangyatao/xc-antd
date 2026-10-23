@@ -8,6 +8,7 @@ export * from './TextField/field';
 export * from './HocTable';
 export * from './CrudTable';
 export * from './ActionOverlay';
+export * from './theme';
 export * from './FormGroup';
 export * from './SchemaForm';
 export * from './ListPanel';

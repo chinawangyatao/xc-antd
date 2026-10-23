@@ -2,6 +2,7 @@ import { Button, ColorPicker, type ColorPickerProps } from 'antd';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import type { GroupedSelectColor } from './utils';
+import { getMaskLayerPopupProps } from '../shared/popupContainer';
 
 function normalizeColors(colors: GroupedSelectColor[]) {
   return colors.map((color) => typeof color === 'string'
@@ -58,6 +59,7 @@ export function GroupedSelectColorPicker({
       onClick={(event) => event.stopPropagation()}
     >
       <ColorPicker
+        {...getMaskLayerPopupProps()}
         value={value}
         open={open}
         onOpenChange={setOpen}
@@ -67,7 +69,6 @@ export function GroupedSelectColorPicker({
         panelRender={panelRender}
         rootClassName="xc-grouped-select__color-picker-root"
         aria-label={ariaLabel}
-        getPopupContainer={(trigger) => trigger.ownerDocument.body}
         onChange={(color) => onChange(color.toHexString())}
       />
     </span>

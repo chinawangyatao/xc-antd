@@ -158,6 +158,7 @@ function App() {
         </Sider>}
         <Drawer
           title="组件导航"
+          closable={{ placement: 'end' }}
           placement="left"
           open={isMobile && menuOpen}
           onClose={() => setMenuOpen(false)}

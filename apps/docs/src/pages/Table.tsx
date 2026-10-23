@@ -15,6 +15,7 @@ import {
 } from '@ant-design/icons';
 import {
   HocTable,
+  xcTablePagination,
   type HocTableColumn,
   type HocTableNewRowFieldConfig,
   type HocTableValidationRule,
@@ -234,9 +235,8 @@ export default function HocTableDemo() {
         )}
         tableProps={{
           pagination: {
+            ...xcTablePagination,
             defaultPageSize: 8,
-            showSizeChanger: true,
-            showTotal: (total) => `共 ${total} 条`,
           },
           scroll: { x: 1080 },
         }}

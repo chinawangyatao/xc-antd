@@ -1,4 +1,6 @@
 import React from 'react';
+import { useComponentTheme } from '../theme/useComponentTheme';
+import { TableCellText } from '../shared/TableCellText';
 import {
   Button,
   Space,
@@ -86,6 +88,7 @@ export function HocTable<RecordType extends object>({
   className,
   style,
 }: HocTableProps<RecordType>) {
+  const themeStyle = useComponentTheme();
   const [tableSize, setTableSize] = React.useState(defaultSize);
   const [filterVisible, setFilterVisible] = React.useState(false);
   const [globalSearch, setGlobalSearch] = React.useState('');
@@ -233,9 +236,10 @@ export function HocTable<RecordType extends object>({
           }
           if (column.render) return column.render(value, record, index);
           const text = String(value ?? '');
-          return highlightKeyword
+          const textNode = highlightKeyword
             ? <HighlightText text={text} keyword={highlightKeyword} />
             : text;
+          return column.ellipsis ? <TableCellText title={text}>{textNode}</TableCellText> : textNode;
         },
       };
     });
@@ -308,7 +312,7 @@ export function HocTable<RecordType extends object>({
   } = tableProps ?? {};
 
   return (
-    <div className={joinClassNames('xc-hoc-table', className)} style={style}>
+    <div className={joinClassNames('xc-hoc-table', className)} style={{ ...themeStyle, ...style }}>
       {showToolbar && (
         <HocTableToolbar
           addText={addText}

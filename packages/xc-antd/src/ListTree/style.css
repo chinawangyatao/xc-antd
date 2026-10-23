@@ -4,9 +4,9 @@
   width: 100%;
   max-width: 100%;
   overflow: hidden;
-  --xc-list-tree-drag-color: #1677ff;
-  --xc-list-tree-drag-background: #e6f4ff;
-  --xc-list-tree-drag-forbidden-color: #86909c;
+  --xc-list-tree-drag-color: var(--xc-color-primary);
+  --xc-list-tree-drag-background: var(--xc-color-primary-bg);
+  --xc-list-tree-drag-forbidden-color: var(--xc-color-text-disabled);
 }
 
 .xc-list-tree__toolbar {
@@ -23,24 +23,6 @@
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
-  scrollbar-color: #b7c0cc transparent;
-  scrollbar-width: thin;
-}
-
-.xc-list-tree--horizontal-scroll .xc-list-tree__tree .ant-tree-list-holder::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.xc-list-tree--horizontal-scroll .xc-list-tree__tree .ant-tree-list-holder::-webkit-scrollbar-thumb {
-  border: 2px solid transparent;
-  border-radius: 6px;
-  background: #b7c0cc;
-  background-clip: content-box;
-}
-
-.xc-list-tree--horizontal-scroll .xc-list-tree__tree .ant-tree-list-holder::-webkit-scrollbar-track {
-  background: transparent;
 }
 
 .xc-list-tree--horizontal-scroll .xc-list-tree__tree .ant-tree-list-holder-inner,

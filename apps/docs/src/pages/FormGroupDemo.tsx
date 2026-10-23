@@ -14,6 +14,7 @@ const FormGroupDemo = () => (
     <Form layout="vertical">
       <FormGroup
         title="基础信息"
+        style={{ padding: 'var(--xc-padding-lg)' }}
         extra={<Button type="link" icon={<EditOutlined />}>编辑说明</Button>}
       >
         <Col xs={24} md={12}>
@@ -34,7 +35,7 @@ const FormGroupDemo = () => (
         </Col>
       </FormGroup>
 
-      <FormGroup title="联系信息">
+      <FormGroup title="联系信息" style={{ padding: 'var(--xc-padding-lg)' }}>
         <Col xs={24} md={12}>
           <Form.Item label="联系人" name="contact">
             <Input placeholder="请输入联系人" />
