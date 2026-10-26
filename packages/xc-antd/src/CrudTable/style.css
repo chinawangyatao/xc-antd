@@ -10,6 +10,73 @@
   overflow: auto;
 }
 
+/* 容器模式只要求父级提供确定高度；查询、工具栏和分页保留自身高度，表体消化剩余空间。 */
+.xc-crud-table--adaptive {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.xc-crud-table--adaptive > .xc-crud-table__search,
+.xc-crud-table--adaptive > .xc-crud-table__toolbar,
+.xc-crud-table--adaptive > .xc-crud-table__alert,
+.xc-crud-table--adaptive > .xc-crud-table__selection-alert,
+[data-xc-crud-table-adaptive] > .ant-table-title,
+[data-xc-crud-table-adaptive] > .ant-table-footer,
+[data-xc-crud-table-adaptive] > .ant-table-container > .ant-table-header,
+[data-xc-crud-table-adaptive] > .ant-table-container > .ant-table-summary,
+.xc-crud-table--adaptive > .xc-crud-table__table > .ant-table-wrapper
+  > :is(.ant-spin, .ant-spin-nested-loading) > .ant-spin-container > .ant-table-pagination {
+  flex: 0 0 auto;
+}
+
+/* 只衔接本表格的 Spin 包装层；行展开内容中的嵌套表格保持自己的布局。 */
+.xc-crud-table--adaptive > .xc-crud-table__table,
+.xc-crud-table--adaptive > .xc-crud-table__table > .ant-table-wrapper,
+.xc-crud-table--adaptive > .xc-crud-table__table > .ant-table-wrapper
+  > :is(.ant-spin, .ant-spin-nested-loading),
+.xc-crud-table--adaptive > .xc-crud-table__table > .ant-table-wrapper
+  > :is(.ant-spin, .ant-spin-nested-loading) > .ant-spin-container,
+[data-xc-crud-table-adaptive],
+[data-xc-crud-table-adaptive] > .ant-table-container {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+[data-xc-crud-table-adaptive] > .ant-table-container > .ant-table-body {
+  min-height: 0;
+  flex: 1 1 0;
+  /* 原生内联样式使用 auto；保留滚动槽可避免少量数据时表头与固定列错位。 */
+  overflow-y: scroll !important;
+  scrollbar-gutter: stable;
+}
+
+[data-xc-crud-table-adaptive] > .ant-table-container
+  > .ant-table-body:has(> table > .ant-table-tbody > .ant-table-placeholder) > table,
+[data-xc-crud-table-adaptive] > .ant-table-container
+  > .ant-table-body > table > .ant-table-tbody > .ant-table-placeholder {
+  height: 100%;
+}
+
+[data-xc-crud-table-adaptive] > .ant-table-container
+  > .ant-table-body > table > .ant-table-tbody > .ant-table-placeholder > .ant-table-cell {
+  vertical-align: middle;
+}
+
+[data-xc-crud-table-adaptive] > .ant-table-container
+  > .ant-table-body > table > .ant-table-tbody > .ant-table-measure-row > td {
+  height: 0;
+  padding: 0;
+  border: 0;
+}
+
 .xc-crud-table__search {
   padding: var(--xc-padding-lg) var(--xc-table-padding-inline, var(--xc-padding-lg)) 8px;
   border-bottom: 1px solid var(--xc-color-split);
@@ -27,9 +94,25 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 8px;
-  min-height: 32px;
+  gap: var(--xc-padding-sm);
   flex-wrap: wrap;
+}
+
+.xc-crud-table__search-button {
+  min-width: 64px;
+  box-shadow: none;
+}
+
+.xc-crud-table__search-reset:not(:disabled):not(:hover):not(:active) {
+  color: var(--xc-color-text-secondary);
+}
+
+.xc-crud-table__search-collapse {
+  padding-inline: 0;
+}
+
+.xc-crud-table__search-collapse .anticon {
+  font-size: 12px;
 }
 
 .xc-crud-table__toolbar {
@@ -167,6 +250,13 @@
 }
 
 @media (max-width: 720px) {
+  .xc-crud-table--adaptive > .xc-crud-table__search {
+    max-height: 40%;
+    min-height: 0;
+    flex-shrink: 1;
+    overflow-y: auto;
+  }
+
   .xc-crud-table__search,
   .xc-crud-table__toolbar,
   .xc-crud-table__table {

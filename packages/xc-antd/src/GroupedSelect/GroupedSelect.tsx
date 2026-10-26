@@ -16,6 +16,7 @@ import { GroupedSelectEditEditor } from './EditEditor';
 import { GroupedSelectColorFilterControl, GroupedSelectColorSwatch } from './ColorPickerSelect';
 import type { ListDeleteConfirmOptions } from '../shared/listDeleteConfirm';
 import { getMaskLayerPopupProps } from '../shared/popupContainer';
+import { useComponentTheme } from '../theme/useComponentTheme';
 import {
   getVisibleGroupedSelectGroups,
   resolveGroupedSelectOptions,
@@ -108,6 +109,7 @@ export function GroupedSelect({
   className,
   style,
 }: GroupedSelectProps) {
+  const themeStyle = useComponentTheme();
   const rootRef = useRef<HTMLDivElement>(null);
   const [innerValue, setInnerValue] = useState(defaultValue);
   const [search, setSearch] = useState('');
@@ -278,7 +280,7 @@ export function GroupedSelect({
   };
 
   return (
-    <div ref={rootRef} className={`xc-grouped-select${className ? ` ${className}` : ''}`} style={style}>
+    <div ref={rootRef} className={`xc-grouped-select${className ? ` ${className}` : ''}`} style={{ ...themeStyle, ...style }}>
       <Select<GroupedSelectValue[]>
         {...getMaskLayerPopupProps()}
         {...selectProps}
@@ -305,7 +307,8 @@ export function GroupedSelect({
         }}
         popupMatchSelectWidth
         popupRender={() => (
-          <div className="xc-grouped-select__popup" onMouseDown={(event) => event.stopPropagation()}>
+          // 下拉内容通过 Portal 挂载，需单独注入主题变量以保持边框与反馈色一致。
+          <div className="xc-grouped-select__popup" style={themeStyle} onMouseDown={(event) => event.stopPropagation()}>
             <div className="xc-grouped-select__search">
               <Input
                 allowClear
@@ -356,7 +359,7 @@ export function GroupedSelect({
                           {group.label}
                         </span>
                         {onEditGroup && (
-                          <Button type="text" size="small" aria-label={`编辑分组 ${group.label}`}
+                          <Button color="primary" variant="text" size="small" aria-label={`编辑分组 ${group.label}`}
                             icon={<EditOutlined />} onClick={() => beginEdit(group)} />
                         )}
                         {onDeleteGroup && (
@@ -403,7 +406,7 @@ export function GroupedSelect({
                             <GroupedSelectColorSwatch color={option.color} label={option.label} />
                           </Checkbox>
                           {onEditOption && (
-                            <Button type="text" size="small" aria-label={`编辑选项 ${option.label}`}
+                            <Button color="primary" variant="text" size="small" aria-label={`编辑选项 ${option.label}`}
                               icon={<EditOutlined />} onClick={() => beginEdit(group, option)} />
                           )}
                           {onDeleteOption && (

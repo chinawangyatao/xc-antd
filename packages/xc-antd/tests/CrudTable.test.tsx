@@ -115,3 +115,48 @@ describe('CrudTable with only the action column visible', () => {
     expect(actionColumns[1].fixed).toBe('right');
   });
 });
+
+describe('CrudTable container height', () => {
+  test.each([{ dataSource: rows }, { dataSource: [] }])('fills its container for populated and empty tables', ({ dataSource }) => {
+    const html = renderToStaticMarkup(
+      <CrudTable
+        columns={columns}
+        dataSource={dataSource}
+        search={false}
+        adaptiveHeight={{ mode: 'container' }}
+      />,
+    );
+    expect(html).toContain('xc-crud-table--adaptive');
+    expect(html).toContain('data-xc-crud-table-adaptive="true"');
+    expect(html).toContain('max-height:100%');
+    expect(html).toContain('ant-table-header');
+    expect(html).toContain('ant-table-body');
+    if (dataSource.length > 0) {
+      expect(html).toContain('ant-pagination');
+    } else {
+      // 空数据沿用 Ant Design 不输出分页器的行为，高度适配不伪造分页。
+      expect(html).not.toContain('ant-pagination');
+    }
+  });
+
+  test('preserves an explicit scroll height in container mode', () => {
+    const html = renderToStaticMarkup(
+      <CrudTable columns={columns} search={false} adaptiveHeight={{ mode: 'container' }}
+        tableProps={{ scroll: { y: 320 } }} />,
+    );
+    expect(html).toContain('xc-crud-table--adaptive');
+    expect(html).toContain('max-height:320px');
+    expect(html).not.toContain('max-height:100%');
+  });
+
+  test.each([undefined, false, true, { mode: 'viewport' as const }])(
+    'keeps the existing layout outside container mode',
+    (adaptiveHeight) => {
+      const html = renderToStaticMarkup(
+        <CrudTable columns={columns} search={false} adaptiveHeight={adaptiveHeight} />,
+      );
+      expect(html).not.toContain('xc-crud-table--adaptive');
+      expect(html).not.toContain('max-height:100%');
+    },
+  );
+});

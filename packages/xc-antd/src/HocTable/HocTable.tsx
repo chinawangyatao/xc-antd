@@ -22,6 +22,7 @@ import {
   mergeHocTableColumnSettings,
   validateHocTableRow,
 } from './utils';
+import '../shared/table.css';
 import './style.css';
 
 const NEW_ROW_PREFIX = '__xc_hoc_new__';

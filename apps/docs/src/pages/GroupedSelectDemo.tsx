@@ -116,6 +116,7 @@ export default function GroupedSelectDemo() {
         <Typography.Title level={3} style={{ marginTop: 0 }}>GroupedSelect 分组选择</Typography.Title>
         <Typography.Paragraph type="secondary">
           搜索、多选、新增、行内编辑（支持切换标签所属分组）和气泡确认删除。删除气泡避免下拉层裁切，滚动或关闭下拉框时自动收起。数据仅保存在本页。
+          编辑、删除与确认按钮统一使用主题主色，下拉分隔线、错误提示随宿主主题变化。
         </Typography.Paragraph>
       </div>
       <Card title="可编辑的分组选择" style={{ maxWidth: 600 }}>

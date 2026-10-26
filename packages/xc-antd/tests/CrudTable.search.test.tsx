@@ -19,6 +19,69 @@ describe('CrudTable search layout', () => {
       .toEqual({ span: 6, order: 2 });
   });
 
+  test('shows all fields without a toggle when they fit within two rows', () => {
+    const html = renderToStaticMarkup(
+      <CrudTable columns={columns} search={{ colProps: { span: 6 } }} options={false} pagination={false} />,
+    ).split('xc-crud-table__toolbar')[0];
+    expect(html).not.toContain('display:none');
+    expect(html).not.toContain('展开');
+    expect(html).not.toContain('收起');
+  });
+
+  test.each([[1440, 7], [848, 3], [375, 2]])(
+    'keeps two rows with room for actions at container width %d',
+    (width, visibleCount) => {
+      const searchColumns: CrudTableColumn<Record<string, string>>[] = Array.from(
+        { length: visibleCount + 1 },
+        (_, index) => ({ title: `字段${index + 1}`, dataIndex: `field${index + 1}` }),
+      );
+      const colProps = getContainerColProps({ xs: 24, sm: 12, lg: 6 }, width, breakpoints);
+      const boundaryHtml = renderToStaticMarkup(
+        <CrudTable columns={searchColumns.slice(0, visibleCount)} search={{ colProps }} options={false} pagination={false} />,
+      ).split('xc-crud-table__toolbar')[0];
+      expect(boundaryHtml).not.toContain('display:none');
+      expect(boundaryHtml).not.toContain('展开');
+      expect(boundaryHtml).not.toContain('收起');
+
+      const collapsedHtml = renderToStaticMarkup(
+        <CrudTable columns={searchColumns} search={{ colProps }} options={false} pagination={false} />,
+      ).split('xc-crud-table__toolbar')[0];
+      expect(collapsedHtml.match(/display:none/g)).toHaveLength(1);
+      expect(collapsedHtml).toContain('展开');
+      expect(collapsedHtml).toContain('aria-expanded="false"');
+      const [visibleHtml, hiddenHtml] = collapsedHtml.split('display:none');
+      expect(visibleHtml).toContain(`for="field${visibleCount}"`);
+      expect(hiddenHtml).toContain(`for="field${visibleCount + 1}"`);
+    },
+  );
+
+  test('keeps two rows and hidden field values in controlled collapsed mode', () => {
+    const searchColumns: CrudTableColumn<Record<string, string>>[] = Array.from(
+      { length: 9 },
+      (_, index) => ({ title: `字段${index + 1}`, dataIndex: `field${index + 1}` }),
+    );
+    const renderSearch = (state: { collapsed?: boolean; defaultCollapsed?: boolean }) => renderToStaticMarkup(
+      <CrudTable
+        columns={searchColumns}
+        search={{ ...state, colProps: { span: 6 }, initialValues: { field9: '保留查询条件' } }}
+        options={false}
+        pagination={false}
+      />,
+    ).split('xc-crud-table__toolbar')[0];
+
+    for (const state of [{ collapsed: false }, { defaultCollapsed: false }]) {
+      const expandedHtml = renderSearch(state);
+      expect(expandedHtml).not.toContain('display:none');
+      expect(expandedHtml).toContain('收起');
+      expect(expandedHtml).toContain('aria-expanded="true"');
+    }
+
+    const collapsedHtml = renderSearch({ collapsed: true, defaultCollapsed: false });
+    expect(collapsedHtml.match(/display:none/g)).toHaveLength(2);
+    expect(collapsedHtml).toContain('展开');
+    expect(collapsedHtml).toContain('value="保留查询条件"');
+  });
+
   test('honors four collapsed fields and orders submit before reset', () => {
     const html = renderToStaticMarkup(
       <CrudTable columns={columns} search={{ defaultColsNumber: 4 }} options={false} pagination={false} />,
@@ -26,6 +89,9 @@ describe('CrudTable search layout', () => {
     expect(html.match(/display:none/g)).toHaveLength(1);
     expect(html.indexOf('展开')).toBeLessThan(html.indexOf('查询'));
     expect(html.indexOf('查询')).toBeLessThan(html.indexOf('重置'));
+    expect(html).not.toContain('data-icon="search"');
+    expect(html).not.toContain('data-icon="reload"');
+    expect(html).toContain('data-icon="down"');
   });
 
   test('allows the legacy action order through configuration', () => {

@@ -73,6 +73,9 @@ export const xcTheme: ThemeConfig = {
   },
   components: {
     Button: {
+      defaultColor: '#4E5969',
+      defaultBorderColor: '#DCDCDC',
+      defaultBg: '#FFFFFF',
       paddingInlineSM: 8,
       paddingInline: 16,
       paddingInlineLG: 24,
@@ -83,6 +86,14 @@ export const xcTheme: ThemeConfig = {
     },
     Form: { itemMarginBottom: 16, verticalLabelPadding: '0 0 4px' },
     Table: {
+      // 表格标注使用冷灰边框；其余组件继续读取全局中性色板。
+      borderColor: '#E5E6EB',
+      headerBg: '#F7F8FA',
+      headerColor: '#4E5969',
+      headerBorderRadius: 0,
+      headerSplitColor: 'transparent',
+      rowHoverBg: '#F7F8FA',
+      fontWeightStrong: 500,
       cellPaddingInline: 16,
       cellPaddingInlineMD: 16,
       cellPaddingInlineSM: 16,
