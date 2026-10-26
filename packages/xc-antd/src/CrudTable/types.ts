@@ -115,9 +115,11 @@ export interface CrudTableSearchActionsContext<Query extends CrudTableQuery> {
 
 export interface CrudTableSearchConfig<Query extends CrudTableQuery> {
   initialValues?: Partial<Query>;
+  /** 是否默认收起，默认 true。 */
   defaultCollapsed?: boolean;
   collapsed?: boolean;
   onCollapse?: (collapsed: boolean) => void;
+  /** 收起时保留的字段数；默认展示两行并为按钮留一格，单列布局保留两个字段。 */
   defaultColsNumber?: number;
   /** 原生栅格配置；响应式断点按查询区实际宽度计算。 */
   colProps?: ColProps;
@@ -142,7 +144,11 @@ export interface CrudTableOptions {
 }
 
 export interface CrudTableAdaptiveHeightConfig {
+  /** 默认 viewport 沿用视口测量；container 填满有确定高度的父容器。 */
+  mode?: 'viewport' | 'container';
+  /** 视口模式底部预留距离，默认 24px。 */
   offsetBottom?: number;
+  /** 视口模式表体最小高度，默认 280px。 */
   minHeight?: number;
 }
 
@@ -187,6 +193,7 @@ export interface CrudTableProps<
   options?: false | CrudTableOptions;
   /** 默认 small（紧凑），可使用 middle / large 调整密度。 */
   defaultSize?: 'large' | 'middle' | 'small';
+  /** true 按视口适配；mode: 'container' 自动衔接父容器、表体和分页的高度。 */
   adaptiveHeight?: boolean | CrudTableAdaptiveHeightConfig;
   dateFormatter?: 'string' | 'number' | false;
   postData?: (data: RecordType[]) => RecordType[];

@@ -14,9 +14,9 @@ interface DeleteButtonProps {
 export function GroupedSelectDeleteButton({ label, confirm, open, onOpenChange, onDelete }: DeleteButtonProps) {
   const button = (
     <Button
-      type="text"
+      color="primary"
+      variant="text"
       size="small"
-      danger
       aria-label={`删除${label}`}
       icon={<DeleteOutlined />}
       onClick={confirm === false ? () => void onDelete() : undefined}
@@ -35,7 +35,7 @@ export function GroupedSelectDeleteButton({ label, confirm, open, onOpenChange, 
       description={config.content ?? '删除后无法恢复，请谨慎操作。'}
       okText={config.okText ?? '确认删除'}
       cancelText={config.cancelText ?? '取消'}
-      okButtonProps={{ danger: true }}
+      okButtonProps={{ color: 'primary', variant: 'solid' }}
       onConfirm={onDelete}
     >
       {button}

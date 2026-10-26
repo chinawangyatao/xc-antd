@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Col, Form, Row, theme } from 'antd';
-import { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined } from '@ant-design/icons';
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { TextField } from '../TextField';
 import { mergeFormControlProps } from '../shared/formControlProps';
 import type {
@@ -136,7 +136,11 @@ export function CrudTableSearchForm<
     [columns],
   );
 
-  const defaultColsNumber = Math.max(1, Math.floor(config.defaultColsNumber ?? 3));
+  const span = Number(colProps.span ?? 24);
+  const columnsPerRow = span > 0 ? Math.max(1, Math.floor(24 / span)) : 1;
+  // 多列布局为第二行末尾的按钮预留一格；单列布局仍保留两个查询字段。
+  const twoRowFieldCount = columnsPerRow > 1 ? columnsPerRow * 2 - 1 : 2;
+  const defaultColsNumber = Math.max(1, Math.floor(config.defaultColsNumber ?? twoRowFieldCount));
   const visibleColumnCount = collapsed
     ? Math.min(searchableColumns.length, defaultColsNumber)
     : searchableColumns.length;
@@ -162,14 +166,13 @@ export function CrudTableSearchForm<
 
   if (searchableColumns.length === 0) return null;
 
-  const span = Number(colProps.span ?? 24);
-  const columnsPerRow = span > 0 ? Math.max(1, Math.floor(24 / span)) : 1;
   const actionOffset = getSearchActionOffset(visibleColumnCount, columnsPerRow, span);
   const actionButtons = {
     collapse: canCollapse && (
       <Button
         key="collapse"
         type="link"
+        className="xc-crud-table__search-collapse"
         icon={collapsed ? <DownOutlined /> : <UpOutlined />}
         aria-expanded={!collapsed}
         onClick={() => setCollapsed(!collapsed)}
@@ -178,12 +181,25 @@ export function CrudTableSearchForm<
       </Button>
     ),
     submit: (
-      <Button key="submit" type="primary" htmlType="submit" icon={<SearchOutlined />} loading={loading}>
+      <Button
+        key="submit"
+        type="primary"
+        htmlType="submit"
+        className="xc-crud-table__search-button"
+        autoInsertSpace={false}
+        loading={loading}
+      >
         {config.submitText ?? '查询'}
       </Button>
     ),
     reset: (
-      <Button key="reset" icon={<ReloadOutlined />} onClick={handleReset} disabled={loading}>
+      <Button
+        key="reset"
+        className="xc-crud-table__search-button xc-crud-table__search-reset"
+        autoInsertSpace={false}
+        onClick={handleReset}
+        disabled={loading}
+      >
         {config.resetText ?? '重置'}
       </Button>
     ),

@@ -192,6 +192,10 @@ describe('GroupedSelect', () => {
     expect(confirmed.props.title).toBe('确认删除标签 A吗？');
     expect(confirmed.props.children.props['aria-label']).toBe('删除标签 A');
     expect(direct.props['aria-label']).toBe('删除标签 A');
+    expect(confirmed.props.children.props.color).toBe('primary');
+    expect(direct.props.color).toBe('primary');
+    expect(direct.props).not.toHaveProperty('danger');
+    expect(confirmed.props.okButtonProps).toEqual({ color: 'primary', variant: 'solid' });
   });
 
   test('mounts delete confirmation outside the clipped Select dropdown', () => {

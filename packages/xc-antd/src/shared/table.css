@@ -1,0 +1,22 @@
+/* CrudTable / HocTable 共用外框与行高；颜色读取原生 Table Token，显式 bordered 保留网格。 */
+:is(.xc-crud-table__table, .xc-hoc-table__table)
+  .ant-table:not(.ant-table-bordered) > .ant-table-container {
+  overflow: hidden;
+  border: 1px solid var(--ant-table-border-color, var(--xc-color-split));
+  border-radius: 0;
+}
+
+:is(.xc-crud-table__table, .xc-hoc-table__table)
+  .ant-table:not(.ant-table-bordered) .ant-table-thead > tr > th::before {
+  display: none;
+}
+
+:is(.xc-crud-table__table, .xc-hoc-table__table) .ant-table-thead > tr > th {
+  height: 48px;
+}
+
+/* 行高为下限，多行内容仍随当前密度自然撑开；测量行不参与实际内容布局。 */
+:is(.xc-crud-table__table, .xc-hoc-table__table)
+  .ant-table-tbody > tr:not(.ant-table-measure-row) > td {
+  height: 50px;
+}

@@ -15,7 +15,6 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   EditOutlined,
-  PlusOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
 import {
@@ -249,12 +248,14 @@ const CrudTableDemo = () => {
   );
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '80vh', minHeight: 480 }}>
       <Typography.Title level={3} style={{ marginTop: 0 }}>
         CrudTable
       </Typography.Title>
       <Typography.Paragraph type="secondary">
+        查询区默认保留两行，末行右侧预留“展开 / 收起、查询、重置”，查询条件超出后可展开。
         默认紧凑模式，工具栏仅显示自定义列。可隐藏到仅剩操作列，恢复其他列后自动恢复固定列与横向滚动。
+        表格使用统一外边框；容器模式自动分配查询区、表体和分页高度。
       </Typography.Paragraph>
 
       <CrudTable<UserRecord, UserQuery>
@@ -264,7 +265,6 @@ const CrudTableDemo = () => {
         request={queryUsers}
         search={{
           defaultCollapsed: true,
-          defaultColsNumber: 4,
           colProps: { xs: 24, sm: 12, lg: 6 },
           rowProps: { gutter: 16 },
           extraActions: ({ form }) => (
@@ -322,7 +322,7 @@ const CrudTableDemo = () => {
         )}
         toolBarRender={() => (
           <>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => openEditor()}>
+            <Button type="primary" autoInsertSpace={false} onClick={() => openEditor()}>
               新增
             </Button>
             <Popconfirm
@@ -332,7 +332,6 @@ const CrudTableDemo = () => {
             >
               <Button
                 danger
-                icon={<DeleteOutlined />}
                 disabled={selectedRows.length === 0}
               >
                 批量删除
@@ -345,7 +344,7 @@ const CrudTableDemo = () => {
           persistenceType: 'localStorage',
         }}
         pagination={{ ...xcTablePagination, defaultPageSize: 10 }}
-        adaptiveHeight={{ minHeight: 360, offsetBottom: 24 }}
+        adaptiveHeight={{ mode: 'container' }}
       />
 
       <ActionDrawer

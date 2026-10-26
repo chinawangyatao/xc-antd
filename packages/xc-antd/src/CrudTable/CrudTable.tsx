@@ -45,6 +45,7 @@ import {
   getCrudColumnKey,
   type ColumnSettingItem,
 } from './utils';
+import '../shared/table.css';
 import './style.css';
 
 const DEFAULT_PAGE_SIZE = 10;
@@ -103,6 +104,8 @@ function useAdaptiveTableHeight(
       return;
     }
     const config = typeof adaptiveHeight === 'object' ? adaptiveHeight : {};
+    // 容器模式由 flex 高度链分配空间，不参与视口高度测量。
+    if (config.mode === 'container') return;
     const update = () => {
       const element = elementRef.current;
       if (!element) return;
@@ -572,6 +575,7 @@ export function CrudTable<
   };
 
   const adaptiveScrollY = useAdaptiveTableHeight(tableAreaRef, adaptiveHeight);
+  const fillContainer = typeof adaptiveHeight === 'object' && adaptiveHeight.mode === 'container';
   const resolvedOptions = options === false
     ? { reload: false, density: false, setting: false, fullScreen: false }
     : { ...DEFAULT_OPTIONS, ...options };
@@ -602,7 +606,11 @@ export function CrudTable<
   };
 
   return (
-    <div ref={rootRef} className={['xc-crud-table', className].filter(Boolean).join(' ')} style={{ ...themeStyle, ...style }}>
+    <div
+      ref={rootRef}
+      className={['xc-crud-table', fillContainer && 'xc-crud-table--adaptive', className].filter(Boolean).join(' ')}
+      style={{ ...themeStyle, ...style }}
+    >
       {searchConfig && (
         <CrudTableSearchForm
           columns={columns}
@@ -697,6 +705,7 @@ export function CrudTable<
       <div ref={tableAreaRef} className="xc-crud-table__table">
         <Table<RecordType>
           {...tableProps}
+          data-xc-crud-table-adaptive={fillContainer || undefined}
           rowKey={rowKey}
           columns={antdColumns}
           dataSource={displayData}
@@ -709,7 +718,7 @@ export function CrudTable<
           scroll={{
             x: antdColumns.length > 1 ? 'max-content' : undefined,
             ...tableProps?.scroll,
-            y: tableProps?.scroll?.y ?? adaptiveScrollY,
+            y: tableProps?.scroll?.y ?? (fillContainer ? '100%' : adaptiveScrollY),
           }}
         />
       </div>
