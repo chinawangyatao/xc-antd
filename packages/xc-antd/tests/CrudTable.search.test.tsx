@@ -28,6 +28,19 @@ describe('CrudTable search layout', () => {
     expect(html).not.toContain('收起');
   });
 
+  test.each([3, 4, 5])('keeps search actions aligned without an empty label for %d fields', (fieldCount) => {
+    const html = renderToStaticMarkup(
+      <CrudTable columns={columns.slice(0, fieldCount)} search={{ colProps: { span: 6 } }} options={false} pagination={false} />,
+    ).split('xc-crud-table__toolbar')[0];
+    const actionsHtml = html.split('xc-crud-table__search-actions-item')[1];
+
+    expect(html).toContain('ant-row-bottom');
+    expect(actionsHtml).toBeDefined();
+    expect(actionsHtml).toContain('查询');
+    expect(actionsHtml).toContain('重置');
+    expect(actionsHtml).not.toContain('ant-form-item-label');
+  });
+
   test.each([[1440, 7], [848, 3], [375, 2]])(
     'keeps two rows with room for actions at container width %d',
     (width, visibleCount) => {

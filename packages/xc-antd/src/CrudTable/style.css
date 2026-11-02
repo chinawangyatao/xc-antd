@@ -79,11 +79,6 @@
 
 .xc-crud-table__search {
   padding: var(--xc-padding-lg) var(--xc-table-padding-inline, var(--xc-padding-lg)) 8px;
-  border-bottom: 1px solid var(--xc-color-split);
-}
-
-.xc-crud-table__search-actions-item .ant-form-item-label {
-  visibility: hidden;
 }
 
 .xc-crud-table__search-actions-item .ant-form-item-control-input-content {

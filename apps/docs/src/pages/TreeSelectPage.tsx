@@ -191,6 +191,7 @@ const TreeSelectPage = () => {
     const [treeNodeType, setTreeNodeType] = useState<'all' | ScenicNodeType>('all');
     const [showAddButton, setShowAddButton] = useState(true);
     const [showSearchInput, setShowSearchInput] = useState(true);
+    const [searchIconPosition, setSearchIconPosition] = useState<'left' | 'right'>('right');
     const [showToolbarSelect, setShowToolbarSelect] = useState(true);
     const [horizontalScroll, setHorizontalScroll] = useState(true);
     const [dragEnabled, setDragEnabled] = useState(true);
@@ -225,7 +226,7 @@ const TreeSelectPage = () => {
             </Typography.Title>
             <Typography.Paragraph type="secondary">
                 ListPanel 用于平铺列表，ListTree 用于层级树；ListTree 支持前方、子级、后方三段式拖拽，
-                拖拽规则和持久化由业务回调注入。
+                拖拽规则和持久化由业务回调注入。树搜索图标默认在右侧，设置 searchIconPosition="left" 可移到左侧。
             </Typography.Paragraph>
 
             <Card size="small" title="交互配置" style={{ marginBottom: 16 }}>
@@ -241,6 +242,12 @@ const TreeSelectPage = () => {
                         checkedChildren="搜索显示"
                         unCheckedChildren="搜索隐藏"
                         onChange={setShowSearchInput}
+                    />
+                    <Switch
+                        checked={searchIconPosition === 'left'}
+                        checkedChildren="树搜索图标左侧"
+                        unCheckedChildren="树搜索图标右侧"
+                        onChange={(checked) => setSearchIconPosition(checked ? 'left' : 'right')}
                     />
                     <Switch
                         checked={showToolbarSelect}
@@ -299,6 +306,7 @@ const TreeSelectPage = () => {
                             defaultSelectedKeys={['0-0']}
                             showAddButton={showAddButton}
                             showSearchInput={showSearchInput}
+                            searchIconPosition={searchIconPosition}
                             showToolbarSelect={showToolbarSelect}
                             onAdd={() => showAction('添加')}
                             toolbarSelectProps={{

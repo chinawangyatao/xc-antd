@@ -7,6 +7,8 @@ import {
   message,
   Popconfirm,
   Select,
+  Space,
+  Switch,
   Tooltip,
   Typography,
   Upload,
@@ -96,6 +98,7 @@ const CrudTableDemo = () => {
   const [editorOpen, setEditorOpen] = React.useState(false);
   const [editingUser, setEditingUser] = React.useState<UserRecord>();
   const [selectedRows, setSelectedRows] = React.useState<UserRecord[]>([]);
+  const [showColumnSettingText, setShowColumnSettingText] = React.useState(false);
 
   const queryUsers = React.useCallback<CrudTableRequest<UserRecord, UserQuery>>(
     async (params, sorter) => {
@@ -256,13 +259,25 @@ const CrudTableDemo = () => {
         查询区默认保留两行，末行右侧预留“展开 / 收起、查询、重置”，查询条件超出后可展开。
         默认紧凑模式，工具栏仅显示自定义列。可隐藏到仅剩操作列，恢复其他列后自动恢复固定列与横向滚动。
         表格使用统一外边框；容器模式自动分配查询区、表体和分页高度。
+        columnSettingText 可将右上角的自定义列入口切换为文字，默认显示齿轮图标。
       </Typography.Paragraph>
+      <Space style={{ marginBottom: 16 }}>
+        <Typography.Text>自定义列入口：</Typography.Text>
+        <Switch
+          aria-label="自定义列入口显示文字"
+          checked={showColumnSettingText}
+          checkedChildren="文字"
+          unCheckedChildren="图标"
+          onChange={setShowColumnSettingText}
+        />
+      </Space>
 
       <CrudTable<UserRecord, UserQuery>
         actionRef={actionRef}
         rowKey="id"
         columns={columns}
         request={queryUsers}
+        columnSettingText={showColumnSettingText ? '自定义列' : undefined}
         search={{
           defaultCollapsed: true,
           colProps: { xs: 24, sm: 12, lg: 6 },

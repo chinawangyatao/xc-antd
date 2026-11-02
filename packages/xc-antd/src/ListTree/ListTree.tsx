@@ -64,6 +64,8 @@ export interface ListTreeProps<TreeDataType extends object = ListTreeDataNode>
   searchValue?: string;
   defaultSearchValue?: string;
   searchPlaceholder?: string;
+  /** 搜索图标位置，默认在右侧；searchInputProps 中的对应前后缀可覆盖默认图标。 */
+  searchIconPosition?: 'left' | 'right';
   searchInputProps?: Omit<InputProps, 'defaultValue' | 'value'>;
   onSearchChange?: (value: string) => void;
   getNodeSearchText?: (node: TreeDataType) => string;
@@ -239,6 +241,7 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
   searchValue,
   defaultSearchValue = '',
   searchPlaceholder = '请输入',
+  searchIconPosition = 'right',
   searchInputProps,
   onSearchChange,
   getNodeSearchText,
@@ -433,7 +436,8 @@ export function ListTree<TreeDataType extends object = ListTreeDataNode>({
               allowClear
               aria-label="搜索树节点"
               placeholder={searchPlaceholder}
-              suffix={<SearchOutlined />}
+              prefix={searchIconPosition === 'left' ? <SearchOutlined /> : undefined}
+              suffix={searchIconPosition === 'right' ? <SearchOutlined /> : undefined}
               {...restSearchInputProps}
               className={joinClassNames(
                 'xc-list-tree__search',
