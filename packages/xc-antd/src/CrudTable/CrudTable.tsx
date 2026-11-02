@@ -175,6 +175,7 @@ export function CrudTable<
     onSelectionChange,
     pagination = {},
     columnsState,
+    columnSettingText,
     options = {},
     defaultSize = 'small',
     adaptiveHeight,
@@ -579,6 +580,12 @@ export function CrudTable<
   const resolvedOptions = options === false
     ? { reload: false, density: false, setting: false, fullScreen: false }
     : { ...DEFAULT_OPTIONS, ...options };
+  let hasColumnSettingText = columnSettingText !== undefined
+    && columnSettingText !== null
+    && typeof columnSettingText !== 'boolean';
+  if (typeof columnSettingText === 'string') {
+    hasColumnSettingText = columnSettingText.trim().length > 0;
+  }
   const toolbar = toolBarRender?.(action, selectedRows);
   const densityItems = [
     { key: 'large', label: '宽松' },
@@ -664,7 +671,13 @@ export function CrudTable<
                 )}
               >
                 <Tooltip title="自定义列">
-                  <Button aria-label="自定义列" icon={<SettingOutlined />} />
+                  <Button
+                    aria-label={hasColumnSettingText ? undefined : '自定义列'}
+                    autoInsertSpace={false}
+                    icon={hasColumnSettingText ? undefined : <SettingOutlined />}
+                  >
+                    {hasColumnSettingText ? columnSettingText : null}
+                  </Button>
                 </Tooltip>
               </Popover>
             )}

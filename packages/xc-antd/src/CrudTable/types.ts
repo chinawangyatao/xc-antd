@@ -190,6 +190,8 @@ export interface CrudTableProps<
   onSelectionChange?: (selectedRows: RecordType[]) => void;
   pagination?: false | TablePaginationConfig;
   columnsState?: CrudTableColumnsStateConfig;
+  /** 自定义列入口的文字插槽；未传或内容为空时默认显示齿轮图标，受 options.setting 控制。 */
+  columnSettingText?: React.ReactNode;
   options?: false | CrudTableOptions;
   /** 默认 small（紧凑），可使用 middle / large 调整密度。 */
   defaultSize?: 'large' | 'middle' | 'small';
