@@ -239,8 +239,9 @@ export function CrudTableSearchForm<
             {...colProps}
             offset={actionOffset}
           >
-            {/* 由 Row 底部对齐输入框，避免按钮换行后仍为空标签保留高度。 */}
             <Form.Item
+              label={<span aria-hidden="true">&nbsp;</span>}
+              colon={false}
               className="xc-crud-table__search-actions-item"
             >
               <div className="xc-crud-table__search-actions">
